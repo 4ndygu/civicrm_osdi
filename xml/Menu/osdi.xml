@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/osdiimport</path>
+    <page_callback>CRM_Osdi_Form_OSDIImport</page_callback>
+    <title>OSDIImport</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
