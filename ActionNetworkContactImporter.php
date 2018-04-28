@@ -2,12 +2,12 @@
 
 require_once("AbstractContactImporter.php");
 
+use Jsor\HalClient\HalClient;
+
 class ActionNetworkContactImporter extends AbstractContactImporter
 {
 
     private $client;
-    private $explorer;
-    private $adapter;
 
     // constructor
     public function __construct($endpoint, $schema, $apikey) {
@@ -18,23 +18,17 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // demo api key is c173bee8d3238bb5bfc4dd014f207feb.
         // TODO: throw $apikey into some config file.
 
-        self.client = new \GuzzleHttp\Client();
-        self.explorer = new \HalExplorer\Explorer();
-        self.adapter = new \HalExplorer\ClientAdapters\Adapter();
 
-        self.adapter->setClient($client);
-        self.explorer->setAdapter($adapter)->setBaseUrl(self.endpoint);
-
-        // override default values for the headers
-        self.explorer->setDefaults(function($original){
-            $original["headers"]["Accept"] = "application/hal+json, application/json";
-            $original["headers"]["OSDI-API-Token"] = self.apikey;
-
-            return $original;
-        });
+        self.client = new HalClient(self.endpoint);
+        self.client = self.client->withHeader("OSDI-API-Token", self.apikey);
+        self.client = self.client->withHeader("Content-Type", "application/json");
     }
 
-    public function pull_endpoint_data() {
+    public function pull_endpoint_data($identifier) {
+        $resource = self.client->get('/people');
+    }
+
+    public function batch_pull_endpoint_data($identifiers) {
         
     }
 
