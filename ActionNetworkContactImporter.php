@@ -1,6 +1,7 @@
 <?php
 
 require_once("AbstractContactImporter.php");
+
 require __DIR__ . '/vendor/autoload.php';
 
 use Ekino\HalClient\HttpClient\FileGetContentsHttpClient;
@@ -10,6 +11,8 @@ use Ekino\HalClient\HttpClient\HttpClientInterface;
 use Ekino\HalClient\Resource;
 
 use GuzzleHttp\Client;
+
+//TODO: Configure my include path to allow civicrm.api.php for civicrm_api3
 
 class ActionNetworkContactImporter extends AbstractContactImporter
 {
@@ -61,6 +64,18 @@ class ActionNetworkContactImporter extends AbstractContactImporter
     }
 
     public function store_data($data) {
+        $embedded = $data->getEmbedded();
+
+        foreach ($embedded as $person) {
+            try {
+                $contacts = civicrm_api3('Contact', 'create', array(
+                    'first_name' => $person["given_name"],
+                    'last_name' => $person["last_name"]
+                ));
+            } catch (CiviCRM_API3_Exception $e) {
+                $error = $e->getMessage();
+            }
+        }
     }
 }
 ?>
