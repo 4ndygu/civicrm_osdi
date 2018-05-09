@@ -7,7 +7,6 @@
         }
     ],
     "require": {
-         "ekino/hal-client": "^1.0",
-         "guzzlehttp/guzzle": "~6.0"
+         "ekino/hal-client": "^1.0"
     }
 }
