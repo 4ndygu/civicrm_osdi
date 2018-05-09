@@ -4,6 +4,6 @@
     <path>civicrm/osdiimport</path>
     <page_callback>CRM_Osdi_Form_OSDIImport</page_callback>
     <title>OSDIImport</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>import contacts</access_arguments>
   </item>
 </menu>
