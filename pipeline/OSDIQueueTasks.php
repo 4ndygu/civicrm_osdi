@@ -7,8 +7,8 @@ class OSDIQueueTasks {
         foreach ($contacts as $contact) {
 			try {
   				$contacts = civicrm_api3('Contact', 'create', array(
-    				'first_name' => 'Alice',
-    				'last_name' => 'Roberts',
+    				'first_name' => $contact["first_name"],
+    				'last_name' => $contact["last_name"],
   				));
 			}
 			catch (CiviCRM_API3_Exception $e) {
@@ -17,7 +17,7 @@ class OSDIQueueTasks {
 
         }
 	}
- 
+
 }
 
 ?>

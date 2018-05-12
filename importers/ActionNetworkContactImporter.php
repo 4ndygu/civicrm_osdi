@@ -20,6 +20,8 @@ use GuzzleHttp\Client;
 class ActionNetworkContactImporter extends AbstractContactImporter
 {
 
+	private $queue;
+
     // constructor
     public function __construct($endpoint, $schema, $apikey) {
         $this->endpoint = $endpoint;
@@ -36,6 +38,9 @@ class ActionNetworkContactImporter extends AbstractContactImporter
        
         // seed a client in Guzzle to craft raw queries
         $this->raw_client = new GuzzleHttp\Client();
+
+		// setup queue
+		$this->queue = OSDIQueueHelper::singleton()->getQueue();
     }
 
     public function pull_endpoint_data() {
@@ -48,6 +53,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 		// a ResourceCollection implements the \Iterator and \Countable interface
 		foreach ($people as $person) {
 			#TODO: Throw into queue
+			$this->add_task_with_page($person);
         }
 
     }
@@ -96,6 +102,16 @@ class ActionNetworkContactImporter extends AbstractContactImporter
             }
         }
     }
+
+	public function add_task_with_page($page) {
+		$task = new CRM_Queue_Task(
+			array('OSDIQueueTasks', 'AddContact'), //call back method
+			array($page) //parameters
+		);
+
+		//now add this task to the queue
+		//$this->queue->createItem($task);
+	}
 }
 
 $x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", "8cfc0188d2c4616b855d9b1025ef9390");
