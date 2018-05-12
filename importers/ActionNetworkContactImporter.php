@@ -20,7 +20,7 @@ use GuzzleHttp\Client;
 class ActionNetworkContactImporter extends AbstractContactImporter
 {
 
-	private $queue;
+    private $queue;
 
     // constructor
     public function __construct($endpoint, $schema, $apikey) {
@@ -39,21 +39,21 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // seed a client in Guzzle to craft raw queries
         $this->raw_client = new GuzzleHttp\Client();
 
-		// setup queue
-		$this->queue = OSDIQueueHelper::singleton()->getQueue();
+        // setup queue
+        $this->queue = OSDIQueueHelper::singleton()->getQueue();
     }
 
     public function pull_endpoint_data() {
         // create an entry point to retrieve the data
         $resource_root = $this->entrypoint->get();// return the main resource
 
-		// retrieve a Resource object, which acts as a Pager
-		$people = $resource_root->get('osdi:people');
+        // retrieve a Resource object, which acts as a Pager
+        $people = $resource_root->get('osdi:people');
 
-		// a ResourceCollection implements the \Iterator and \Countable interface
-		foreach ($people as $person) {
-			#TODO: Throw into queue
-			$this->add_task_with_page($person);
+        // a ResourceCollection implements the \Iterator and \Countable interface
+        foreach ($people as $person) {
+            #TODO: Throw into queue
+            $this->add_task_with_page($person);
         }
 
     }
@@ -69,14 +69,14 @@ class ActionNetworkContactImporter extends AbstractContactImporter
                 'Content-Type' => "application/json"
             ]
         ]);
-	
+    
         // wrap everything into a hal-client resource so nobody knows I used Guzzle
         $response_string = $response->getBody()->getContents();
         $data = json_decode($response_string, true);
 
         $people = Resource::create($this->client, $data);        
         foreach ($people as $person) {
-    		#TODO: Throw into queue
+            #TODO: Throw into queue
         }
     }
 
@@ -103,15 +103,15 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         }
     }
 
-	public function add_task_with_page($page) {
-		$task = new CRM_Queue_Task(
-			array('OSDIQueueTasks', 'AddContact'), //call back method
-			array($page) //parameters
-		);
+    public function add_task_with_page($page) {
+        $task = new CRM_Queue_Task(
+            array('OSDIQueueTasks', 'AddContact'), //call back method
+            array($page) //parameters
+        );
 
-		//now add this task to the queue
-		//$this->queue->createItem($task);
-	}
+        //now add this task to the queue
+        //$this->queue->createItem($task);
+    }
 }
 
 $x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", "8cfc0188d2c4616b855d9b1025ef9390");
