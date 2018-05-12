@@ -97,8 +97,5 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         }
     }
 }
-
-$x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", "8cfc0188d2c4616b855d9b1025ef9390");
-$x->update_endpoint_data("2014-01-01");
 ?>
 
