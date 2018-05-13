@@ -14,7 +14,7 @@ class CRM_Osdi_Page_OSDI extends CRM_Core_Page {
 
     // Example: Assign a variable for use in a template
     $this->assign('currentTime', date('Y-m-d H:i:s'));
-	$x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", "6db80edbd8ed5b41f28cb37ec007f129");
+	$x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", "rolling these again");
 	$x->pull_endpoint_data();
 
     parent::run();
