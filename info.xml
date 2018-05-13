@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="com.example.osdi" type="module">
   <file>osdi</file>
-  <name>FIXME</name>
+  <name>OSDI sample application</name>
   <description>FIXME</description>
   <license>AGPL-3.0</license>
   <classloader>

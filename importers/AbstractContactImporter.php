@@ -23,7 +23,6 @@ abstract class AbstractContactImporter
     abstract public function update_endpoint_data($date);
     abstract public function validate_endpoint_data($data);
     abstract public function format_data($data);
-    abstract public function store_data($data);
 	abstract public function add_task_with_page($page);
 }
 ?>

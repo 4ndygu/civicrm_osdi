@@ -12,12 +12,13 @@
     require_once $filename;
 }*/
 
-set_include_path(get_include_path() . PATH_SEPARATOR . "/home/student/buildkit/build/my-drupal-civi47/sites/all/modules/civicrm");
+/*set_include_path(get_include_path() . PATH_SEPARATOR . "/home/student/buildkit/build/my-drupal-civi47/sites/all/modules/civicrm");
 require_once __DIR__ . '/../../../../CRM/Core/DAO.php';
 foreach (glob(__DIR__ . '/../../../../CRM/Queue/*.php') as $filename)
 {
     require_once $filename;
-}
+}*/
+//eval(`cv php:boot`);
 
 class OSDIQueueHelper
 {

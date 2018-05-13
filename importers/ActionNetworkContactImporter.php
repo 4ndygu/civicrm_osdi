@@ -88,21 +88,6 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         //TODO: format_data
     }
 
-    public function store_data($data) {
-        $embedded = $data->getEmbedded();
-
-        foreach ($embedded as $person) {
-            try {
-                $contacts = civicrm_api3('Contact', 'create', array(
-                    'first_name' => $person["given_name"],
-                    'last_name' => $person["last_name"]
-                ));
-            } catch (CiviCRM_API3_Exception $e) {
-                $error = $e->getMessage();
-            }
-        }
-    }
-
     public function add_task_with_page($page) {
         $task = new CRM_Queue_Task(
             array('OSDIQueueTasks', 'AddContact'), //call back method
@@ -110,11 +95,8 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         );
 
         //now add this task to the queue
-        //$this->queue->createItem($task);
+        $this->queue->createItem($task);
     }
 }
-
-$x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", "8cfc0188d2c4616b855d9b1025ef9390");
-$x->update_endpoint_data("2014-01-01");
 ?>
 

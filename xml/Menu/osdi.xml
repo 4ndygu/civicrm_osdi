@@ -1,9 +1,15 @@
 <?xml version="1.0"?>
 <menu>
   <item>
-    <path>civicrm/osdiimport</path>
-    <page_callback>CRM_Osdi_Form_OSDIImport</page_callback>
-    <title>OSDIImport</title>
-    <access_arguments>import contacts</access_arguments>
+    <path>civicrm/OSDI</path>
+    <page_callback>CRM_Osdi_Page_OSDI</page_callback>
+    <title>OSDI</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/osdi/queue/runner</path>
+    <page_callback>CRM_Osdi_Page_OSDIQueueRunner</page_callback>
+    <title>OSDIQueueRunner</title>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>
