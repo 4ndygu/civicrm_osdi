@@ -1,21 +1,26 @@
 <?php
 class OSDIQueueTasks {
 
-	public static function AddContact($contacts) {
+	public static function AddContact(CRM_Queue_TaskContext $context, $contact) {
 		// this expects a hal object that represents a page of contacts
 		// where do u load an action?
-		var_dump("appending this shit");
-		try {
+		CRM_Core_Session::setStatus('executing add contact task', 'Queue task', 'success');
+
+		/*try {
+			$properties = $contacts->getProperties();
 			$result = civicrm_api3('Contact', 'create', array(
-				'first_name' => $contacts["first_name"],
-				'last_name' => $contacts["last_name"],
+				'first_name' => $properties["first_name"],
+				'last_name' => $properties["last_name"],
+				'email' => $properties["email_addresses"][0]["address"],
+				'display_name' => $properties["last_name"],
 				'contact_type' => 'Individual'
 			));
 		}
 		catch (CiviCRM_API3_Exception $e) {
 			$error = $e->getMessage();
-		}
-		var_dump("hello");
+		}*/
+
+		return True;
 	}
 
 }

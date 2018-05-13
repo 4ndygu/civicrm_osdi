@@ -53,6 +53,8 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // a ResourceCollection implements the \Iterator and \Countable interface
         foreach ($people as $person) {
             #TODO: Throw into queue
+			echo "adding to queue" . PHP_EOL;
+			//$person_json = json_encode($person->getProperties());
             $this->add_task_with_page($person);
         }
 

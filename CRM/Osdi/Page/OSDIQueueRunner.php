@@ -18,7 +18,8 @@ class CRM_Osdi_Page_OSDIQueueRunner extends CRM_Core_Page {
 			'onEndUrl' => CRM_Utils_System::url('civicrm', 'reset=1'), //go to page after all tasks are finished
 		));
 
-		$runner->runAllViaWeb(); // does not return
+		var_dump("doing this");
+		var_dump($runner->runAll()); // does not return
 	}
 
 	static function onEnd(CRM_Queue_TaskContext $ctx) {
