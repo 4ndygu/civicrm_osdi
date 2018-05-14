@@ -9,7 +9,6 @@ class CRM_Osdi_Page_OSDIRunner extends CRM_Core_Page {
 
 		//retrieve the queue
 		$queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
-		var_dump($queue);
 		$runner = new CRM_Queue_Runner(array(
 			'title' => ts('OSDI Queue Page runner'), //title fo the queue
 			'queue' => $queue, //the queue object

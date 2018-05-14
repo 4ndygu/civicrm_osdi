@@ -56,7 +56,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
             #TODO: Throw into queue
 			//$person_json = json_encode($person->getProperties());
 			if ($this->validate_endpoint_data($person)) {
-            	$this->add_task_with_page($person);
+				$this->add_task_with_page($person);
 				$counter++;
 			}
         }
@@ -66,7 +66,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
     public function update_endpoint_data($date) {
         // TODO: sanitize this input later
-        $query_string = "/people?filter=modified_date gt " . $date;
+        $query_string = "/people?filter=modified_date gt '" . $date . "'";
         $full_uri = $this->endpoint . $query_string;
 
         $response = $this->raw_client->request('GET', $full_uri, [
@@ -80,9 +80,15 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $response_string = $response->getBody()->getContents();
         $data = json_decode($response_string, true);
 
-        $people = Resource::create($this->client, $data);        
+		$data = Resource::create($this->client, $data);        
+		$people = $data->get('osdi:people');
+
+		$counter = 0;
         foreach ($people as $person) {
-            #TODO: Throw into queue
+			if ($this->validate_endpoint_data($person)) {
+				$this->add_task_with_page($person);
+				$counter++;
+			}
         }
     }
 
