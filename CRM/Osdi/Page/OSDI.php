@@ -12,9 +12,9 @@ class CRM_Osdi_Page_OSDI extends CRM_Core_Page {
     // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
     CRM_Utils_System::setTitle(E::ts('OSDI'));
 
-    // Example: Assign a variable for use in a template
-    $this->assign('currentTime', date('Y-m-d H:i:s'));
-	$x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", "rolling these again");
+	$configs = include('config.php');
+
+	$x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $configs["key"]);
 	$x->pull_endpoint_data();
 
     parent::run();
