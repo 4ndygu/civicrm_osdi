@@ -14,9 +14,12 @@ class CRM_Osdi_Page_OSDI extends CRM_Core_Page {
 
 	$configs = include('config.php');
 
-	$x = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $configs["key"]);
-	$x->pull_endpoint_data();
+	$this->assign('taskNumber', '0');
+	$importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $configs["key"]);
+	$count = $importer->pull_endpoint_data();
 
+	$this->assign('taskNumber', $count);
+	$this->assign('completed', "yes");
     parent::run();
   }
 

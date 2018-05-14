@@ -49,15 +49,19 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
         // retrieve a Resource object, which acts as a Pager
         $people = $resource_root->get('osdi:people');
+
+		$counter = 0;
         // a ResourceCollection implements the \Iterator and \Countable interface
         foreach ($people as $person) {
             #TODO: Throw into queue
 			//$person_json = json_encode($person->getProperties());
 			if ($this->validate_endpoint_data($person)) {
             	$this->add_task_with_page($person);
+				$counter++;
 			}
         }
 
+		return $counter;
     }
 
     public function update_endpoint_data($date) {
