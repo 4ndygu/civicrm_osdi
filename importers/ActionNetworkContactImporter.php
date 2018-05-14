@@ -40,7 +40,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $this->raw_client = new GuzzleHttp\Client();
 
         // setup queue
-        $this->queue = OSDIQueueHelper::singleton()->getQueue();
+        $this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
     }
 
     public function pull_endpoint_data() {
@@ -92,9 +92,10 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
     public function add_task_with_page($page) {
         $task = new CRM_Queue_Task(
-            array('OSDIQueueTasks', 'AddContact'), //call back method
-            array($page) //parameters
+            array('CRM_OSDIQueue_Tasks', 'AddContact'), //call back method
+            array($page->getProperties())
         );
+		echo "Added jobs to queue." . PHP_EOL;
 
         //now add this task to the queue
         $this->queue->createItem($task);

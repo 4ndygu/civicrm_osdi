@@ -7,9 +7,9 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-    <path>civicrm/osdi/queue/runner</path>
-    <page_callback>CRM_Osdi_Page_OSDIQueueRunner</page_callback>
-    <title>OSDIQueueRunner</title>
+    <path>civicrm/OSDIQueue/runner</path>
+    <page_callback>CRM_Osdi_Page_OSDIRunner</page_callback>
+    <title>OSDIRunner</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

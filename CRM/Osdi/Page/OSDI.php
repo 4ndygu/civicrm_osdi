@@ -1,7 +1,7 @@
 <?php
 
 // include the importer classes
-require_once __DIR__ . '/OSDIQueueHelper.php';
+//require_once __DIR__ . '/OSDIQueueHelper.php';
 require_once __DIR__ . '/../../../importers/ActionNetworkContactImporter.php';
 
 use CRM_Osdi_ExtensionUtil as E;

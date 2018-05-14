@@ -20,7 +20,7 @@ foreach (glob(__DIR__ . '/../../../../CRM/Queue/*.php') as $filename)
 }*/
 //eval(`cv php:boot`);
 
-class OSDIQueueHelper
+class CRM_OSDIQueue_Helper
 {
     const QUEUE_NAME = 'com.civicrm.osdiqueue';
     private $queue;
@@ -37,7 +37,7 @@ class OSDIQueueHelper
     }
 
     public static function singleton() {
-        if (!self::$singleton) self::$singleton = new OSDIQueueHelper();
+        if (!self::$singleton) self::$singleton = new CRM_OSDIQueue_Helper();
         return self::$singleton;
     }
 
