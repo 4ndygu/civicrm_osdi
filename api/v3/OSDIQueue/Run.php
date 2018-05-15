@@ -32,6 +32,8 @@ function civicrm_api3_o_s_d_i_queue_Run($params) {
 	    'title' => ts('OSDI Queue runner'), //title fo the queue
 	    'queue' => $queue, //the queue object
 	    'errorMode'=> CRM_Queue_Runner::ERROR_CONTINUE, //continue on error otherwise the queue will hang
+		'onEnd' => array('CRM_OSDIQueue_Runner', 'onEnd'),
+		'onEndUrl' => CRM_Utils_System::url('civicrm/xxxx', 'reset=0'),
     ));
 
 	$maxRunTime = time() + 30; //stop executing next item after 30 seconds
@@ -40,6 +42,7 @@ function civicrm_api3_o_s_d_i_queue_Run($params) {
         $result = $runner->runNext(false);
         if (!$result['is_continue']) {
             $continue = false; //all items in the queue are processed
+			$runner->handleEnd();
         }
         $returnValues[] = $result;
     }
