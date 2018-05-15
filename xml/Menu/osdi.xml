@@ -12,4 +12,10 @@
     <title>OSDIRunner</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/osdi/config</path>
+    <page_callback>CRM_Osdi_Page_Configure</page_callback>
+    <title>Configure</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
