@@ -37,7 +37,7 @@
 				});
 			}
 		}
-		//CRM.api('importer', 'import', {params}, {success: function});
+
 		e.preventDefault();
 	});
 </script>

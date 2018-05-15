@@ -47,19 +47,22 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // create an entry point to retrieve the data
         $resource_root = $this->entrypoint->get();// return the main resource
 
-        // retrieve a Resource object, which acts as a Pager
-        $people = $resource_root->get('osdi:people');
 
 		$counter = 0;
-        // a ResourceCollection implements the \Iterator and \Countable interface
-        foreach ($people as $person) {
-            #TODO: Throw into queue
-			//$person_json = json_encode($person->getProperties());
-			if ($this->validate_endpoint_data($person)) {
-				$this->add_task_with_page($person);
-				$counter++;
+		while ($resource_root != NULL) {
+			// retrieve a Resource object, which acts as a Pager
+			$people = $resource_root->get('osdi:people');
+
+			// a ResourceCollection implements the \Iterator and \Countable interface
+			foreach ($people as $person) {
+				#TODO: Throw into queue
+				//$person_json = json_encode($person->getProperties());
+				if ($this->validate_endpoint_data($person)) {
+					$this->add_task_with_page($person);
+					$counter++;
+				}
 			}
-        }
+			$resource_root = $resource_root->get('next');
 
 		return $counter;
     }
@@ -81,15 +84,21 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $data = json_decode($response_string, true);
 
 		$data = Resource::create($this->client, $data);        
-		$people = $data->get('osdi:people');
 
 		$counter = 0;
-        foreach ($people as $person) {
-			if ($this->validate_endpoint_data($person)) {
-				$this->add_task_with_page($person);
-				$counter++;
+		while ($data != NULL) {
+			$people = $data->get('osdi:people');
+
+			foreach ($people as $person) {
+				if ($this->validate_endpoint_data($person)) {
+					$this->add_task_with_page($person);
+					$counter++;
+				}
 			}
-        }
+
+			$data = $data->get('next');
+		}
+
     }
 
     public function validate_endpoint_data($person) {
@@ -108,7 +117,6 @@ class ActionNetworkContactImporter extends AbstractContactImporter
             array('CRM_OSDIQueue_Tasks', 'AddContact'), //call back method
             array($page->getProperties())
         );
-		echo "Added jobs to queue." . PHP_EOL;
 
         //now add this task to the queue
         $this->queue->createItem($task);
