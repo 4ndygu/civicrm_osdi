@@ -12,7 +12,7 @@ use CRM_Osdi_ExtensionUtil as E;
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
  */
 function _civicrm_api3_updater_Update_spec(&$spec) {
-  $spec['key']['api.required'] = 1;
+	$spec['key']['api.required'] = 1;
 }
 
 /**
@@ -30,7 +30,6 @@ function civicrm_api3_updater_Update($params) {
 	$date = date('Y-m-d', time());
 
 	// run the importer
-
     $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
     $importer->update_endpoint_data($date);
 

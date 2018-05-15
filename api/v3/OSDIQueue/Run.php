@@ -24,24 +24,25 @@ function _civicrm_api3_o_s_d_i_queue_Run_spec(&$spec) {
  */
 function civicrm_api3_o_s_d_i_queue_Run($params) {
 	$returnValues = array();
- 
+
 	//retrieve the queue
 	$queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
-	$runner = new CRM_Osdi_Page_OSDIRunner(array(
-	    'title' => ts('OSDI Queue runner'), //title fo the queue
-	    'queue' => $queue, //the queue object
-	    'errorMode'=> CRM_Queue_Runner::ERROR_CONTINUE, //continue on error otherwise the queue will hang
-  ));
- 
+
+	$runner = new CRM_Queue_Runner(array(
+	    'title' => ts('OSDI Queue runner'), //title fo the queue
+	    'queue' => $queue, //the queue object
+	    'errorMode'=> CRM_Queue_Runner::ERROR_CONTINUE, //continue on error otherwise the queue will hang
+    ));
+
 	$maxRunTime = time() + 30; //stop executing next item after 30 seconds
 	$continue = true;
 	while(time() < $maxRunTime && $continue) {
-    	$result = $runner->runNext(false);
-		if (!$result['is_continue']) {
-			$continue = false; //all items in the queue are processed
-		}
-		$returnValues[] = $result;
-	}
+        $result = $runner->runNext(false);
+        if (!$result['is_continue']) {
+            $continue = false; //all items in the queue are processed
+        }
+        $returnValues[] = $result;
+    }
 
 	return civicrm_api3_create_success($returnValues, $params, 'OSDIQueue', 'Run');
 }
