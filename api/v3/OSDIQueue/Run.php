@@ -34,15 +34,7 @@ function civicrm_api3_o_s_d_i_queue_Run($params) {
 	    'errorMode'=> CRM_Queue_Runner::ERROR_CONTINUE, //continue on error otherwise the queue will hang
     ));
 
-	$maxRunTime = time() + 30; //stop executing next item after 30 seconds
-	$continue = true;
-	while(time() < $maxRunTime && $continue) {
-        $result = $runner->runNext(false);
-        if (!$result['is_continue']) {
-            $continue = false; //all items in the queue are processed
-        }
-        $returnValues[] = $result;
-    }
+	$result = $runner->runAll();
 
 	return civicrm_api3_create_success($returnValues, $params, 'OSDIQueue', 'Run');
 }
