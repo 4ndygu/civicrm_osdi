@@ -32,8 +32,8 @@
 			if (data["resource"] == 1) {
 				console.log("calling api");
 				CRM.api3('Importer', 'import', {"key": data["apikey"]}).done(function(result) {
-					alert("ASDFASDFASDF");
-					console.log(result);
+					var returnedCount = result["values"]["count"];	
+					alert("Added " + returnedCount + " tasks.");
 				});
 			}
 		}

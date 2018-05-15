@@ -1,6 +1,8 @@
 <?php
 use CRM_Osdi_ExtensionUtil as E;
 
+require_once __DIR__ . '/../../../importers/ActionNetworkContactImporter.php';
+
 /**
  * Importer.Import API specification (optional)
  * This is used for documentation and validation.
