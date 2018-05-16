@@ -61,4 +61,17 @@ class api_v3_OSDIQueue_RunTest extends \PHPUnit_Framework_TestCase implements He
     #TODO: Generate group with one user and check its presence in the DB
   }
 
+  /**
+   * Test empty queue on a sequential run
+   */
+  public function testEmptyQueue() {
+    $queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+
+    $result = civicrm_api3('OSDIQueue', 'Run');
+    $this->assertEquals(0, $queue->numberOfItems());
+
+    $result = civicrm_api3('OSDIQueue', 'Run');
+    $this->assertEquals(0, $queue->numberOfItems());
+  }
+
 }
