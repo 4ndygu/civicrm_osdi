@@ -41,8 +41,15 @@ class ActionNetworkContactImporter extends AbstractContactImporter
     }
 
     public function pull_endpoint_data() {
+		$counter = 0;
+
         // create an entry point to retrieve the data
         $resource_root = $this->entrypoint->get();// return the main resource
+
+		if ($resource_root->get("osdi:people") == NULL) {
+			$counter = 1;
+			return $counter;
+		}
 
 		// shunt the root into the queue
 		if (!isset($_SESSION["extractors"])) {
@@ -51,7 +58,6 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
 		$_SESSION["extractors"][] = serialize($resource_root);
 		
-		$counter = 0;
 		return $counter;
     }
 
