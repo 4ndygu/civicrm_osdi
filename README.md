@@ -1,5 +1,7 @@
 # com.example.osdi
 
+[![Coverage Status](https://coveralls.io/repos/github/4ndygu/civicrm_osdi/badge.svg?branch=master)](https://coveralls.io/github/4ndygu/civicrm_osdi?branch=master)
+
 ![Screenshot](/images/screenshot.png)
 
 (*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
