@@ -40,7 +40,20 @@ function civicrm_api3_importer_Schedule($params) {
 	}
 
 	// run this 20 times, quit if you hit NULL
-	$root = unserialize(array_pop($_SESSION["extractors"]));
+	$to_unserialize = array_pop($_SESSION["extractors"]);
+	$malformed = false;
+	if (is_string($to_unserialize)) {
+		$root = unserialize($to_unserialize);
+	} else {
+		$malformed = true;
+	}
+
+	if ($malformed or ! ($root instanceof Ekino\HalClient\Resource)) {
+		$returnValues["status"] = "malformed data";
+		CRM_Core_Session::setStatus('malformed data. removing from queue', 'Queue task', 'success');
+		return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
+	}
+	
 	//$this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
 	if ($root == NULL) {
@@ -51,6 +64,11 @@ function civicrm_api3_importer_Schedule($params) {
 	$counter = 0;
 	for ($i = 0; $i <= 10; $i++) {
 		$people = $root->get('osdi:people');
+		if ($people == NULL) {
+			$returnValues["status"] = "malformed data";
+			CRM_Core_Session::setStatus('malformed data. removing from queue', 'Queue task', 'success');
+			return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
+		}
 	
 		foreach ($people as $person) {
 			if (ActionNetworkContactImporter::validate_endpoint_data($person)) {
