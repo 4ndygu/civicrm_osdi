@@ -69,7 +69,7 @@ The push_endpoint_data function will return all users in CiviCRM in a hal/json f
 
 ### Schedule
 
-The schedule for this project is attached [here](google.com).
+The schedule for this project is attached [here](https://docs.google.com/document/d/1wqB8Ax73ZjcrSrs2_3C_pTLzOEKkTFTCr5tt4lzsUmo/edit?usp=sharing).
 
 ### Profiles
 
