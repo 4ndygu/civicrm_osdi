@@ -1,6 +1,6 @@
 # Open Supporter Data Integration
 
-If you have any qusetions / comments, feel fre to reach me on Mattermost as everykittysdaydream.
+If you have any questions / comments, feel fre to reach me on Mattermost as everykittysdaydream.
 
 ### Synopsis
 The Open Supporter Data Interface (OSDI) is a set of standards which aims to define a common interface for sharing data in a common format between progressive and nonprofit organizations. Currently, there is no reliable CiviCRM extension that allows organizations to implement the OSDI API across the platform. This project will create an extension that allows organizations to easily import data from external endpoints which are compliant with the the OSDI standard. This permits users to sync contact data across different platforms, setting CiviCRM as a single “source of truth” against other services such as Action Network, ActBlue, etc.
