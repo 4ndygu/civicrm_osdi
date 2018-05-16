@@ -37,7 +37,7 @@ Import Participants requires the remote server to support the People resource.
 Import Memberships requires the remote server to support the People resource.
 Batch Data Entry requires the remote server to support the Donations and Fundraising Pages resource. 
 
-In order of priority, it is most important to support accessing the Contact resource. Our base case is to support a sync function against an external endpoint. This will load all Contact resources from an external endpoint and also generate a Scheduled Job that pulls all newly modified users and loads them into CiviCRM.
+In order of priority, it is most important to support accessing the Contact resource most, because the most endpoints support it. Our base case is to support a sync function against an external endpoint. This will load all Contact resources from an external endpoint and also generate a Scheduled Job that pulls all newly modified users and loads them into CiviCRM.
 
 While we believe this limited set of imports is the most important, if time permits, our stretch goal is to allow imports from the full set (or a part of the full set) of OSDI objects. 
 
