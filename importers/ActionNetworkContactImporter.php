@@ -84,10 +84,10 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 			$_SESSION["extractors"] = array();
 		} 
 
-		$_SESSION["extractors"][] = serialize($resource_root);
+		$_SESSION["extractors"][] = serialize($data);
 
-		$counter = 0;
-		return $counter;
+		$serialized_item = serialize($data);
+		return $serialized_item;
     }
 
     public static function validate_endpoint_data($person) {
@@ -114,5 +114,6 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $tempqueue->createItem($task);
     }
 }
+
 ?>
 
