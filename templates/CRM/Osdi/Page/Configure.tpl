@@ -10,10 +10,8 @@
 		<option value="1">Contacts</option>
 	</select>
 	<br>
-	<input type="checkbox" name="update">Update data periodically</input>
-	<br>
 	<p>API Key:</p> 
-	<input type="text" name="apikey">
+	<input type="text" name="apikey" id="apikey">
 	<br>
 	<button>Sync data<button>
 </form>
@@ -33,7 +31,11 @@
 				console.log("calling api");
 				CRM.api3('Importer', 'import', {"key": data["apikey"]}).done(function(result) {
 					var returnedCount = result["values"]["count"];	
-					alert("Added " + returnedCount + " tasks.");
+					if (returnedCount == 0) {
+						alert("Jobs added to queue successfully.");
+					} else {
+						alert("ERROR: Jobs not added successfully.");
+					}
 				});
 			}
 		}

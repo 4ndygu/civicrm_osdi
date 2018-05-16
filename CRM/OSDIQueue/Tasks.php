@@ -20,6 +20,5 @@ class CRM_OSDIQueue_Tasks {
 
 		return True;
 	}
-
 }
 ?>

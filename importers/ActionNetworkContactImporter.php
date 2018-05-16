@@ -10,9 +10,6 @@ use Ekino\HalClient\EntryPoint;
 use Ekino\HalClient\HttpClient\HttpClientInterface;
 use Ekino\HalClient\Resource;
 
-//TODO: this isn't right lmao
-require __DIR__ . '/../../../../vendor/autoload.php';
-
 use GuzzleHttp\Client;
 
 //TODO: Configure my include path to allow civicrm.api.php for civicrm_api3
@@ -47,23 +44,14 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // create an entry point to retrieve the data
         $resource_root = $this->entrypoint->get();// return the main resource
 
+		// shunt the root into the queue
+		if (!isset($_SESSION["extractors"])) {
+			$_SESSION["extractors"] = array();
+		} 
 
+		$_SESSION["extractors"][] = serialize($resource_root);
+		
 		$counter = 0;
-		while ($resource_root != NULL) {
-			// retrieve a Resource object, which acts as a Pager
-			$people = $resource_root->get('osdi:people');
-
-			// a ResourceCollection implements the \Iterator and \Countable interface
-			foreach ($people as $person) {
-				#TODO: Throw into queue
-				//$person_json = json_encode($person->getProperties());
-				if ($this->validate_endpoint_data($person)) {
-					$this->add_task_with_page($person);
-					$counter++;
-				}
-			}
-			$resource_root = $resource_root->get('next');
-
 		return $counter;
     }
 
@@ -85,23 +73,18 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
 		$data = Resource::create($this->client, $data);        
 
+		// shunt the root into the queue
+		if (!isset($_SESSION["extractors"])) {
+			$_SESSION["extractors"] = array();
+		} 
+
+		$_SESSION["extractors"][] = serialize($resource_root);
+
 		$counter = 0;
-		while ($data != NULL) {
-			$people = $data->get('osdi:people');
-
-			foreach ($people as $person) {
-				if ($this->validate_endpoint_data($person)) {
-					$this->add_task_with_page($person);
-					$counter++;
-				}
-			}
-
-			$data = $data->get('next');
-		}
-
+		return $counter;
     }
 
-    public function validate_endpoint_data($person) {
+    public static function validate_endpoint_data($person) {
 		$properties = $person->getProperties();
 		$checks = array("family_name", "given_name", "email_addresses");
 		foreach ($checks as $check) {
@@ -112,14 +95,17 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 		return True;
     }
 
-    public function add_task_with_page($page) {
+    public static function add_task_with_page($page) {
+		// this queue is created as a temp copy to preserve the static function
+		$tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+
         $task = new CRM_Queue_Task(
             array('CRM_OSDIQueue_Tasks', 'AddContact'), //call back method
             array($page->getProperties())
         );
 
         //now add this task to the queue
-        $this->queue->createItem($task);
+        $tempqueue->createItem($task);
     }
 }
 ?>
