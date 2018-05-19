@@ -8,6 +8,7 @@ use Ekino\HalClient\Resource;
 use CRM_Osdi_ExtensionUtil as E;
 
 require_once __DIR__ . '/../../../importers/ActionNetworkContactImporter.php';
+require_once __DIR__ . '/../../../importers/ResourceStruct.php';
 
 /**
  * Importer.Schedule API specification (optional)
@@ -43,16 +44,18 @@ function civicrm_api3_importer_Schedule($params) {
 	$to_unserialize = array_pop($_SESSION["extractors"]);
 	$malformed = false;
 	if (is_string($to_unserialize)) {
-		$root = unserialize($to_unserialize);
+		$rootdata = unserialize($to_unserialize);
 	} else {
 		$malformed = true;
 	}
 
-	if ($malformed or ! ($root instanceof Ekino\HalClient\Resource)) {
+	if ($malformed or ! ($rootdata instanceof ResourceStruct)) {
 		$returnValues["status"] = "malformed data";
 		CRM_Core_Session::setStatus('malformed data. removing from queue', 'Queue task', 'success');
 		return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
 	}
+
+    $root = $rootdata->resource;
 	
 	//$this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
@@ -71,8 +74,8 @@ function civicrm_api3_importer_Schedule($params) {
 		}
 	
 		foreach ($people as $person) {
-			if (ActionNetworkContactImporter::validate_endpoint_data($person)) {
-				ActionNetworkContactImporter::add_task_with_page($person);
+			if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter)) {
+				ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule);
 				$counter++;
 			}
 		}
@@ -88,7 +91,9 @@ function civicrm_api3_importer_Schedule($params) {
 	// in this case, we still got stuff to do! so im gonna put it back into the array.
 	// i throw it into tthe back to prevent starvation in event of multiple extractors
 	CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
-	$_SESSION["extractors"][] = serialize($root);
+
+    $returned_data = new ResourceStruct($root, $rootdata->rule, $rootdata->filter);
+	$_SESSION["extractors"][] = serialize($returned_data);
 
 	$returnValues["status"] = "partially completed";
 	$returnValues["counter"] = $counter;

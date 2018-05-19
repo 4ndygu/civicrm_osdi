@@ -13,10 +13,22 @@
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
 	<br>
+    <p>Rule ID:</p>
+    <input type="text" name="rule" id="rule">
+    <br>
+    <p>Specify Required Fields:</p>
+    <input type="text" name="required" id="required">
 	<button>Sync data<button>
 </form>
 {literal}
 <script type="text/javascript">
+
+    function isInt(value) {
+        return !isNaN(value) && 
+            parseInt(Number(value)) == value && 
+            !isNaN(parseInt(value, 10));
+    }
+
 
 	CRM.$("#OSDIRequestForm").submit(function(e) {
 		
@@ -29,7 +41,7 @@
 		if (data["endpoint"] == 1) {
 			if (data["resource"] == 1) {
 				console.log("calling api");
-				CRM.api3('Importer', 'import', {"key": data["apikey"]}).done(function(result) {
+				CRM.api3('Importer', 'import', {"key": data["apikey"], "rule": data["rule"], "required": data["required"]}).done(function(result) {
 					var returnedCount = result["values"]["count"];	
 					if (returnedCount == 0) {
 						alert("Jobs added to queue successfully.");
