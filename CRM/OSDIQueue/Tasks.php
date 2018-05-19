@@ -24,11 +24,18 @@ class CRM_OSDIQueue_Tasks {
 		catch (Exception $e) {
 			return False;
 		}
+	}
 
+    public static function MergeContacts(CRM_Queue_TaskContext $context, $contact_wrapper) {
+        var_dump("merging");
+        $contactresource = unserialize($contact_wrapper);
         $rule = $contactresource->rule;
-        if ($rule == NULL) return True;
+        if ($rule == NULL or $rule == -1) return True;
+
+        $dupes = CRM_Dedupe_Finder::dupes($rule);
+        //$result = CRM_Dedupe_Merger::merge($dupes);
 
 		return True;
-	}
+    }
 }
 ?>

@@ -29,9 +29,19 @@ function civicrm_api3_updater_Update($params) {
 	// get the current date
 	$date = date('Y-m-d', time());
 
+    $filter = NULL;
+    $rule = NULL;
+    if (isset($params["required"])) {
+        $filter = $params["required"];
+    }
+  
+    if (isset($params["rule"])) {
+        $rule = $params["rule"];
+    }
+
 	// run the importer
     $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
-    $result = $importer->update_endpoint_data($date);
+    $result = $importer->update_endpoint_data($date, $filter, $rule);
 
 	$returnValues = array();
 	$returnValues["returned_item"] = $result;
