@@ -54,7 +54,23 @@ function civicrm_api3_exporter_Export($params) {
         $response["properties"]["page"] = $offset / 25;
         $response["properties"]["per_page"] = $result["count"];
 
-        $response["links"]["next"] = CRM.config.resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=userkey&key=sitekey&json=" . JSON
+        //$response["links"]["next"] = CRM.config.resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=userkey&key=sitekey&json=" . JSON
+
+        $response["embedded"]["osdi:people"] = array();
+        foreach ($result["values"] as $contact) {
+            var_dump($contact);
+            $newcontact = array();
+            $newcontact["family_name"] = $contact["last_name"];
+            $newcontact["given_name"] = $contact["first_name"];
+            $newcontact["email_addresses"][0]["address"] = $contact["email"];
+            $newcontact["email_addresses"][0]["primary"] = True;
+ 
+             
+            $newcontact["postal_addresses"][0]["primary"] = True;
+            $newcontact["postal_addresses"][0]["address_lines"][0] = $contact["street_address"];
+
+            $response["embedded"]["osdi:people"][] = $newcontact;
+        }
     }
 
     var_dump($result);
