@@ -31,9 +31,10 @@ function civicrm_api3_updater_Update($params) {
 
 	// run the importer
     $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
-    $importer->update_endpoint_data($date);
+    $result = $importer->update_endpoint_data($date);
 
-    // if we here we ballin	
-    	$returnValues = array();
-    	return civicrm_api3_create_success($returnValues, $params, 'Updater', 'Update');
+	$returnValues = array();
+	$returnValues["returned_item"] = $result;
+	// if we here we ballin	
+	return civicrm_api3_create_success($returnValues, $params, 'Updater', 'Update');
 }

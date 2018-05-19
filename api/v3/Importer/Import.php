@@ -1,4 +1,5 @@
 <?php
+
 use CRM_Osdi_ExtensionUtil as E;
 
 require_once __DIR__ . '/../../../importers/ActionNetworkContactImporter.php';
@@ -26,9 +27,20 @@ function _civicrm_api3_importer_Import_spec(&$spec) {
  */
 function civicrm_api3_importer_Import($params) {
 	$importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
-	$count = $importer->pull_endpoint_data();
 
-	$returnValues["count"] = $count;
+    if (isset($params["required"])) { 
+        $filter = $params["required"];
+    }
 
+    if (isset($params["rule"])) { 
+        $rule = $params["rule"];
+    }
+
+	$count = $importer->pull_endpoint_data($filter, $rule);
+
+	$returnValues["count"] = $count; 
+
+    $returnValues["session"] = $_SESSION["extractors"];
+ 
 	return civicrm_api3_create_success($returnValues, $params, 'Importer', 'import');
 }

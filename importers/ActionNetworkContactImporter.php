@@ -1,6 +1,8 @@
 <?php
 
 require_once("AbstractContactImporter.php");
+require_once("ResourceStruct.php");
+require_once("PeopleStruct.php");
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -40,18 +42,26 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
     }
 
-    public function pull_endpoint_data() {
+    public function pull_endpoint_data($filter = NULL, $rule = NULL) {
+		$counter = 0;
+
         // create an entry point to retrieve the data
         $resource_root = $this->entrypoint->get();// return the main resource
+
+		if ($resource_root->get("osdi:people") == NULL) {
+			$counter = 1;
+			return $counter;
+		}
 
 		// shunt the root into the queue
 		if (!isset($_SESSION["extractors"])) {
 			$_SESSION["extractors"] = array();
 		} 
 
-		$_SESSION["extractors"][] = serialize($resource_root);
+        $final_data = new ResourceStruct($resource_root, $rule, $filter);
+
+		$_SESSION["extractors"][] = serialize($final_data);
 		
-		$counter = 0;
 		return $counter;
     }
 
@@ -78,13 +88,13 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 			$_SESSION["extractors"] = array();
 		} 
 
-		$_SESSION["extractors"][] = serialize($resource_root);
+		$_SESSION["extractors"][] = serialize($data);
 
-		$counter = 0;
-		return $counter;
+		$serialized_item = serialize($data);
+		return $serialized_item;
     }
 
-    public static function validate_endpoint_data($person) {
+    public static function validate_endpoint_data($person, $filter = NULL) {
 		$properties = $person->getProperties();
 		$checks = array("family_name", "given_name", "email_addresses");
 		foreach ($checks as $check) {
@@ -92,21 +102,35 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 				return False;
 			}
 		}
+
+        $filters = preg_split('/\s+/', $filter, -1, PREG_SPLIT_NO_EMPTY);
+
+		foreach ($filters as $single_filter) {
+			if (!array_key_exists($single_filter, $properties)) {
+				return False;
+			} else if (ctype_space($properties[$single_filter])) {
+				return False;
+            }
+		}
+
 		return True;
     }
 
-    public static function add_task_with_page($page) {
+    public static function add_task_with_page($page, $rule = NULL) {
 		// this queue is created as a temp copy to preserve the static function
 		$tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
+        $peoplestruct = new PeopleStruct($page->getProperties(), $rule);
+
         $task = new CRM_Queue_Task(
             array('CRM_OSDIQueue_Tasks', 'AddContact'), //call back method
-            array($page->getProperties())
+            array(serialize($peoplestruct))
         );
 
         //now add this task to the queue
         $tempqueue->createItem($task);
     }
 }
+
 ?>
 

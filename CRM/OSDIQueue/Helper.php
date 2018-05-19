@@ -28,7 +28,6 @@ class CRM_OSDIQueue_Helper
 
     private function __construct()
     {
-
         $this->queue = CRM_Queue_Service::singleton()->create(array(
             'type' => 'Sql',
             'name' => self::QUEUE_NAME,
