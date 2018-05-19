@@ -33,6 +33,7 @@ function civicrm_api3_updater_Update($params) {
     $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
     $importer->update_endpoint_data($date);
 
-	// if we here we ballin	
-	return civicrm_api3_create_success($returnValues, $params, 'Updater', 'Update');
+    // if we here we ballin	
+    	$returnValues = array();
+    	return civicrm_api3_create_success($returnValues, $params, 'Updater', 'Update');
 }

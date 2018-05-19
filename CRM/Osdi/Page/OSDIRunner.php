@@ -17,7 +17,7 @@ class CRM_Osdi_Page_OSDIRunner extends CRM_Core_Page {
 			'onEndUrl' => CRM_Utils_System::url('civicrm/xxxx', 'reset=0'), //go to page after all tasks are finished
 		));
 
-		$runner->runAll(); // does not return
+		$runner->runAllViaWeb(); // does not return
 
 		parent::run();
 	}
