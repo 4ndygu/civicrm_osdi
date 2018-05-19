@@ -65,7 +65,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 		return $counter;
     }
 
-    public function update_endpoint_data($date) {
+    public function update_endpoint_data($date, $filter = NULL, $rule = NULL) {
         // TODO: sanitize this input later
         $query_string = "/people?filter=modified_date gt '" . $date . "'";
         $full_uri = $this->endpoint . $query_string;
@@ -81,16 +81,17 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $response_string = $response->getBody()->getContents();
         $data = json_decode($response_string, true);
 
-		$data = Resource::create($this->client, $data);        
+		$data = Resource::create($this->client, $data);
+        $final_data = new ResourceStruct($data, $rule, $filter);
 
 		// shunt the root into the queue
 		if (!isset($_SESSION["extractors"])) {
 			$_SESSION["extractors"] = array();
 		} 
 
-		$_SESSION["extractors"][] = serialize($data);
+		$_SESSION["extractors"][] = serialize($final_data);
 
-		$serialized_item = serialize($data);
+		$serialized_item = serialize($final_data);
 		return $serialized_item;
     }
 
@@ -124,6 +125,21 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
         $task = new CRM_Queue_Task(
             array('CRM_OSDIQueue_Tasks', 'AddContact'), //call back method
+            array(serialize($peoplestruct))
+        );
+
+        //now add this task to the queue
+        $tempqueue->createItem($task);
+    }
+
+    public static function merge_task_with_page($rule = NULL) {
+		// this queue is created as a temp copy to preserve the static function
+		$tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+
+        $peoplestruct = new PeopleStruct(array(), $rule);
+
+        $task = new CRM_Queue_Task(
+            array('CRM_OSDIQueue_Tasks', 'MergeContacts'), //call back method
             array(serialize($peoplestruct))
         );
 

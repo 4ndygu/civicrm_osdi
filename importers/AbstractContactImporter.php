@@ -20,7 +20,7 @@ abstract class AbstractContactImporter
     protected $raw_client;
 
     abstract public function pull_endpoint_data($filter = NULL, $rule = NULL);
-    abstract public function update_endpoint_data($date);
+    abstract public function update_endpoint_data($date, $filter = NULL, $rule = NULL);
     abstract public static function validate_endpoint_data($data);
 	abstract public static function add_task_with_page($page, $rule = NULL);
 }

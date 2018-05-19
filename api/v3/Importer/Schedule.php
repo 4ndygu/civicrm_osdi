@@ -83,6 +83,10 @@ function civicrm_api3_importer_Schedule($params) {
 		$root = $root->get('next');
 		if ($root == NULL) {
 			$returnValues["status"] = "completed";
+
+            // add merge task
+            ActionNetworkContactImporter::merge_task_with_page($rootdata->rule);
+
 			CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
 			return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
 		}
