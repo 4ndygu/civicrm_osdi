@@ -35,7 +35,7 @@ function civicrm_api3_exporter_Export($params) {
     }
 
     if (!isset($params["limit"])) {
-        $limit = 0;
+        $limit = 25;
     } else {
         $limit = $params["limit"];
     }

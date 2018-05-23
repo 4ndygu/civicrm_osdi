@@ -32,8 +32,10 @@ class CRM_OSDIQueue_Tasks {
         $rule = $contactresource->rule;
         if ($rule == NULL or $rule == -1) return True;
 
-        $dupes = CRM_Dedupe_Finder::dupes($rule);
-        //$result = CRM_Dedupe_Merger::merge($dupes);
+        //$dupes = CRM_Dedupe_Finder::dupes($rule);
+        $mergestatus = CRM_Dedupe_Merger::batchMerge($rule);
+        var_dump("MERTGING");
+        var_dump($mergestatus);
 
 		return True;
     }
