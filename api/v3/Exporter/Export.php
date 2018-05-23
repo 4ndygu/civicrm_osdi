@@ -15,6 +15,8 @@ use Hateoas\HateoasBuilder;
  */
 function _civicrm_api3_exporter_Export_spec(&$spec) {
   $spec['object']['api.required'] = 1;
+  $spec['apikey']['api.required'] = 0;
+  $spec['sitekey']['api.required'] = 0;
 }
 
 /**
@@ -47,13 +49,15 @@ function civicrm_api3_exporter_Export($params) {
         // dump the contacts
 
         $result = NULL;
-        if (isset($params["filter"])) {
+        $singleuser = false;
+        if (isset($params["id"])) {
             $result = civicrm_api3('Contact', 'get', array(
                 'contact_type' => "Individual",
                 'sequential' => 1,
-                'id' => $params["filter"]["id"],
+                'id' => $params["id"],
                 'options' => array("offset" => $offset, "limit" => $limit)
             ));
+            $singleuser = true;
         } else {
             $result = civicrm_api3('Contact', 'get', array(
                 'contact_type' => "Individual",
@@ -62,27 +66,30 @@ function civicrm_api3_exporter_Export($params) {
             ));
         }
 
+        $apikey = (isset($params["apikey"]) ? $params["apikey"] : "apikey");
+        $sitekey = (isset($params["sitekey"]) ? $params["sitekey"] : "sitekey");
+
         $response["properties"]["page"] = $offset / 25;
         $response["properties"]["per_page"] = $result["count"];
 
         //nextPage
         $config = CRM_Core_Config::singleton();
         $paramscopy = $params;
-        $response["links"]["self"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=userkey&key=sitekey&json=" . json_encode($paramscopy);
-        $paramscopy["page"]++;
-        $response["links"]["next"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=userkey&key=sitekey&json=" . json_encode($paramscopy);
+        $response["links"]["self"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy);
+        if ($singleuser) {
+            $paramscopy["page"]++;
+            $response["links"]["next"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy);
+        }
         $response["links"]["osdi:people"] = array();
 
-        //$response["links"]["next"] = CRM.config.resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=userkey&key=sitekey&json=" . JSON
 
         $response["embedded"]["osdi:people"] = array();
         foreach ($result["values"] as $contact) {
             // generate the link give nthe ID first
             $newparams = $params;
             $newparams["limit"] = 1;
-            $newparams["filter"] = array();
-            $newparams["filter"]["id"] = $contact["id"];
-            $contactURL = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=userkey&key=sitekey&json=" . json_encode($newparams);
+            $newparams["id"] = $contact["id"];
+            $contactURL = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($newparams);
             $response["links"]["osdi:people"][] = $contactURL;
 
             $newcontact = array();
