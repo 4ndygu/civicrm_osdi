@@ -26,7 +26,8 @@ class CRM_Osdi_Page_OSDIResponse extends CRM_Core_Page {
     
     $result = civicrm_api3('Exporter', 'export', $params);
 
-    print json_encode($result["values"]);
+    header('Content-Type: application/json');
+    print json_encode($result["values"], JSON_PRETTY_PRINT);
 
     CRM_Utils_System::civiExit();
     parent::run();
