@@ -17,7 +17,7 @@ class CRM_Osdi_Page_OSDIResponse extends CRM_Core_Page {
 
     $params["object"] = $_GET["object"];
 
-    $optionals = array("apikey", "sitekey", "page", "limit");
+    $optionals = array("apikey", "sitekey", "page", "limit", "id");
     foreach ($optionals as $optional) {
         if (isset($_GET[$optional])) {
             $params[$optional] = $_GET[$optional];

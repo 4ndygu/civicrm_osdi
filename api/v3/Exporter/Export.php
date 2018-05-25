@@ -75,10 +75,10 @@ function civicrm_api3_exporter_Export($params) {
         //nextPage
         $config = CRM_Core_Config::singleton();
         $paramscopy = $params;
-        $response["_links"]["self"] = CRM_Utils_System::url("civicrm/osdi/response", "entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy), TRUE, NULL, FALSE, TRUE);
-        if ($singleuser) {
+        $response["_links"]["self"] = CRM_Utils_System::url("civicrm/osdi/response", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
+        if (!$singleuser) {
             $paramscopy["page"]++;
-			$response["_links"]["next"] = CRM_Utils_System::url("civicrm/osdi/response", "entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy), TRUE, NULL, FALSE, TRUE);
+			$response["_links"]["next"] = CRM_Utils_System::url("civicrm/osdi/response", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
         }
         $response["_links"]["osdi:people"] = array();
 
@@ -89,7 +89,7 @@ function civicrm_api3_exporter_Export($params) {
             $newparams = $params;
             $newparams["limit"] = 1;
             $newparams["id"] = $contact["id"];
-			$contactURL = CRM_Utils_System::url("civicrm/osdi/response", "entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($newparams), TRUE, NULL, FALSE, TRUE);
+			$contactURL = CRM_Utils_System::url("civicrm/osdi/response", URLformat($newparams), TRUE, NULL, FALSE, TRUE);
             $response["_links"]["osdi:people"][] = $contactURL;
 
             $newcontact = array();
@@ -139,3 +139,12 @@ function civicrm_api3_exporter_Export($params) {
     return civicrm_api3_create_success($response, $params, 'Exporter', 'export');
 }
 
+function URLformat($params) {
+
+    $finalstring = "";
+
+    foreach ($params as $key => $value) {
+        $finalstring = $finalstring . "&" . $key . "=" . $value;
+    }
+    return $finalstring;
+}
