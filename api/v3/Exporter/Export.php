@@ -75,12 +75,12 @@ function civicrm_api3_exporter_Export($params) {
         //nextPage
         $config = CRM_Core_Config::singleton();
         $paramscopy = $params;
-        $response["links"]["self"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy);
+        $response["_links"]["self"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy);
         if ($singleuser) {
             $paramscopy["page"]++;
-            $response["links"]["next"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy);
+            $response["_links"]["next"] = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($paramscopy);
         }
-        $response["links"]["osdi:people"] = array();
+        $response["_links"]["osdi:people"] = array();
 
 
         $response["embedded"]["osdi:people"] = array();
@@ -90,10 +90,10 @@ function civicrm_api3_exporter_Export($params) {
             $newparams["limit"] = 1;
             $newparams["id"] = $contact["id"];
             $contactURL = $config->resourceBase . "extern/rest.php?entity=Exporter&action=export&api_key=" . $apikey . "&key=" . $sitekey . "&json=" . json_encode($newparams);
-            $response["links"]["osdi:people"][] = $contactURL;
+            $response["_links"]["osdi:people"][] = $contactURL;
 
             $newcontact = array();
-            $newcontact["links"]["self"]["href"] = $contactURL;
+            $newcontact["_links"]["self"]["href"] = $contactURL;
             $newcontact["family_name"] = $contact["last_name"];
             $newcontact["given_name"] = $contact["first_name"];
             $newcontact["additional_name"] = $contact["middle_name"];
