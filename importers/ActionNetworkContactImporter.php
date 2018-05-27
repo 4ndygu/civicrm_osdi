@@ -133,6 +133,8 @@ class ActionNetworkContactImporter extends AbstractContactImporter
     }
 
     public static function merge_task_with_page($rule = NULL) {
+        if ($rule == NULL) return;
+
 		// this queue is created as a temp copy to preserve the static function
 		$tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 

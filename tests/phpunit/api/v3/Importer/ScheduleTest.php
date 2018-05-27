@@ -82,7 +82,52 @@ class api_v3_Importer_ScheduleTest extends \PHPUnit_Framework_TestCase implement
 
 	// check if we in the queue
 	$queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
-	$this->assertEquals(35, $queue->numberOfItems());	
+	$this->assertEquals(36, $queue->numberOfItems());	
+  }
+
+  /**
+   * Test inport folter for validated data / unvalidated data
+   */
+  public function testValidateFilter() {
+    $_SESSION["extractors"] = NULL; 
+    // first import what you need
+    $configs = include(__DIR__ . '/../../../../../CRM/Osdi/Page/config.php'); 
+    $importresult = civicrm_api3('Importer', 'Import', array(
+        'key' => $configs["key"],
+        'required' => "NOTAREALVALUE"
+    ));
+
+    $result = civicrm_api3('Importer', 'Schedule');
+
+    $this->assertEquals('completed', $result["values"]["status"]);
+	$this->assertEmpty($_SESSION["extractors"]);
+
+	// check if we in the queue // theres one job to merge via the rule only
+	$queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+	$this->assertEquals(0, $queue->numberOfItems());	
+  }
+
+  /**
+   * Test that rule specified is added as a job
+   */
+  public function testRuleInsertedJob() {
+    $_SESSION["extractors"] = NULL; 
+    // first import what you need
+    $configs = include(__DIR__ . '/../../../../../CRM/Osdi/Page/config.php'); 
+    $importresult = civicrm_api3('Importer', 'Import', array(
+        'key' => $configs["key"],
+        'required' => "NOTAREALVALUE",
+        'rule' => 1
+    ));
+
+    $result = civicrm_api3('Importer', 'Schedule');
+
+    $this->assertEquals('completed', $result["values"]["status"]);
+	$this->assertEmpty($_SESSION["extractors"]);
+
+	// check if we in the queue // theres one job to merge via the rule only
+	$queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+	$this->assertEquals(1, $queue->numberOfItems());	
   }
 
   /**
