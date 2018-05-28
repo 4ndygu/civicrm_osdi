@@ -28,6 +28,8 @@ function _civicrm_api3_importer_Import_spec(&$spec) {
 function civicrm_api3_importer_Import($params) {
 	$importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
 
+    $filter = NULL;
+    $rule = NULL;
     if (isset($params["required"])) { 
         $filter = $params["required"];
     }

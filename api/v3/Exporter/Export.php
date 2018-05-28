@@ -30,13 +30,14 @@ function _civicrm_api3_exporter_Export_spec(&$spec) {
  */
 function civicrm_api3_exporter_Export($params) {
     //TODO: convert to tertiary operators
-    if (!isset($params["page"])) {
-        $offset = 0;
+	$offset = 0;
+    if (!array_key_exists("page", $params)) {
+        $params["page"] = 0;
     } else {
         $offset = $params["page"] * 25;
     }
 
-    if (!isset($params["limit"])) {
+    if (!array_key_exists("limit", $params)) {
         $limit = 25;
     } else {
         $limit = $params["limit"];
@@ -50,7 +51,7 @@ function civicrm_api3_exporter_Export($params) {
 
         $result = NULL;
         $singleuser = false;
-        if (isset($params["id"])) {
+        if (array_key_exists("id", $params)) {
             $result = civicrm_api3('Contact', 'get', array(
                 'contact_type' => "Individual",
                 'sequential' => 1,
@@ -66,12 +67,12 @@ function civicrm_api3_exporter_Export($params) {
             ));
         }
 
-        $apikey = (isset($params["apikey"]) ? $params["apikey"] : "apikey");
-        $sitekey = (isset($params["sitekey"]) ? $params["sitekey"] : "sitekey");
+        $apikey = (array_key_exists("apikey", $params) ? $params["apikey"] : "apikey");
+        $sitekey = (array_key_exists("sitekey", $params) ? $params["sitekey"] : "sitekey");
 
+        $response["properties"] = array();
         $response["properties"]["page"] = $offset / 25;
         $response["properties"]["per_page"] = $result["count"];
-
         //nextPage
         $config = CRM_Core_Config::singleton();
         $paramscopy = $params;
@@ -81,7 +82,6 @@ function civicrm_api3_exporter_Export($params) {
 			$response["_links"]["next"] = CRM_Utils_System::url("civicrm/osdi/response", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
         }
         $response["_links"]["osdi:people"] = array();
-
 
         $response["embedded"]["osdi:people"] = array();
         foreach ($result["values"] as $contact) {
