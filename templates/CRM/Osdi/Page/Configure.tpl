@@ -62,10 +62,13 @@
 		if (data["endpoint"] == 1) {
 			if (data["resource"] == 1) {
 				console.log("calling api");
-                console.log(data);
 				CRM.api3('Exporter', 'bulk', {"required": data["required"], "key": data["apikey"], "endpoint": "https://actionnetwork.org/api/v2/people/"}).done(function(result) {
 					var returnedCount = '' + result["values"]["count"];
-                    alert(returnedCount + " Users successfully added to group.");
+                    if (returnedCount == -1) {
+                        alert("no users added. job completed.");
+                    } else {
+                        alert(returnedCount + " Users successfully added to group. Please add the exporter.bulk job to the list of scheduled jobs.");
+                    }
 				});
 			}
 		}
