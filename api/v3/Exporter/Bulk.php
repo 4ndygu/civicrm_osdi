@@ -58,7 +58,7 @@ function civicrm_api3_exporter_Bulk($params) {
 
   if (sizeof($result["values"]) != 0) {
       foreach ($result["values"] as $contact) {
-          if (validate_array_data($contact)) {
+          if (validate_array_data($contact, $params["required"])) {
               $newcontact = convertContactOSDI($contact);
               $body = array();
               $body["person"] = $newcontact;
