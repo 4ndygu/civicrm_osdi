@@ -93,6 +93,7 @@
 		if (data["endpoint"] == 1) {
 			if (data["resource"] == 1) {
 				console.log("calling api");
+                console.log(data);
 				CRM.api3('Importer', 'import', {"group": data["group"], "key": data["apikey"], "rule": rule, "required": data["required"]}).done(function(result) {
 					var returnedCount = result["values"]["count"];	
 					if (returnedCount == 0) {
