@@ -28,12 +28,11 @@ class CRM_OSDIQueue_Tasks {
                 ));
             }
 		}
-		catch (Exception $e) {
-            var_dump($e)
+	catch (Exception $e) {
+		        CRM_Core_Session::setStatus(var_export($e), 'Queue task', 'success');
 			return True;
 		}
-
-        return True;
+		return True;
 	}
 
     public static function MergeContacts(CRM_Queue_TaskContext $context, $contact_wrapper) {
