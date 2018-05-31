@@ -30,6 +30,7 @@ function civicrm_api3_importer_Import($params) {
 
     $filter = NULL;
     $rule = NULL;
+    $group = -1;
     if (isset($params["required"])) { 
         $filter = $params["required"];
     }
@@ -38,7 +39,11 @@ function civicrm_api3_importer_Import($params) {
         $rule = $params["rule"];
     }
 
-	$count = $importer->pull_endpoint_data($filter, $rule);
+    if (isset($params["group"])) { 
+        $group = $params["group"];
+    }
+
+	$count = $importer->pull_endpoint_data($filter, $rule, $group);
 
 	$returnValues["count"] = $count; 
 
