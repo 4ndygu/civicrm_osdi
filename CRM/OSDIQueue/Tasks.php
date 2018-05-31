@@ -27,8 +27,11 @@ class CRM_OSDIQueue_Tasks {
             ));
 		}
 		catch (Exception $e) {
-			return False;
+            var_dump($e)
+			return True;
 		}
+
+        return True;
 	}
 
     public static function MergeContacts(CRM_Queue_TaskContext $context, $contact_wrapper) {
