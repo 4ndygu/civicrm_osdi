@@ -17,6 +17,7 @@ function _civicrm_api3_exporter_Export_spec(&$spec) {
   $spec['object']['api.required'] = 1;
   $spec['apikey']['api.required'] = 0;
   $spec['sitekey']['api.required'] = 0;
+  $spec['group']['api.required'] = 0;
 }
 
 /**
