@@ -13,6 +13,9 @@ use CRM_Osdi_ExtensionUtil as E;
  */
 function _civicrm_api3_updater_Update_spec(&$spec) {
 	$spec['key']['api.required'] = 1;
+	$spec['required']['api.required'] = 0;
+	$spec['rule']['api.required'] = 0;
+	$spec['group']['api.required'] = 0;
 }
 
 /**
@@ -39,9 +42,13 @@ function civicrm_api3_updater_Update($params) {
         $rule = $params["rule"];
     }
 
+    if (isset($params["group"])) {
+        $group = $params["group"];
+    }
+
 	// run the importer
     $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
-    $result = $importer->update_endpoint_data($date, $filter, $rule);
+    $result = $importer->update_endpoint_data($date, $filter, $rule, $group);
 
 	$returnValues = array();
 	$returnValues["returned_item"] = $result;

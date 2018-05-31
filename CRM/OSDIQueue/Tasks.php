@@ -11,6 +11,7 @@ class CRM_OSDIQueue_Tasks {
 
         $contactresource = unserialize($contact_wrapper);
         $contact = $contactresource->person;
+        $group = $contactresource->groupid;
 
 		try {
 			$result = civicrm_api3('Contact', 'create', array(
@@ -20,6 +21,10 @@ class CRM_OSDIQueue_Tasks {
 				'display_name' => $contact["family_name"],
 				'contact_type' => 'Individual'
 			));
+            $result2 = civicrm_api3('GroupContact', 'create', array(
+                'group_id' => $group,
+                'contact_id' => $result["id"]
+            ));
 		}
 		catch (Exception $e) {
 			return False;

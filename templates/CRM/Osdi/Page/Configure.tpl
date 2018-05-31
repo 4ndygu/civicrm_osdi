@@ -17,6 +17,9 @@
     <p>Rule ID:</p>
     <input type="text" name="rule" id="rule">
     <br>
+    <p>Group ID:</p>
+    <input type="text" name="group" id="group">
+    <br>
     <p>Specify Required Fields:</p>
     <input type="text" name="required" id="required">
 	<button>Sync data</button>
@@ -90,7 +93,7 @@
 		if (data["endpoint"] == 1) {
 			if (data["resource"] == 1) {
 				console.log("calling api");
-				CRM.api3('Importer', 'import', {"key": data["apikey"], "rule": rule, "required": data["required"]}).done(function(result) {
+				CRM.api3('Importer', 'import', {"group": data["group"], "key": data["apikey"], "rule": rule, "required": data["required"]}).done(function(result) {
 					var returnedCount = result["values"]["count"];	
 					if (returnedCount == 0) {
 						alert("Jobs added to queue successfully.");

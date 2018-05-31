@@ -7,10 +7,12 @@ class PeopleStruct {
 
     public $person;
     public $rule;
+    public $groupid;
 
-    public function __construct($person, $rule) {
+    public function __construct($person, $rule, $groupid) {
         $this->person = $person;
         $this->rule = $rule;
+        $this->groupid = $groupid;
     }
 }
 ?>
