@@ -21,10 +21,12 @@ class CRM_OSDIQueue_Tasks {
 				'display_name' => $contact["family_name"],
 				'contact_type' => 'Individual'
 			));
-            $result2 = civicrm_api3('GroupContact', 'create', array(
-                'group_id' => $group,
-                'contact_id' => $result["id"]
-            ));
+            if ($group != -1) {
+                $result2 = civicrm_api3('GroupContact', 'create', array(
+                    'group_id' => $group,
+                    'contact_id' => $result["id"]
+                ));
+            }
 		}
 		catch (Exception $e) {
             var_dump($e)

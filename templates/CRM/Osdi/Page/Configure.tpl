@@ -40,6 +40,9 @@
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
     <br>
+    <p>Group ID:</p>
+    <input type="text" name="group" id="group">
+    <br>
     <p>Specify Required Fields:</p>
     <input type="text" name="required" id="required">
 	<button>Export data</button>
@@ -65,7 +68,8 @@
 		if (data["endpoint"] == 1) {
 			if (data["resource"] == 1) {
 				console.log("calling api");
-				CRM.api3('Exporter', 'bulk', {"required": data["required"], "key": data["apikey"], "endpoint": "https://actionnetwork.org/api/v2/people/"}).done(function(result) {
+                console.log(data);
+				CRM.api3('Exporter', 'bulk', {"group": data["group"], "required": data["required"], "key": data["apikey"], "endpoint": "https://actionnetwork.org/api/v2/people/"}).done(function(result) {
 					var returnedCount = '' + result["values"]["count"];
                     if (returnedCount == -1) {
                         alert("no users added. job completed.");

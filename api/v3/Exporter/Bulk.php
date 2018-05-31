@@ -14,6 +14,7 @@ include "Export.php";
 function _civicrm_api3_exporter_Bulk_spec(&$spec) {
   $spec['key']['api.required'] = 1;
   $spec['endpoint']['api.required'] = 1;
+  $spec['group']['api.required'] = 0;
 }
 
 /**
@@ -35,29 +36,65 @@ function civicrm_api3_exporter_Bulk($params) {
 
   $count = 0;
   $offset = 0;
+  
+  // check if group is there
+  $group = -1;
+  if (isset($params["group"])) $group = $params["group"];
+  if ($params["group"] == "") $group = -1;
 
+  // use a sha1 of the key with the endpoint to generate our identifier
+  $hash = sha1($params["key"]);
+  $second_key = $params["endpoint"] . $hash;
+
+  // check if we've run this before
   if (isset($_SESSION["exporters_offset"])) {
-      if (isset($_SESSION["exporters_offset"][$params["endpoint"]])) {
-          $offset = $_SESSION["exporters_offset"][$params["endpoint"]];
+      if (isset($_SESSION["exporters_offset"][$second_key])) {
+          $offset = $_SESSION["exporters_offset"][$second_key];
       } else {
-          $_SESSION["exporters_offset"][$params["endpoint"]] = 0;
+          $_SESSION["exporters_offset"][$second_key] = 0;
      }
   } else {
       $_SESSION["exporters_offset"] = array();
-	  $_SESSION["exporters_offset"][$params["endpoint"]] = 0;
+	  $_SESSION["exporters_offset"][$second_key] = 0;
   }
-    
-  $result = civicrm_api3('Contact', 'get', array(
-	  'contact_type' => "Individual",
-	  'sequential' => 1,
-	  'options' => array('offset' => $offset, 'limit' => 100)
-  ));
+
+  $result = NULL;
+  $isgroup = false;
+  if ($group == -1) { 
+      $result = civicrm_api3('Contact', 'get', array(
+	      'contact_type' => "Individual",
+	      'sequential' => 1,
+	      'options' => array('offset' => $offset, 'limit' => 100)
+      ));
+  } else {
+      $result = civicrm_api3('GroupContact', 'get', array(
+          'sequential' => 1,
+          'return' => array('contact_id'),
+          'group_id' => $group,
+	      'options' => array('offset' => $offset, 'limit' => 100)
+      ));
+      $isgroup = true;
+  }
 
   $returnValues = array();
   $returnValues["results"] = array();
 
   if (sizeof($result["values"]) != 0) {
-      foreach ($result["values"] as $contact) {
+      foreach ($result["values"] as $item) {
+
+          // generate the actual contact if is gruop
+          $contact = NULL;
+          if ($isgroup) {
+              $id = $item["contact_id"];
+              $response = civicrm_api3('Contact', 'get', array(
+                  'sequential' => 1,
+	              'id' => $id
+              ));
+              $contact = $response["values"][0];
+          } else {
+              $contact = $item;
+          }
+
           if (validate_array_data($contact, $params["required"])) {
               $newcontact = convertContactOSDI($contact);
               $body = array();
@@ -66,16 +103,16 @@ function civicrm_api3_exporter_Bulk($params) {
               $result = $client->post($params["endpoint"], [
                   "body" => json_encode($body)
               ]);
-
+  
               $returnValues["results"][] = $result;
               $count++;
           }
       }
 
       $offset = $offset + 100;
-      $_SESSION["exporters_offset"][$params["endpoint"]] = $offset;
+      $_SESSION["exporters_offset"][$second_key] = $offset;
   } else {
-      unset($_SESSION["exporters_offset"][$params["endpoint"]]);
+      unset($_SESSION["exporters_offset"][$second_key]);
       $count = -1;
   }
 
