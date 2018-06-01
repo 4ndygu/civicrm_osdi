@@ -57,6 +57,9 @@ function civicrm_api3_exporter_Export($params) {
                 'contact_type' => "Individual",
                 'sequential' => 1,
                 'id' => $params["id"],
+                'first_name' => array('IS NOT NULL' => 1),
+                'last_name' => array('IS NOT NULL' => 1),
+                'email' => array('IS NOT NULL' => 1),
                 'options' => array("offset" => $offset, "limit" => $limit)
             ));
             $singleuser = true;
