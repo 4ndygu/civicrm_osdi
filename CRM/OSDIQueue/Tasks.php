@@ -20,7 +20,8 @@ class CRM_OSDIQueue_Tasks {
                 'email' => $contact["email_addresses"][0]["address"],
                 'display_name' => $contact["family_name"],
                 'contact_type' => 'Individual',
-                'dupe_check' => 1
+                'dupe_check' => 1,
+                'check_permission' => 1
 			));
             if ($group != -1) {
                 $result2 = civicrm_api3('GroupContact', 'create', array(
