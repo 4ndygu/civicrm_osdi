@@ -22,7 +22,7 @@
     <br>
     <p>Specify Required Fields:</p>
     <input type="text" name="required" id="required">
-	<button>Sync data</button>
+	<button>Import data</button>
 </form>
 <br>
 <h2>Export</h2>
@@ -73,6 +73,8 @@
 					var returnedCount = '' + result["values"]["count"];
                     if (returnedCount == -1) {
                         alert("no users added. job completed.");
+                    } else if (returnedCount == -100) {
+                        alert("job added to session. Please add the exporter.bulk job to the list of scheduled jobs.");
                     } else {
                         alert(returnedCount + " Users successfully added to group. Please add the exporter.bulk job to the list of scheduled jobs.");
                     }

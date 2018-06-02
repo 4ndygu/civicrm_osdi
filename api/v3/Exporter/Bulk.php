@@ -46,16 +46,27 @@ function civicrm_api3_exporter_Bulk($params) {
   $hash = sha1($params["key"]);
   $second_key = $params["endpoint"] . $hash;
 
+  // init return values
+  $returnValues = array();
+  $returnValues["results"] = array();
+  $initcode = -100;
+
   // check if we've run this before
   if (isset($_SESSION["exporters_offset"])) {
       if (isset($_SESSION["exporters_offset"][$second_key])) {
           $offset = $_SESSION["exporters_offset"][$second_key];
       } else {
           $_SESSION["exporters_offset"][$second_key] = 0;
+
+          $returnValues["count"] = $initcode;
+          return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
      }
   } else {
       $_SESSION["exporters_offset"] = array();
 	  $_SESSION["exporters_offset"][$second_key] = 0;
+
+      $returnValues["count"] = $initcode;
+      return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
   }
 
   $result = NULL;
@@ -75,9 +86,6 @@ function civicrm_api3_exporter_Bulk($params) {
       ));
       $isgroup = true;
   }
-
-  $returnValues = array();
-  $returnValues["results"] = array();
 
   if (sizeof($result["values"]) != 0) {
       foreach ($result["values"] as $item) {
