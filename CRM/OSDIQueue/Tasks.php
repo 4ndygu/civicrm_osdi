@@ -14,7 +14,7 @@ class CRM_OSDIQueue_Tasks {
         $group = $contactresource->groupid;
 
 		try {
-			$result = civicrm_api3('Contact', 'create', array(
+			$result = civicrm_api3('Contact', 'getorcreate', array(
 				'first_name' => $contact["given_name"],
 				'last_name' => $contact["family_name"],
 				'email' => $contact["email_addresses"][0]["address"],
@@ -29,7 +29,7 @@ class CRM_OSDIQueue_Tasks {
             }
 		}
 		catch (Exception $e) {
-            var_dump($e)
+            var_dump($e);
 			return True;
 		}
 
@@ -37,7 +37,9 @@ class CRM_OSDIQueue_Tasks {
 	}
 
     public static function MergeContacts(CRM_Queue_TaskContext $context, $contact_wrapper) {
-        var_dump("merging");
+        // deprecated
+        return True;
+
         $contactresource = unserialize($contact_wrapper);
         $rule = $contactresource->rule;
         if ($rule == NULL or $rule == -1) return True;
