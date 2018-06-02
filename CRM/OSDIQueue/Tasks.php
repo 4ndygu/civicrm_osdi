@@ -14,12 +14,13 @@ class CRM_OSDIQueue_Tasks {
         $group = $contactresource->groupid;
 
 		try {
-			$result = civicrm_api3('Contact', 'getorcreate', array(
-				'first_name' => $contact["given_name"],
-				'last_name' => $contact["family_name"],
-				'email' => $contact["email_addresses"][0]["address"],
-				'display_name' => $contact["family_name"],
-				'contact_type' => 'Individual'
+            $result = civicrm_api3('Contact', 'create', array(
+                'first_name' => $contact["given_name"],
+                'last_name' => $contact["family_name"],
+                'email' => $contact["email_addresses"][0]["address"],
+                'display_name' => $contact["family_name"],
+                'contact_type' => 'Individual',
+                'dupe_check' => 1
 			));
             if ($group != -1) {
                 $result2 = civicrm_api3('GroupContact', 'create', array(
