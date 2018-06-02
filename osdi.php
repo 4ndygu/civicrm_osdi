@@ -140,24 +140,24 @@ function osdi_civicrm_entityTypes(&$entityTypes) {
  * Implements hook_civicrm_preProcess().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
+ */
 function osdi_civicrm_preProcess($formName, &$form) {
 
-} // */
+} 
 
 /**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
+ */
 function osdi_civicrm_navigationMenu(&$menu) {
-  _osdi_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
+  _osdi_civix_insert_navigation_menu($menu, 'Contacts', array(
+    'label' => E::ts('Import via OSDI'),
+    'name' => 'Import via OSDI',
+    'url' => 'civicrm/osdi/config',
+    'permission' => 'access CiviCRM',
     'operator' => 'OR',
     'separator' => 0,
   ));
   _osdi_civix_navigationMenu($menu);
-} // */
+} 
