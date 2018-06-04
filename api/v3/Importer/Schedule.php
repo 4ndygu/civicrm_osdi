@@ -64,7 +64,13 @@ function civicrm_api3_importer_Schedule($params) {
 		return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
 	}
 
+    // set counter n date
+    // note - we do the date_filter for *everybody* because we always want the 
+    // newest data if items are already modified.
 	$counter = 0;
+    $date = date('Y-m-d', time());
+
+    // add the relevant contacts that can be added to the queue
 	for ($i = 0; $i <= 10; $i++) {
 		$people = $root->get('osdi:people');
 		if ($people == NULL) {
@@ -74,7 +80,8 @@ function civicrm_api3_importer_Schedule($params) {
 		}
 	
 		foreach ($people as $person) {
-			if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter)) {
+			if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter) and
+                ActionNetworkContactImporter::is_newest_endpoint_data($person, $date)) {
 				ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule, $rootdata->group);
 				$counter++;
 			}
