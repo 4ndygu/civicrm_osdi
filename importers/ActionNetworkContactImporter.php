@@ -76,7 +76,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
                 'Content-Type' => "application/json"
             ]
         ]);
-    
+
         // wrap everything into a hal-client resource so nobody knows I used Guzzle
         $response_string = $response->getBody()->getContents();
         $data = json_decode($response_string, true);
@@ -93,6 +93,32 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
 		$serialized_item = serialize($final_data);
 		return $serialized_item;
+    }
+
+    public static function is_newest_endpoint_data($data, $date) {
+        $properties = $data->getProperties();
+
+        $result = civicrm_api3('Contact', 'get', array(
+           'first_name' => $properties["given_name"],
+           'last_name'=> $properties["family_name"],
+           'email' => $properties["email_addresses"][0]["address"]
+        ));
+        $modified_result = civicrm_api3('Contact', 'get', array(
+           'first_name' => $properties["given_name"],
+           'last_name'=> $properties["family_name"],
+           'return' => ["modified_date"],
+           'email' => $properties["email_addresses"][0]["address"],
+           'sequential' => 1
+        ));
+
+        if (sizeof($result["values"]) == 0) return True;
+
+        if (strtotime($modified_result["values"][0]["modified_date"]) > strtotime($date)) {
+            return False;
+        }
+
+        // this should be return true 
+        return True;
     }
 
     public static function validate_endpoint_data($person, $filter = NULL) {
