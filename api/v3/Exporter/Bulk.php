@@ -125,19 +125,16 @@ function civicrm_api3_exporter_Bulk($params) {
           if ($isgroup) {
               $id = $item["contact_id"];
               $response = civicrm_api3('Contact', 'get', array(
+                  'modified_date' => array('>=' => $date),
                   'sequential' => 1,
 	              'id' => $id
               ));
               $result_response = civicrm_api3('Contact', 'get', array(
+                  'modified_date' => array('>=' => $date),
                   'sequential' => 1,
                   'return' => ['modified_date'],
 	              'id' => $id
               ));
-              /*$response = civicrm_api3('Contact', 'get', array(
-                  'sequential' => 1,
-                  'modified_date' => array('>=' => $date),
-	              'id' => $id
-              ));*/
               if (sizeof($response["values"]) == 0) {
                   continue;
               }
