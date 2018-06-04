@@ -15,6 +15,9 @@ function _civicrm_api3_exporter_Bulk_spec(&$spec) {
   $spec['key']['api.required'] = 1;
   $spec['endpoint']['api.required'] = 1;
   $spec['group']['api.required'] = 0;
+  $spec['updatejob']['api.required'] = 0;
+  $spec['updateendpoint']['api.required'] = 0;
+  $spec['required']['api.required'] = 0;
 }
 
 /**
@@ -27,6 +30,32 @@ function _civicrm_api3_exporter_Bulk_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_exporter_Bulk($params) {
+  // init return values
+  $returnValues = array();
+  $returnValues["results"] = array();
+  $initcode = -100;
+
+  // grab current date
+  $date = "1980-01-01";
+  if (isset($params["updatejob"])) { 
+      $date = ($params["updatejob"] == 1) ? date('Y-m-d', time()) : "1980-01-01";
+
+      if (!isset($params["updateendpoint"])) {
+          $returnValues["message"] = "Please provide an update endpoint.";
+          return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
+      }
+
+      if ($params["updateendpoint"] == "") {
+          $returnValues["message"] = "Please provide an update endpoint.";
+          return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
+      }
+  }
+
+  // handle validation
+  if (!isset($params["required"])) {
+      $params["required"] = "";
+  }
+
   $client = new \GuzzleHttp\Client([
       'headers' => [
           'OSDI-API-Token' => $params["key"],
@@ -46,10 +75,9 @@ function civicrm_api3_exporter_Bulk($params) {
   $hash = sha1($params["key"]);
   $second_key = $params["endpoint"] . $hash;
 
-  // init return values
-  $returnValues = array();
-  $returnValues["results"] = array();
-  $initcode = -100;
+  if (isset($params["updatejob"])) {
+      if ($params["updatejob"] == 1) $second_key = $second_key . "update";
+  }
 
   // check if we've run this before
   if (isset($_SESSION["exporters_offset"])) {
@@ -75,6 +103,7 @@ function civicrm_api3_exporter_Bulk($params) {
       $result = civicrm_api3('Contact', 'get', array(
 	      'contact_type' => "Individual",
 	      'sequential' => 1,
+          'modified_date' => array('>=' => $date),
 	      'options' => array('offset' => $offset, 'limit' => 100)
       ));
   } else {
@@ -82,6 +111,7 @@ function civicrm_api3_exporter_Bulk($params) {
           'sequential' => 1,
           'return' => array('contact_id'),
           'group_id' => $group,
+          'status' => "Added",
 	      'options' => array('offset' => $offset, 'limit' => 100)
       ));
       $isgroup = true;
@@ -98,12 +128,31 @@ function civicrm_api3_exporter_Bulk($params) {
                   'sequential' => 1,
 	              'id' => $id
               ));
+              $result_response = civicrm_api3('Contact', 'get', array(
+                  'sequential' => 1,
+                  'return' => ['modified_date'],
+	              'id' => $id
+              ));
+              /*$response = civicrm_api3('Contact', 'get', array(
+                  'sequential' => 1,
+                  'modified_date' => array('>=' => $date),
+	              'id' => $id
+              ));*/
+              if (sizeof($response["values"]) == 0) {
+                  continue;
+              }
+
               $contact = $response["values"][0];
+              $contact["modified_date"] = $result_response["values"][0]["modified_date"];
           } else {
               $contact = $item;
           }
 
-          if (validate_array_data($contact, $params["required"])) {
+          $newer = True;
+          if (isset($params["updateendpoint"])) {
+              if ($params["updateendpoint"] == 1) $newer = contact_newer($contact, $params["updateendpoint"], $params["key"]);
+          }
+          if (validate_array_data($contact, $params["required"]) and $newer) {
               $newcontact = convertContactOSDI($contact);
               $body = array();
               $body["person"] = $newcontact;
@@ -127,6 +176,30 @@ function civicrm_api3_exporter_Bulk($params) {
   $returnValues["count"] = $count;
 
   return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
+}
+
+function contact_newer($contact, $updateendpoint, $key) {
+    $cividate = $contact["modified_date"];
+
+    $query_string = $updateendpoint . "?filter=email_address eq '" . $contact["email"] . "'";
+
+    $raw_client = new GuzzleHttp\Client();
+    $response = $raw_client->request('GET', $query_string, [
+        'headers' => [
+            'OSDI-API-Token' => $key,
+            'Content-Type' => "application/json"
+        ]
+    ]);
+
+    $response_string = $response->getBody()->getContents();
+    $data = json_decode($response_string, true);
+
+    if (sizeof($data["_embedded"]["osdi:people"]) == 0) {
+        return False;
+    }
+
+    $newdate = $data["_embedded"]["osdi:people"][0]["modified_date"];
+    return strtotime($cividate) > strtotime($newdate);
 }
 
 function validate_array_data($person, $filter = NULL) {

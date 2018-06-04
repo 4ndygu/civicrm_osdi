@@ -144,9 +144,11 @@ function convertContactOSDI($contact) {
 	$newcontact["phone_numbers"][0]["do_not_call"] = $contact["do_not_phone"];
 
 	$tokenized_bday = explode("-", $contact["birth_date"]);
-	$newcontact["birthdate"]["month"] = $tokenized_bday[2];
-	$newcontact["birthdate"]["day"] = $tokenized_bday[1];
-	$newcontact["birthdate"]["year"] = $tokenized_bday[0];
+    if (sizeof($tokenized_bday) == 3) {
+        $newcontact["birthdate"]["month"] = $tokenized_bday[2];
+        $newcontact["birthdate"]["day"] = $tokenized_bday[1];
+        $newcontact["birthdate"]["year"] = $tokenized_bday[0];
+    }
 
 	$newcontact["preferred_language"] = $contact["preferred_language"];
 
