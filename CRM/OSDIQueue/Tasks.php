@@ -18,8 +18,8 @@ class CRM_OSDIQueue_Tasks {
                 'first_name' => $contact["given_name"],
                 'last_name' => $contact["family_name"],
                 'email' => $contact["email_addresses"][0]["address"],
-		'contact_type' => 'Individual',
-		'sequential' => 1
+                'contact_type' => 'Individual',
+                'sequential' => 1
             ));
 
             // if contact exists, supply with id to update instead
