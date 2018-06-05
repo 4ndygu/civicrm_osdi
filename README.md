@@ -73,6 +73,8 @@ To do this, you can navigate to the `/civicrm/admin/job?reset=1` endpoint and pr
 
 You can schedule the job by calling out to the Importer.Schedule endpoint. There are no parameters to be made. In order to set up the import pipeline, you must go to `/civicrm/admin/job` and configure Importer.Schedule as a cron job to be run at an interval of your discretion. This will add all tasks to a queue.
 
+These jobs can be timed in cron, but can also be tested by pressing `more -> Execute now`.
+
 The Scheduler will return information in the following format:
 
     'email' => [
