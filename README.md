@@ -67,7 +67,7 @@ In specify required fields, you can specify a space_delimited string. In Import,
 The import job above only adds the job *to be imported* in a queue that sits in `$_SESSION["extractors"]`. In order to continue with the job, you have to schedule it.
 
 To continue scheduling the job and getting contacts into CiviCRM, you need to set up two endpoints: Importer.Schedule and OSDIQueue.Run
-To do this, you can navigate to the `/civicrm/admin/job?reset=1` endpoint and press "Add New Scheduled Job". There are two jobs to configure. You can name them whatever you like, but make sure the two jobs use the Importer entity + Schedule action, and the OSDIQueue entity and run action, respectively.
+To do this, you can navigate to the `/civicrm/admin/job?reset=1` endpoint and press "Add New Scheduled Job". There are two jobs to configure. You can name them whatever you like, but make sure the two jobs use the Importer entity + Schedule action, and the OSDIQueue entity and run action, respectively. There are no parameters to these two tasks.
 
 ![job image](https://github.com/4ndygu/civicrm_osdi/blob/master/civicrm_job_schedule.png?raw=true "job image")
 
