@@ -14,6 +14,12 @@ class CRM_OSDIQueue_Tasks {
         $group = $contactresource->groupid;
 
 		try {
+                /*'middle_name' => $contact["additional_name"],
+                'prefix_id' => $contact["honorific_prefix"],
+                'suffix_id' => $contact["honorific_suffix"],
+                'gender_id' => $contact["gender_id"],
+                'preferred_language' => $contact["preferred_language"],
+                'current_employer' => $contact["employer"],*/
             $result = civicrm_api3('Contact', 'create', array(
                 'first_name' => $contact["given_name"],
                 'last_name' => $contact["family_name"],
@@ -23,7 +29,7 @@ class CRM_OSDIQueue_Tasks {
                 'dupe_check' => 1,
                 'check_permission' => 1
 			));
-            if ($group != -1) {
+            if ($group != -1 and $group != NULL) {
                 $result2 = civicrm_api3('GroupContact', 'create', array(
                     'group_id' => $group,
                     'contact_id' => $result["id"]
@@ -31,7 +37,27 @@ class CRM_OSDIQueue_Tasks {
             }
 		}
 		catch (Exception $e) {
-            var_dump($e);
+            // if duplicate, patch up
+            var_dump("dupe");
+            //var_dump($e->getExtraParams()['error_code']);
+            //var_dump($e->getExtraParams()['error_code']["ASDFASDF"]);
+            /*if ($e["extraParams"]["error_code"] == "Duplicate") {
+                $result = civicrm_api3('Contact', 'create', array(
+                    'id' => $e["extraParams"]["ids"][0],
+                    'first_name' => $contact["given_name"],
+                    'last_name' => $contact["family_name"],
+                    'middle_name' => $contact["additional_name"],
+                    'prefix_id' => $contact["honorific_prefix"],
+                    'suffix_id' => $contact["honorific_suffix"],
+                    'gender_id' => $contact["gender_id"],
+                    'current_employer' => $contact["employer"],
+                    'email' => $contact["email_addresses"][0]["address"],
+                    'preferred_language' => $contact["preferred_language"],
+                    'display_name' => $contact["family_name"],
+                    'contact_type' => 'Individual',
+			    ));
+                return True;
+            }*/
 			return True;
 		}
 
