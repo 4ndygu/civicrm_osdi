@@ -19,7 +19,7 @@ class CRM_OSDIQueue_Tasks {
                 'last_name' => $contact["family_name"],
                 'email' => $contact["email_addresses"][0]["address"],
                 'contact_type' => 'Individual'
-            );
+            ));
 
             // if contact exists, supply with id to update instead
             if (sizeof($test["values"]) == 0) {
@@ -27,25 +27,24 @@ class CRM_OSDIQueue_Tasks {
                     'first_name' => $contact["given_name"],
                     'last_name' => $contact["family_name"],
                     'email' => $contact["email_addresses"][0]["address"],
-                    'city' => $contact["postal_addresses"][-1]["locality"],
-                    'state_province_name' => $contact["postal_addresses"][-1]["region"],
-                    'country' => $contact["postal_addresses"][-1]["country"],
+                    'city' => $contact["postal_addresses"][0]["locality"],
+                    'state_province_name' => $contact["postal_addresses"][0]["region"],
+                    'country' => $contact["postal_addresses"][0]["country"],
                     'display_name' => $contact["family_name"],
                     'contact_type' => 'Individual',
                     'dupe_check' => 1,
                     'check_permission' => 1
                 ));
             } else {
+                var_dump($test["values"][0]["contact_id"]);
                 $result = civicrm_api3('Contact', 'create', array(
-                    'id' => $e["extraParams"]["ids"][0],
+                    'id' => $test["values"][0]["contact_id"],
                     'first_name' => $contact["given_name"],
                     'last_name' => $contact["family_name"],
                     'email' => $contact["email_addresses"][0]["address"],
-                    'city' => $contact["postal_addresses"][-1]["locality"],
-                    'state_province_name' => $contact["postal_addresses"][-1]["region"],
-                    'country' => $contact["postal_addresses"][-1]["country"],
-                    'display_name' => $contact["family_name"],
-                    'contact_type' => 'Individual',
+                    'city' => $contact["postal_addresses"][0]["locality"],
+                    'state_province_name' => $contact["postal_addresses"][0]["region"],
+                    'country' => $contact["postal_addresses"][0]["country"],
                     'display_name' => $contact["family_name"],
                     'contact_type' => 'Individual',
                 ));
