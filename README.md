@@ -64,9 +64,24 @@ In specify required fields, you can specify a space_delimited string. In Import,
 
 #### actually importing
 
-After you call import, you must schedule the job and then execute it. You can schedule the job by calling out to the Importer.Schedule endpoint. There are no parameters to be made. In order to set up the import pipeline, you must go to `/civicrm/admin/job` and configure Importer.Schedule as a cron job to be run at an interval of your discretion. This will add all tasks to a queue.
+The import job above only adds the job *to be imported* in a queue that sits in `$_SESSION["extractors"]`. In order to continue with the job, you have to schedule it.
+
+You can schedule the job by calling out to the Importer.Schedule endpoint. There are no parameters to be made. In order to set up the import pipeline, you must go to `/civicrm/admin/job` and configure Importer.Schedule as a cron job to be run at an interval of your discretion. This will add all tasks to a queue.
+
+The Scheduler will return information in the following format:
+
+    'email' => [
+        'valid' => True or false,
+        'new' => True or false,
+    ]
+
+Valid determines if the imported contact was valid, or if it contains a first name, last name, and email plus whatever space_delimited OSDI keys that you deem are necessary. New determines if the imported contact is newer than whatever matching contact sits in CiviCRM already. If there is no matching contact, this automatically returns true. The scheduler loads all contacts as separate jobs in a CiviCRM Queue class.
+
+If the Scheduler returns the information "no variable set", that means that the scheduler is empty. You can import more jobs like above. 
 
 After you call schedule, you have to run the tasks in the queue. You can do this by calling out to the OSDIQueue.run endpoint. There are no parameters to be made. In order to set up the import pipeline, you must go to `/civicrm/admin/job` and configure OSDIQueue.run as a cron job to be run at an interval of your discretion. This will run everybody in the queue.
+
+The OSDIQueue.run job will run *everybody* in the queue. 
 
 Currently, the architecture is constructed this way because I cannot configure the queue to only run a few elements without throwing a `failed to obtain next task` error. Please do let me know if you have gotten past this!
 
