@@ -18,7 +18,8 @@ class CRM_OSDIQueue_Tasks {
                 'first_name' => $contact["given_name"],
                 'last_name' => $contact["family_name"],
                 'email' => $contact["email_addresses"][0]["address"],
-                'contact_type' => 'Individual'
+                'contact_type' => 'Individual',
+                'sequential' => 1
             ));
 
             // if contact exists, supply with id to update instead
@@ -36,7 +37,6 @@ class CRM_OSDIQueue_Tasks {
                     'check_permission' => 1
                 ));
             } else {
-                var_dump($test["values"][0]["contact_id"]);
                 $result = civicrm_api3('Contact', 'create', array(
                     'id' => $test["values"][0]["contact_id"],
                     'first_name' => $contact["given_name"],
