@@ -31,10 +31,11 @@ function civicrm_api3_o_s_d_i_queue_Run($params) {
 	$runner = new CRM_Queue_Runner(array(
 	    'title' => ts('OSDI Queue runner'), //title fo the queue
 	    'queue' => $queue, //the queue object
-	    'errorMode'=> CRM_Queue_Runner::ERROR_CONTINUE, //continue on error otherwise the queue will hang
+	    'errorMode'=> CRM_Queue_Runner::ERROR_ABORT, //continue on error otherwise the queue will hang
     ));
 
 	$result = $runner->runAll();
+    $returnValues["result"] = $result;
 
 	return civicrm_api3_create_success($returnValues, $params, 'OSDIQueue', 'Run');
 }
