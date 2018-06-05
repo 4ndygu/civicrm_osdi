@@ -33,7 +33,6 @@ function _civicrm_api3_importer_Schedule_spec(&$spec) {
 function civicrm_api3_importer_Schedule($params) {
 
 	$returnValues = array();
-	
 	// get out if nobody started
 	if (!isset($_SESSION["extractors"]) or empty($_SESSION["extractors"])) {
 		$returnValues["status"] = "no variable set";
@@ -78,12 +77,18 @@ function civicrm_api3_importer_Schedule($params) {
 			CRM_Core_Session::setStatus('malformed data. removing from queue', 'Queue task', 'success');
 			return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
 		}
-	
+
+		var_dump($rootdata->group);	
+		$returnValues["group"] = $rootdata->group;
+
 		foreach ($people as $person) {
-			if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter) and
-                ActionNetworkContactImporter::is_newest_endpoint_data($person, $date)) {
+		$returnValues["valid"][] = ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter);
+			if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter)) {
+                if (ActionNetworkContactImporter::is_newest_endpoint_data($person, $date)) {
+		$returnValues["new"][] = ActionNetworkContactImporter::is_newest_endpoint_data($person, $date);
 				ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule, $rootdata->group);
 				$counter++;
+		}
 			}
 		}
 
@@ -92,7 +97,7 @@ function civicrm_api3_importer_Schedule($params) {
 			$returnValues["status"] = "completed";
 
             // add merge task
-            ActionNetworkContactImporter::merge_task_with_page($rootdata->rule);
+            // ActionNetworkContactImporter::merge_task_with_page($rootdata->rule);
 
 			CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
 			return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');

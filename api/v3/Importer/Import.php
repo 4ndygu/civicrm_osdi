@@ -42,6 +42,7 @@ function civicrm_api3_importer_Import($params) {
     if (isset($params["group"])) { 
         $group = $params["group"];
     }
+    $returnValues["group"] = $group;
 
 	$count = $importer->pull_endpoint_data($filter, $rule, $group);
 
