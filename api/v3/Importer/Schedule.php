@@ -83,9 +83,11 @@ function civicrm_api3_importer_Schedule($params) {
 
 		foreach ($people as $person) {
 		$returnValues["valid"][] = ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter);
+		$returnValues["person"][] = $person["email_addresses"][0];
+
 			if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter)) {
-                if (ActionNetworkContactImporter::is_newest_endpoint_data($person, $date)) {
 		$returnValues["new"][] = ActionNetworkContactImporter::is_newest_endpoint_data($person, $date);
+                if (ActionNetworkContactImporter::is_newest_endpoint_data($person, $date)) {
 				ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule, $rootdata->group);
 				$counter++;
 		}
