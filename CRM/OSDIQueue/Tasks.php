@@ -12,6 +12,7 @@ class CRM_OSDIQueue_Tasks {
         $contactresource = unserialize($contact_wrapper);
         $contact = $contactresource->person;
         $group = $contactresource->groupid;
+        $rule = $contactresource->rule;
 
         try {
             $test = civicrm_api3('Contact', 'get', array(

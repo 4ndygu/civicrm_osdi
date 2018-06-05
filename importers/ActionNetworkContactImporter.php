@@ -113,6 +113,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
         if (sizeof($result["values"]) == 0) return True;
 
+ 
         if (strtotime($modified_result["values"][0]["modified_date"]) > strtotime($date)) {
             return False;
         }
