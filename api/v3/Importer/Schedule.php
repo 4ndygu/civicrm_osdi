@@ -81,9 +81,9 @@ function civicrm_api3_importer_Schedule($params) {
 		var_dump($rootdata->group);	
 		$returnValues["group"] = $rootdata->group;
 
+            $returnValues["person"][$person["email_addresses"][0]["address"]] = array();
 		foreach ($people as $person) {
             $returnValues["person"] = array();
-            $returnValues["person"][$person["email_addresses"][0]["address"]] = array();
             $returnValues["person"][$person["email_addresses"][0]["address"]]["name"] = $person["email_addresses"][0]["address"];
             $returnValues["person"][$person["email_addresses"][0]["address"]]["valid"] = ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter);
 
