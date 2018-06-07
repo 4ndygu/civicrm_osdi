@@ -16,8 +16,6 @@ class CRM_OSDIQueue_Tasks {
 
         try {
             $test = civicrm_api3('Contact', 'get', array(
-                'first_name' => $contact["given_name"],
-                'last_name' => $contact["family_name"],
                 'email' => $contact["email_addresses"][0]["address"],
                 'contact_type' => 'Individual',
                 'sequential' => 1

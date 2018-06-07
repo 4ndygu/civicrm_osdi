@@ -70,6 +70,7 @@
 				console.log("calling api");
                 console.log(data);
 				CRM.api3('Exporter', 'bulk', {"group": data["group"], "required": data["required"], "key": data["apikey"], "endpoint": "https://actionnetwork.org/api/v2/people/"}).done(function(result) {
+                    console.log(result["values"]["session"]);
 					var returnedCount = '' + result["values"]["count"];
                     if (returnedCount == -1) {
                         alert("no users added. job completed.");
