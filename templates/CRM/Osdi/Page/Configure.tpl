@@ -101,6 +101,7 @@
 				console.log("calling api");
                 console.log(data);
 				CRM.api3('Importer', 'import', {"group": data["group"], "key": data["apikey"], "rule": rule, "required": data["required"]}).done(function(result) {
+                                        console.log(result["values"]["session"]);
 					var returnedCount = result["values"]["count"];	
 					if (returnedCount == 0) {
 						alert("Jobs added to queue successfully.");

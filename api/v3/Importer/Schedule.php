@@ -70,6 +70,7 @@ function civicrm_api3_importer_Schedule($params) {
     $date = date('Y-m-d', time());
 
     // add the relevant contacts that can be added to the queue
+        $returnValues["person"] = array();
 	for ($i = 0; $i <= 10; $i++) {
 		$people = $root->get('osdi:people');
 		if ($people == NULL) {
@@ -81,14 +82,13 @@ function civicrm_api3_importer_Schedule($params) {
 		var_dump($rootdata->group);	
 		$returnValues["group"] = $rootdata->group;
 
-            $returnValues["person"] = array();
 		foreach ($people as $person) {
-            $returnValues["person"][$person["email_addresses"][0]["address"]] = array();
-            $returnValues["person"][$person["email_addresses"][0]["address"]]["name"] = $person["email_addresses"][0]["address"];
-            $returnValues["person"][$person["email_addresses"][0]["address"]]["valid"] = ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter);
+            $properties = $person->getProperties();
+            $returnValues["person"][$properties["email_addresses"][0]["address"]] = array();
+            $returnValues["person"][$properties["email_addresses"][0]["address"]]["valid"] = ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter);
 
             if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter)) {
-                $returnValues["person"][$person["email_addresses"][0]["address"]]["new"] = ActionNetworkContactImporter::is_newest_endpoint_data($person, $date);
+                $returnValues["person"][$properties["email_addresses"][0]["address"]]["new"] = ActionNetworkContactImporter::is_newest_endpoint_data($person, $date);
                 if (ActionNetworkContactImporter::is_newest_endpoint_data($person, $date)) {
                     ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule, $rootdata->group);
                     $counter++;
