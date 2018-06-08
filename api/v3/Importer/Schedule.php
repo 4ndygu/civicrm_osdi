@@ -55,8 +55,7 @@ function civicrm_api3_importer_Schedule($params) {
 	}
 
     $root = $rootdata->resource;
-	
-	//$this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+    $zone = $rootdata->zone;
 
 	if ($root == NULL) {
 		$returnValues["status"] = "no root";
@@ -67,10 +66,10 @@ function civicrm_api3_importer_Schedule($params) {
     // note - we do the date_filter for *everybody* because we always want the 
     // newest data if items are already modified.
 	$counter = 0;
-    $date = date('Y-m-d', time());
 
     // add the relevant contacts that can be added to the queue
-        $returnValues["person"] = array();
+    $returnValues["person"] = array();
+
 	for ($i = 0; $i <= 10; $i++) {
 		$people = $root->get('osdi:people');
 		if ($people == NULL) {
@@ -79,17 +78,17 @@ function civicrm_api3_importer_Schedule($params) {
 			return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
 		}
 
-		var_dump($rootdata->group);	
 		$returnValues["group"] = $rootdata->group;
 
 		foreach ($people as $person) {
             $properties = $person->getProperties();
+            $date = $properties["modified_date"];
             $returnValues["person"][$properties["email_addresses"][0]["address"]] = array();
             $returnValues["person"][$properties["email_addresses"][0]["address"]]["valid"] = ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter);
 
             if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter)) {
-                $returnValues["person"][$properties["email_addresses"][0]["address"]]["new"] = ActionNetworkContactImporter::is_newest_endpoint_data($person, $date);
-                if (ActionNetworkContactImporter::is_newest_endpoint_data($person, $date)) {
+                $returnValues["person"][$properties["email_addresses"][0]["address"]]["new"] = ActionNetworkContactImporter::is_newest_endpoint_data($person, $date, $zone);
+                if (ActionNetworkContactImporter::is_newest_endpoint_data($person, $date, $zone)) {
                     ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule, $rootdata->group);
                     $counter++;
                 }
@@ -112,7 +111,7 @@ function civicrm_api3_importer_Schedule($params) {
 	// i throw it into tthe back to prevent starvation in event of multiple extractors
 	CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
 
-    $returned_data = new ResourceStruct($root, $rootdata->rule, $rootdata->filter, $rootdata->group);
+    $returned_data = new ResourceStruct($root, $rootdata->rule, $rootdata->filter, $rootdata->group, $zone);
 	$_SESSION["extractors"][] = serialize($returned_data);
 
 	$returnValues["status"] = "partially completed";

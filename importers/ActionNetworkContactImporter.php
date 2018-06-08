@@ -42,7 +42,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
     }
 
-    public function pull_endpoint_data($filter = NULL, $rule = NULL, $group = -1) {
+    public function pull_endpoint_data($filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
 		$counter = 0;
 
         // create an entry point to retrieve the data
@@ -58,14 +58,14 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 			$_SESSION["extractors"] = array();
 		} 
 
-        $final_data = new ResourceStruct($resource_root, $rule, $filter, $group);
+        $final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone);
 
 		$_SESSION["extractors"][] = serialize($final_data);
 		
 		return $counter;
     }
 
-    public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1) {
+    public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
         // TODO: sanitize this input later
         $query_string = "/people?filter=modified_date gt '" . $date . "'";
         $full_uri = $this->endpoint . $query_string;
@@ -82,7 +82,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $data = json_decode($response_string, true);
 
 		$data = Resource::create($this->client, $data);
-        $final_data = new ResourceStruct($data, $rule, $filter, $group);
+        $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone);
 
 		// shunt the root into the queue
 		if (!isset($_SESSION["extractors"])) {
@@ -95,7 +95,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 		return $serialized_item;
     }
 
-    public static function is_newest_endpoint_data($data, $date) {
+    public static function is_newest_endpoint_data($data, $date, $zone) {
         $properties = $data->getProperties();
 
         $result = civicrm_api3('Contact', 'get', array(
@@ -113,8 +113,9 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
         if (sizeof($result["values"]) == 0) return True;
 
- 
-        if (strtotime($modified_result["values"][0]["modified_date"]) > strtotime($date)) {
+        $converted_date = strtotime($modified_result["values"][0]["modified_date"]) - 60 * $zone;
+
+        if ($converted_date > strtotime($date)) {
             return False;
         }
 

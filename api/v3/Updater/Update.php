@@ -17,6 +17,7 @@ function _civicrm_api3_updater_Update_spec(&$spec) {
 	$spec['rule']['api.required'] = 0;
 	$spec['group']['api.required'] = 0;
 	$spec['endpoint']['api.required'] = 1;
+	$spec['zone']['api.required'] = 0;
 }
 
 /**
@@ -36,6 +37,7 @@ function civicrm_api3_updater_Update($params) {
     $filter = NULL;
     $rule = NULL;
     $group = -1;
+    $zone = 0;
 
     if (isset($params["required"])) {
         $filter = $params["required"];
@@ -48,10 +50,14 @@ function civicrm_api3_updater_Update($params) {
     if (isset($params["group"])) {
         $group = $params["group"];
     }
+   
+    if (isset($params["zone"])) {
+        $zone = $params["zone"];
+    }
 
 	// run the importer
     $importer = new ActionNetworkContactImporter($params["endpoint"], "x", $params["key"]);
-    $result = $importer->update_endpoint_data($date, $filter, $rule, $group);
+    $result = $importer->update_endpoint_data($date, $filter, $rule, $group, $zone);
 
 	$returnValues = array();
 	$returnValues["returned_item"] = $result;

@@ -18,6 +18,7 @@ function _civicrm_api3_exporter_Bulk_spec(&$spec) {
   $spec['updatejob']['api.required'] = 0;
   $spec['updateendpoint']['api.required'] = 0;
   $spec['required']['api.required'] = 0;
+  $spec['zone']['api.required'] = 0;
 }
 
 /**
@@ -54,6 +55,12 @@ function civicrm_api3_exporter_Bulk($params) {
   // handle validation
   if (!isset($params["required"])) {
       $params["required"] = "";
+  }
+
+  // valkidate zone
+  $zone = 0;
+  if (isset($params["zone"])) {
+      $zone = $params["zone"];
   }
 
   $client = new \GuzzleHttp\Client([
@@ -147,8 +154,9 @@ function civicrm_api3_exporter_Bulk($params) {
 
           $newer = True;
           if (isset($params["updateendpoint"])) {
-              if ($params["updateendpoint"] == 1) $newer = contact_newer($contact, $params["updateendpoint"], $params["key"]);
+              if ($params["updateendpoint"] == 1) $newer = contact_newer($contact, $params["updateendpoint"], $params["key"], $zone);
           }
+
           if (validate_array_data($contact, $params["required"]) and $newer) {
               $newcontact = convertContactOSDI($contact);
               $body = array();
@@ -175,7 +183,7 @@ function civicrm_api3_exporter_Bulk($params) {
   return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
 }
 
-function contact_newer($contact, $updateendpoint, $key) {
+function contact_newer($contact, $updateendpoint, $key, $zone) {
     $cividate = $contact["modified_date"];
 
     $query_string = $updateendpoint . "?filter=email_address eq '" . $contact["email"] . "'";
@@ -196,7 +204,9 @@ function contact_newer($contact, $updateendpoint, $key) {
     }
 
     $newdate = $data["_embedded"]["osdi:people"][0]["modified_date"];
-    return strtotime($cividate) > strtotime($newdate);
+
+    $modified_date = strtotime($cividate) - 60 * $zone;
+    return $modified_date > strtotime($newdate);
 }
 
 function validate_array_data($person, $filter = NULL) {
@@ -214,7 +224,7 @@ function validate_array_data($person, $filter = NULL) {
     foreach ($filters as $single_filter) {
         if (!array_key_exists($single_filter, $person)) {
             return False;
-        } else if (ctype_space($properties[$single_filter])) {
+        } else if (ctype_space($person[$single_filter])) {
             return False;
         } else if ($person[$single_filter] == NULL or $person[$single_filter] == "") {
             return False;
