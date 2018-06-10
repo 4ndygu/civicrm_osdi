@@ -4,7 +4,7 @@ require_once __DIR__ . "/../../importers/PeopleStruct.php";
 
 class CRM_OSDIQueue_Tasks {
 
-    public $OSDICiviArray = array(
+    public static $OSDICiviArray = array(
         "last_name" => "family_name",
         "first_name" => "given_name",
         "middle_name" => "additional_name"
@@ -42,8 +42,8 @@ class CRM_OSDIQueue_Tasks {
             if ($rule != NULL) {
                 // grab fields from rule and load up Contact.get query
                 $fieldsResponse = civicrm_api3('Rule', 'get', array(
-                      "sequential": 1,
-                      "dedupe_rule_group_id": $rule
+                      "sequential" => 1,
+                      "dedupe_rule_group_id" => $rule
                 ));
 
                 foreach ($fieldsResponse["values"] as $field) {
@@ -51,7 +51,7 @@ class CRM_OSDIQueue_Tasks {
                     if ($actualField == "email") {
                         $getParams[$field] = $contact["email_addresses"][0]["address"];
                     } else {
-                        $getParams[$field] = $contact[$OSDICiviArray[$field]];
+                        $getParams[$field] = $contact[Tasks::OSDICiviArray[$field]];
                     }
                 }
             }
