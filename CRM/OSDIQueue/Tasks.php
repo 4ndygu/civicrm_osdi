@@ -4,6 +4,12 @@ require_once __DIR__ . "/../../importers/PeopleStruct.php";
 
 class CRM_OSDIQueue_Tasks {
 
+    public $OSDICiviArray = array(
+        "last_name" => "family_name",
+        "first_name" => "given_name",
+        "middle_name" => "additional_name"
+    );
+
 	public static function AddContact(CRM_Queue_TaskContext $context, $contact_wrapper) {
 		// this expects a hal object that represents a page of contacts
 		// where do u load an action?
@@ -14,15 +20,58 @@ class CRM_OSDIQueue_Tasks {
         $group = $contactresource->groupid;
         $rule = $contactresource->rule;
 
-        try {
-            $test = civicrm_api3('Contact', 'get', array(
-                'email' => $contact["email_addresses"][0]["address"],
-                'contact_type' => 'Individual',
-                'sequential' => 1
-            ));
+        // check if our ID is stored already
+        $contact_id = -1;
+        if ($contact["custom_fields"] != NULL) {
+            $hash = CRM_Utils_System::url("civicrm");
+            if (isset($contact["custom_fields"][$hash])) {
+                $contact_id = $contact["custom_fields"][$hash];
+            }
+        }
+        var_Dump($contact_id);
 
+        // if not, match by dedupe rule
+        if ($contact_id == -1) {
+            $getParams = array();
+            $getParams["sequential"] = 1;
+            $getParams["contact_type"] = "Individual";
+
+            $fieldsResponse = array();
+            $fieldsResponse["values"] = array();
+
+            if ($rule != NULL) {
+                // grab fields from rule and load up Contact.get query
+                $fieldsResponse = civicrm_api3('Rule', 'get', array(
+                      "sequential": 1,
+                      "dedupe_rule_group_id": $rule
+                ));
+
+                foreach ($fieldsResponse["values"] as $field) {
+                    $actualField = $field["rule_field"];
+                    if ($actualField == "email") {
+                        $getParams[$field] = $contact["email_addresses"][0]["address"];
+                    } else {
+                        $getParams[$field] = $contact[$OSDICiviArray[$field]];
+                    }
+                }
+            }
+            var_dump($getParams);
+ 
+            if ($rule == NULL or sizeof($fieldsResponse["values"]) == 0) {
+                $getParams["email"] = $contact["email_addresses"][0]["address"];
+            }
+
+            $test = civicrm_api3('Contact', 'get', $getParams);
+
+            if (sizeof($test["values"]) != 0) {
+                $contact_id = $test["values"][0]["contact_id"];
+            }
+        }
+
+        return True;
+        try {
             // if contact exists, supply with id to update instead
-            if (sizeof($test["values"]) == 0) {
+            if ($contact_id == -1) {
                 $result = civicrm_api3('Contact', 'create', array(
                     'first_name' => $contact["given_name"],
                     'last_name' => $contact["family_name"],
@@ -34,7 +83,7 @@ class CRM_OSDIQueue_Tasks {
                 ));
             } else {
                 $result = civicrm_api3('Contact', 'create', array(
-                    'id' => $test["values"][0]["contact_id"],
+                    'id' => $contact_id,
                     'first_name' => $contact["given_name"],
                     'last_name' => $contact["family_name"],
                     'email' => $contact["email_addresses"][0]["address"],
@@ -50,7 +99,6 @@ class CRM_OSDIQueue_Tasks {
                     'contact_id' => $result["id"]
                 ));
             }
-
         } catch (Exception $e) {
             var_dump($e);
             return True;
