@@ -28,7 +28,6 @@ class CRM_OSDIQueue_Tasks {
                 $contact_id = $contact["custom_fields"][$hash];
             }
         }
-        var_Dump($contact_id);
 
         // if not, match by dedupe rule
         if ($contact_id == -1) {
@@ -49,15 +48,14 @@ class CRM_OSDIQueue_Tasks {
                 foreach ($fieldsResponse["values"] as $field) {
                     $actualField = $field["rule_field"];
                     if ($actualField == "email") {
-                        $getParams[$field] = $contact["email_addresses"][0]["address"];
-                    } else {
-                        $getParams[$field] = $contact[Tasks::OSDICiviArray[$field]];
+                        $getParams[$actualField] = $contact["email_addresses"][0]["address"];
+		    } else {
+                        $getParams[$actualField] = $contact[CRM_OSDIQueue_Tasks::$OSDICiviArray[$actualField]];
                     }
                 }
             }
-            var_dump($getParams);
  
-            if ($rule == NULL or sizeof($fieldsResponse["values"]) == 0) {
+	    if ($rule == NULL or $rule == "" or sizeof($fieldsResponse["values"]) == 0) {
                 $getParams["email"] = $contact["email_addresses"][0]["address"];
             }
 
@@ -66,9 +64,8 @@ class CRM_OSDIQueue_Tasks {
             if (sizeof($test["values"]) != 0) {
                 $contact_id = $test["values"][0]["contact_id"];
             }
-        }
+	}
 
-        return True;
         try {
             // if contact exists, supply with id to update instead
             if ($contact_id == -1) {
