@@ -1,0 +1,12 @@
+{
+    "name": "student/com.example.osdi",
+    "authors": [
+        {
+            "name": "Andy Gu",
+            "email": "andygu@usc.edu"
+        }
+    ],
+    "require": {
+         "ekino/hal-client": "^1.0"
+    }
+}
