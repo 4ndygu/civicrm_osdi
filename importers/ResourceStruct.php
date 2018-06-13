@@ -10,13 +10,15 @@ class ResourceStruct {
     public $filter;
     public $group;
     public $zone;
+    public $apikey;
 
-    public function __construct($resource, $rule, $filter, $group, $zone) {
+    public function __construct($resource, $rule, $filter, $group, $zone, $apikey) {
         $this->rule = $rule;
         $this->resource = $resource;
         $this->filter = $filter;
         $this->group = $group;
-        $this->zone = $zone;
+	$this->zone = $zone;
+	$this->apikey = $apikey;
     }
 }
 ?>

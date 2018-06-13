@@ -186,7 +186,6 @@ function convertContactOSDI($contact) {
         }
     }
 
-    var_dump($_SESSION["OSDIGROUPID"]);
     // load yourself into the custom fields
     if (!$selffound) {
         $fieldresult = civicrm_api3('CustomField', 'create', array(
@@ -197,7 +196,6 @@ function convertContactOSDI($contact) {
 
     // add this to newcountacts
     $newcontact["custom_fields"][$key] = $result["id"];
-    var_dump($newcontact["custom_fields"]);
 
     return $newcontact;
 }

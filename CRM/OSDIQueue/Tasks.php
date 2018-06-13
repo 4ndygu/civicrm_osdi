@@ -10,15 +10,16 @@ class CRM_OSDIQueue_Tasks {
         "middle_name" => "additional_name"
     );
 
-	public static function AddContact(CRM_Queue_TaskContext $context, $contact_wrapper) {
-		// this expects a hal object that represents a page of contacts
-		// where do u load an action?
-		CRM_Core_Session::setStatus('executing add contact task', 'Queue task', 'success');
+    public static function AddContact(CRM_Queue_TaskContext $context, $contact_wrapper) {
+        // this expects a hal object that represents a page of contacts
+        // where do u load an action?
+        CRM_Core_Session::setStatus('executing add contact task', 'Queue task', 'success');
 
         $contactresource = unserialize($contact_wrapper);
         $contact = $contactresource->person;
         $group = $contactresource->groupid;
         $rule = $contactresource->rule;
+        $apikey = $contactresource->apikey;
 
         // check if our ID is stored already
         $contact_id = -1;
@@ -75,8 +76,12 @@ class CRM_OSDIQueue_Tasks {
         $params["contact_type"] = "Individual";
 
         // load the ID into your group
-        $custom_fields = $contact["custom_fields"];
-     
+	$custom_fields = $contact["custom_fields"];
+	$custom_fields[sha1($apikey)] = $contact["identifiers"][0];
+
+	// load the AN ID into custom_fields
+        	
+
         // current key is sha1 of the /civicrm endpoint
         $key = sha1(CRM_Utils_System::url("civicrm"));
         $currentCRMFound = False;
@@ -118,12 +123,14 @@ class CRM_OSDIQueue_Tasks {
                 $params["dupe_check"] = 1;
                 $params["check_permission"] = 1;
 
-                $result = civicrm_api3('Contact', 'create', $params);
+                //$result = civicrm_api3('Contact', 'create', $params);
             } else {
                 $params["id"] = $contact_id;
 
-                $result = civicrm_api3('Contact', 'create', $params);
+                //$result = civicrm_api3('Contact', 'create', $params);
             }
+	    var_dump($params);
+	    return;
 
             // add to group as well
             if ($group != -1 and $group != NULL) {
