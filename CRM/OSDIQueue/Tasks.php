@@ -100,8 +100,9 @@ class CRM_OSDIQueue_Tasks {
                 if (sizeof($results["values"]) == 0) {
                     $results = civicrm_api3('CustomField', 'create', array(
                         'custom_group_id' => $_SESSION["OSDIGROUPID"],
-                        'name' => $custom_field,
-                        'label' => $custom_field
+			'label' => $custom_field,
+                        'data_type' => 'String',
+			'html_type' => "Text"
                     ));
                 } 
                 $id = $results["id"]; 
@@ -113,24 +114,25 @@ class CRM_OSDIQueue_Tasks {
             if (!$currentCRMFound) { 
                 $results = civicrm_api3('CustomField', 'create', array(
                         'custom_group_id' => $_SESSION["OSDIGROUPID"],
-                        'name' => $key,
-                        'label' => $key
+			'label' => $custom_field,
+                        'data_type' => 'String',
+			'html_type' => "Text"
                 ));
             }
 
+	    var_dump($params);
+	    $params["debug"] = 1;
             // if contact exists, supply with id to update instead
             if ($contact_id == -1) {
                 $params["dupe_check"] = 1;
                 $params["check_permission"] = 1;
 
-                //$result = civicrm_api3('Contact', 'create', $params);
+                $result = civicrm_api3('Contact', 'create', $params);
             } else {
                 $params["id"] = $contact_id;
 
-                //$result = civicrm_api3('Contact', 'create', $params);
+                $result = civicrm_api3('Contact', 'create', $params);
             }
-	    var_dump($params);
-	    return;
 
             // add to group as well
             if ($group != -1 and $group != NULL) {

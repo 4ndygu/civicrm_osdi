@@ -190,7 +190,9 @@ function convertContactOSDI($contact) {
     if (!$selffound) {
         $fieldresult = civicrm_api3('CustomField', 'create', array(
             'custom_group_id' => $_SESSION["OSDIGROUPID"],
-            'label' => $key
+	    'label' => $key,
+	    'data_type' => 'String',
+	    'html_type' => "Text"
         ));
     }
 
