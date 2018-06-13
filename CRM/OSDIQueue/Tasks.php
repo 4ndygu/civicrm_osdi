@@ -77,13 +77,13 @@ class CRM_OSDIQueue_Tasks {
 
         // load the ID into your group
 	$custom_fields = $contact["custom_fields"];
-	$custom_fields[sha1($apikey)] = $contact["identifiers"][0];
+	$custom_fields["ID_" . sha1($apikey)] = $contact["identifiers"][0];
 
 	// load the AN ID into custom_fields
         	
 
         // current key is sha1 of the /civicrm endpoint
-        $key = sha1(CRM_Utils_System::url("civicrm"));
+        $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
         $currentCRMFound = False;
 
         try {
