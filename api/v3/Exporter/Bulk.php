@@ -126,7 +126,6 @@ function civicrm_api3_exporter_Bulk($params) {
 
   if (sizeof($result["values"]) != 0) {
       foreach ($result["values"] as $item) {
-
           // generate the actual contact if is gruop
           $contact = NULL;
           if ($isgroup) {

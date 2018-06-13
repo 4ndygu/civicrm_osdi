@@ -23,7 +23,7 @@ abstract class AbstractContactImporter
     abstract public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1);
     abstract public static function validate_endpoint_data($data);
     abstract public static function is_newest_endpoint_data($data, $date, $zone);
-	abstract public static function add_task_with_page($page, $rule = NULL, $groupid = -1);
+	abstract public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey);
 }
 ?>
 
