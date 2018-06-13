@@ -55,7 +55,7 @@ class CRM_OSDIQueue_Tasks {
                 }
             }
  
-	    if ($rule == NULL or $rule == "" or sizeof($fieldsResponse["values"]) == 0) {
+            if ($rule == NULL or $rule == "" or sizeof($fieldsResponse["values"]) == 0) {
                 $getParams["email"] = $contact["email_addresses"][0]["address"];
             }
 
@@ -64,29 +64,65 @@ class CRM_OSDIQueue_Tasks {
             if (sizeof($test["values"]) != 0) {
                 $contact_id = $test["values"][0]["contact_id"];
             }
-	}
+	    }
+
+        // this ultimately getVs passed to the api
+        $params = array();
+        $params["first_name"] = $contact["given_name"];
+        $params["last_name"] = $contact["family_name"];
+        $params["email"] = $contact["email_addresses"][0]["address"];
+        $params["display_name"] = $contact["family_name"];
+        $params["contact_type"] = "Individual";
+
+        // load the ID into your group
+        $custom_fields = $contact["custom_fields"];
+     
+        // current key is sha1 of the /civicrm endpoint
+        $key = sha1(CRM_Utils_System::url("civicrm"));
+        $currentCRMFound = False;
 
         try {
+            foreach ($custom_fields as $custom_field => $custom_value) {
+                if ($custom_field == $key) $currentCRMFound = True;
+
+                // each custom field should be searchable
+                $results = civicrm_api3('CustomField', 'get', array(
+                    'custom_group_id' => $_SESSION["OSDIGROUPID"],
+                    'name' => $custom_field,
+                ));
+
+                // if custom field doesn't exist, create
+                if (sizeof($results["values"]) == 0) {
+                    $results = civicrm_api3('CustomField', 'create', array(
+                        'custom_group_id' => $_SESSION["OSDIGROUPID"],
+                        'name' => $custom_field,
+                        'label' => $custom_field
+                    ));
+                } 
+                $id = $results["id"]; 
+                $params["custom_" . $id] = $custom_value;
+            }
+
+            // generate the field for this instance if it isn't generated. 
+            // DONT import it. only do that on export
+            if (!$currentCRMFound) { 
+                $results = civicrm_api3('CustomField', 'create', array(
+                        'custom_group_id' => $_SESSION["OSDIGROUPID"],
+                        'name' => $key,
+                        'label' => $key
+                ));
+            }
+
             // if contact exists, supply with id to update instead
             if ($contact_id == -1) {
-                $result = civicrm_api3('Contact', 'create', array(
-                    'first_name' => $contact["given_name"],
-                    'last_name' => $contact["family_name"],
-                    'email' => $contact["email_addresses"][0]["address"],
-                    'display_name' => $contact["family_name"],
-                    'contact_type' => 'Individual',
-                    'dupe_check' => 1,
-                    'check_permission' => 1
-                ));
+                $params["dupe_check"] = 1;
+                $params["check_permission"] = 1;
+
+                $result = civicrm_api3('Contact', 'create', $params);
             } else {
-                $result = civicrm_api3('Contact', 'create', array(
-                    'id' => $contact_id,
-                    'first_name' => $contact["given_name"],
-                    'last_name' => $contact["family_name"],
-                    'email' => $contact["email_addresses"][0]["address"],
-                    'display_name' => $contact["family_name"],
-                    'contact_type' => 'Individual',
-                ));
+                $params["id"] = $contact_id;
+
+                $result = civicrm_api3('Contact', 'create', $params);
             }
 
             // add to group as well

@@ -3,6 +3,7 @@
 use CRM_Osdi_ExtensionUtil as E;
 
 require_once __DIR__ . '/../../../importers/ActionNetworkContactImporter.php';
+require_once __DIR__ . '/../../../osdi.php';
 
 /**
  * Importer.Import API specification (optional)
@@ -27,6 +28,8 @@ function _civicrm_api3_importer_Import_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_importer_Import($params) {
+    install_groupid();
+
 	$importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
 
     $filter = NULL;

@@ -36,7 +36,35 @@ function osdi_civicrm_install() {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
  */
 function osdi_civicrm_postInstall() {
+  install_groupid();
+
   _osdi_civix_civicrm_postInstall();
+}
+
+function install_groupid() {
+  $id = -1;
+
+  try {
+      $result = civicrm_api3('CustomGroup', 'create', array(
+          'title' => "osditags",
+          'extends' => "Contact",
+          'is_multiple' => 1,
+          'max_multiple' => 0,
+      ));
+  } catch (CiviCRM_API3_Exception $e) {
+      if ($e->getErrorCode() == "already exists") {
+          $result = civicrm_api3('CustomGroup', 'get', array(
+              'title' => "osditags",
+              'sequential' => 1
+          ));
+      } 
+
+      $id = $result["id"];
+      $_SESSION["OSDIGROUPID"] = "osditags";
+  }
+
+  $id = $result["id"];
+  $_SESSION["OSDIGROUPID"] = "osditags";
 }
 
 /**
@@ -54,6 +82,8 @@ function osdi_civicrm_uninstall() {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
 function osdi_civicrm_enable() {
+  install_groupid();
+
   _osdi_civix_civicrm_enable();
 }
 

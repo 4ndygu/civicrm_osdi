@@ -44,8 +44,6 @@ function civicrm_api3_exporter_Export($params) {
         $limit = $params["limit"];
     }
 
-    $hateoas = HateoasBuilder::create()->build();
-
     $result = NULL;
     if (strtolower($params["object"]) == "contact") {
         // dump the contacts
@@ -158,6 +156,48 @@ function convertContactOSDI($contact) {
 			$newcontact[$param] = $contact[$param];
 		}
 	}
+
+    // grab custom fields in group
+    $resultfields = civicrm_api3('CustomField', 'get', array(
+        'sequential' => 1,
+        'custom_group_id' => $_SESSION["OSDIGROUPID"]
+    ));
+
+    // load all custom fields, add yourself too
+    $customparams = array();
+    $customfields = array();
+    $customparams["id"] = $contact["contact_id"];
+    $key = sha1(CRM_Utils_System::url("civicrm"));
+    $selffound = False;
+
+    foreach ($resultfields["values"] as $custom_field) {
+        $customfields[] = "custom_" . $custom_field["id"]; 
+        if ($custom_field["name"] == $key) $selffound = True;
+    }
+    $customparams["return"] = $customfields;
+
+    $newcontact["custom_fields"] = array();
+    if (sizeof($customparams["return"]) != 0) {
+        $result = civicrm_api3('Contact', 'get', $customparams);
+
+        foreach ($resultfields["values"] as $custom_field) {
+            $newcontact["custom_fields"][$custom_field["name"]] 
+                = $result["values"][0]["custom_" . $custom_field["id"]];
+        }
+    }
+
+    var_dump($_SESSION["OSDIGROUPID"]);
+    // load yourself into the custom fields
+    if (!$selffound) {
+        $fieldresult = civicrm_api3('CustomField', 'create', array(
+            'custom_group_id' => $_SESSION["OSDIGROUPID"],
+            'label' => $key
+        ));
+    }
+
+    // add this to newcountacts
+    $newcontact["custom_fields"][$key] = $result["id"];
+    var_dump($newcontact["custom_fields"]);
 
     return $newcontact;
 }
