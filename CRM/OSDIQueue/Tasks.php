@@ -24,11 +24,11 @@ class CRM_OSDIQueue_Tasks {
         // check if our ID is stored already
         $contact_id = -1;
         if ($contact["custom_fields"] != NULL) {
-            $hash = CRM_Utils_System::url("civicrm");
-            if (isset($contact["custom_fields"][$hash])) {
+            $hash = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
+	    if (isset($contact["custom_fields"][$hash])) {
                 $contact_id = $contact["custom_fields"][$hash];
             }
-        }
+	}
 
         // if not, match by dedupe rule
         if ($contact_id == -1) {
@@ -76,11 +76,9 @@ class CRM_OSDIQueue_Tasks {
         $params["contact_type"] = "Individual";
 
         // load the ID into your group
+	// load the AN ID into custom_fields
 	$custom_fields = $contact["custom_fields"];
 	$custom_fields["ID_" . sha1($apikey)] = $contact["identifiers"][0];
-
-	// load the AN ID into custom_fields
-        	
 
         // current key is sha1 of the /civicrm endpoint
         $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
