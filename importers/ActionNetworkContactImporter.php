@@ -43,26 +43,26 @@ class ActionNetworkContactImporter extends AbstractContactImporter
     }
 
     public function pull_endpoint_data($filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
-		$counter = 0;
+        $counter = 0;
 
         // create an entry point to retrieve the data
         $resource_root = $this->entrypoint->get();// return the main resource
 
-		if ($resource_root->get("osdi:people") == NULL) {
-			$counter = 1;
-			return $counter;
-		}
+        if ($resource_root->get("osdi:people") == NULL) {
+            $counter = 1;
+            return $counter;
+        }
 
-		// shunt the root into the queue
-		if (!isset($_SESSION["extractors"])) {
-			$_SESSION["extractors"] = array();
-		} 
+        // shunt the root into the queue
+        if (!isset($_SESSION["extractors"])) {
+            $_SESSION["extractors"] = array();
+        } 
 
         $final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone, $this->apikey);
 
-		$_SESSION["extractors"][] = serialize($final_data);
-		
-		return $counter;
+        $_SESSION["extractors"][] = serialize($final_data);
+        
+        return $counter;
     }
 
     public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
@@ -81,18 +81,18 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $response_string = $response->getBody()->getContents();
         $data = json_decode($response_string, true);
 
-		$data = Resource::create($this->client, $data);
+        $data = Resource::create($this->client, $data);
         $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone, $this->apikey);
 
-		// shunt the root into the queue
-		if (!isset($_SESSION["extractors"])) {
-			$_SESSION["extractors"] = array();
-		} 
+        // shunt the root into the queue
+        if (!isset($_SESSION["extractors"])) {
+            $_SESSION["extractors"] = array();
+        } 
 
-		$_SESSION["extractors"][] = serialize($final_data);
+        $_SESSION["extractors"][] = serialize($final_data);
 
-		$serialized_item = serialize($final_data);
-		return $serialized_item;
+        $serialized_item = serialize($final_data);
+        return $serialized_item;
     }
 
     public static function is_newest_endpoint_data($data, $date, $zone) {
@@ -124,30 +124,30 @@ class ActionNetworkContactImporter extends AbstractContactImporter
     }
 
     public static function validate_endpoint_data($person, $filter = NULL) {
-		$properties = $person->getProperties();
-		$checks = array("family_name", "given_name", "email_addresses");
-		foreach ($checks as $check) {
-			if (!array_key_exists($check, $properties)) {
-				return False;
-			}
-		}
+        $properties = $person->getProperties();
+        $checks = array("family_name", "given_name", "email_addresses");
+        foreach ($checks as $check) {
+            if (!array_key_exists($check, $properties)) {
+                return False;
+            }
+        }
 
         $filters = preg_split('/\s+/', $filter, -1, PREG_SPLIT_NO_EMPTY);
 
-		foreach ($filters as $single_filter) {
-			if (!array_key_exists($single_filter, $properties)) {
-				return False;
-			} else if (ctype_space($properties[$single_filter])) {
-				return False;
+        foreach ($filters as $single_filter) {
+            if (!array_key_exists($single_filter, $properties)) {
+                return False;
+            } else if (ctype_space($properties[$single_filter])) {
+                return False;
             }
-		}
+        }
 
-		return True;
+        return True;
     }
 
     public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey) {
-		// this queue is created as a temp copy to preserve the static function
-		$tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+        // this queue is created as a temp copy to preserve the static function
+        $tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
         $peoplestruct = new PeopleStruct($page->getProperties(), $rule, $groupid, $apikey);
 
@@ -163,8 +163,8 @@ class ActionNetworkContactImporter extends AbstractContactImporter
     public static function merge_task_with_page($rule = NULL) {
         if ($rule == NULL) return;
 
-		// this queue is created as a temp copy to preserve the static function
-		$tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+        // this queue is created as a temp copy to preserve the static function
+        $tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
         $peoplestruct = new PeopleStruct(array(), $rule, -1, NULL);
 
