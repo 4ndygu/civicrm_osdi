@@ -3,13 +3,20 @@
 <form id="OSDIRequestForm" method="post">
 	<select name="endpoint">
 		<option value="" disabled="disabled" selected="selected">Please select a endpoint</option>
-		<option value="1">ActionNetwork</option>
+		<option value="1">Actionnetwork</option>
+		<option value="2">CiviCRM</option>
 	</select>
 	<br>
 	<select name="resource">
 		<option value="" disabled="disabled" selected="selected">Please select a resource</option>
 		<option value="1">Contacts</option>
 	</select>
+	<br>
+	<p>CiviCRM endpoint</p> 
+	<input type="text" name="civiendpoint" id="civiendpoint">
+    <br>
+	<p>Site Key:</p> 
+	<input type="text" name="sitekey" id="sitekey">
 	<br>
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
@@ -115,6 +122,7 @@
 	<select name="endpoint">
 		<option value="" disabled="disabled" selected="selected">Please select a endpoint</option>
 		<option value="1">ActionNetwork</option>
+		<option value="2">CiviCRM</option>
 	</select>
 	<br>
 	<select name="resource">
@@ -122,6 +130,12 @@
 		<option value="1">Contacts</option>
 	</select>
 	<br>
+	<p>CiviCRM endpoint</p> 
+	<input type="text" name="civiendpoint" id="civiendpoint">
+    <br>
+	<p>Site Key:</p> 
+	<input type="text" name="sitekey" id="sitekey">
+    <br>
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
     <br>
@@ -236,10 +250,19 @@
 		); 
 
 		if (data["endpoint"] == 1) {
-			if (data["resource"] == 1) {
-				console.log("calling api");
-                console.log(data);
-				CRM.api3('Exporter', 'bulk', {"zone": data["zone"], "group": data["group"], "required": data["required"], "key": data["apikey"], "endpoint": "https://actionnetwork.org/api/v2/people/"}).done(function(result) {
+            var endpoint = "https://actionnetwork.org/api/v2/people/";
+        }
+
+        if (data["resource"] == 1) {
+            console.log("calling api");
+            console.log(data);
+            CRM.api3('Exporter', 'bulk', {
+                "sitekey": data["sitekey"], 
+                "zone": data["zone"],
+				"group": data["group"],
+                "required": data["required"],
+                "key": data["apikey"],
+                "endpoint": endpoint}).done(function(result) {
                     console.log(result["values"]["session"]);
 					var returnedCount = '' + result["values"]["count"];
                     if (returnedCount == -1) {
@@ -249,8 +272,7 @@
                     } else {
                         alert(returnedCount + " Users successfully added to group. Please add the exporter.bulk job to the list of scheduled jobs.");
                     }
-				});
-			}
+		    });
 		}
 
 		e.preventDefault();
@@ -267,21 +289,33 @@
         var rule = -1;
         if (isInt(data["rule"])) { rule = data["rule"]; }
 
+        var endpoint = null;
 		if (data["endpoint"] == 1) {
-			if (data["resource"] == 1) {
-				console.log("calling api");
-                console.log(data);
-				CRM.api3('Importer', 'import', {"zone": data["zone"], "group": data["group"], "key": data["apikey"], "rule": rule, "required": data["required"]}).done(function(result) {
-                                        console.log(result["values"]["session"]);
-					var returnedCount = result["values"]["count"];	
-					if (returnedCount == 0) {
-						alert("Jobs added to queue successfully.");
-					} else {
-						alert("ERROR: Jobs not added successfully.");
-					}
-				});
-			}
-		}
+            var endpoint = "https://actionnetwork.org/api/v2/people/";
+        } else if (data["endpoint"] == 2) {
+		    var endpoint = data["civiendpoint"];
+        }
+
+        if (data["resource"] == 1) {
+            console.log("calling api");
+            console.log(data);
+            CRM.api3('Importer', 'import', {
+                "sitekey": data["sitekey"], 
+                "zone": data["zone"], 
+                "group": data["group"], 
+                "key": data["apikey"], 
+                "rule": rule, 
+                "required": data["required"],
+                "endpoint": endpoint}).done(function(result) {
+                    console.log(result["values"]["session"]);
+                    var returnedCount = result["values"]["count"];
+                    if (returnedCount == 0) {
+                        alert("Jobs added to queue successfully.");
+                    } else {
+                        alert("ERROR: Jobs not added successfully.");
+                    }
+                });
+        }
 
 		e.preventDefault();
 	});

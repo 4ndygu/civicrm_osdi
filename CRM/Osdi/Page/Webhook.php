@@ -8,22 +8,36 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use Ekino\HalClient\Resource;
 use Ekino\HalClient\HttpClient\FileGetContentsHttpClient;
 
-class CRM_Osdi_Page_OSDIResponse extends CRM_Core_Page {
+class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
   public function run() {
+
+    // Check CMS's permission for (presumably) anonymous users.
+    if (CRM_Core_Config::singleton()->userPermissionClass->isModulePermissionSupported() && !CRM_Osdi_Permission::check('allow webhook posts')) {
+      throw new RuntimeException("Missing allow webhook posts permission.", 500);
+    }
+
+    // check key and header in values
+    $headers = getallheaders();
+
+    $apikey = isset($headers["OSDI-API-Token"]) ? $headers["OSDI-API-Token"] : null;
+    $object = isset($headers["Object"]) ? $headers["Object"] : null;
+    // Check CMS's permission for (presumably) anonymous users.
+    if ($apikey != "demokey") {
+      throw new RuntimeException("Missing our incorrect apikey.", 500);
+    }
+
+	if ($object == NULL) {
+		print "must set 'object' parameter in get or post";
+		CRM_Utils_System::civiExit();
+		//parent::run();
+		return;
+	}
 
     $params = array();
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if (!isset($_GET["object"])) {
-            print "must set 'object' parameter";
-
-            CRM_Utils_System::civiExit();
-            parent::run();
-            return;
-        }
-
-        $params["object"] = $_GET["object"];
+        $params["object"] = $object;
 
         $optionals = array("apikey", "sitekey", "page", "limit", "id");
         foreach ($optionals as $optional) {
@@ -44,7 +58,7 @@ class CRM_Osdi_Page_OSDIResponse extends CRM_Core_Page {
             print "post was null";
 
             CRM_Utils_System::civiExit();
-            parent::run();
+            //parent::run();
 
             return;
         }
@@ -87,7 +101,7 @@ class CRM_Osdi_Page_OSDIResponse extends CRM_Core_Page {
     }
 
     CRM_Utils_System::civiExit();
-    parent::run();
+    //parent::run();
   }
 
 }

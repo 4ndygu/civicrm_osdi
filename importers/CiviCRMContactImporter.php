@@ -16,7 +16,7 @@ use GuzzleHttp\Client;
 
 //TODO: Configure my include path to allow civicrm.api.php for civicrm_api3
 
-class ActionNetworkContactImporter extends AbstractContactImporter
+class CiviCRMContactImporter extends AbstractContactImporter
 {
 
     private $queue;
@@ -30,10 +30,11 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // create a HttpClient to perform http request
         $this->client = new FileGetContentsHttpClient($this->endpoint, array(
             'OSDI-API-Token' => $this->apikey,
+            'Object' => 'Contact',
             'Content-Type' => "application/json"
         ));
 
-        $this->entrypoint = new EntryPoint('/people', $this->client);
+        $this->entrypoint = new EntryPoint('/osdi/webhook', $this->client);
        
         // seed a client in Guzzle to craft raw queries
         $this->raw_client = new GuzzleHttp\Client();

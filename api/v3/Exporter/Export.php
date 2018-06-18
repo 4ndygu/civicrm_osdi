@@ -180,9 +180,11 @@ function convertContactOSDI($contact) {
     if (sizeof($customparams["return"]) != 0) {
         $result = civicrm_api3('Contact', 'get', $customparams);
 
-        foreach ($resultfields["values"] as $custom_field) {
-            $newcontact["custom_fields"][$custom_field["name"]] 
-                = $result["values"][0]["custom_" . $custom_field["id"]];
+        if (sizeof($result["values"] != 0)) {
+            foreach ($resultfields["values"] as $custom_field) {
+                $newcontact["custom_fields"][$custom_field["name"]] 
+                    = $result["values"][0]["custom_" . $custom_field["id"]];
+            }
         }
     }
 

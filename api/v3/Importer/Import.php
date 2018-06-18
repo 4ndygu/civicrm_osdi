@@ -3,6 +3,7 @@
 use CRM_Osdi_ExtensionUtil as E;
 
 require_once __DIR__ . '/../../../importers/ActionNetworkContactImporter.php';
+require_once __DIR__ . '/../../../importers/CiviCRMContactImporter.php';
 require_once __DIR__ . '/../../../osdi.php';
 
 /**
@@ -16,6 +17,10 @@ require_once __DIR__ . '/../../../osdi.php';
 function _civicrm_api3_importer_Import_spec(&$spec) {
   $spec['key']['api.required'] = 1;
   $spec['zone']['api.required'] = 0;
+  $spec['required']['api.required'] = 0;
+  $spec['rule']['api.required'] = 0;
+  $spec['sitekey']['api.required'] = 0;
+  $spec['endpoint']['api.required'] = 1;
 }
 
 /**
@@ -30,7 +35,12 @@ function _civicrm_api3_importer_Import_spec(&$spec) {
 function civicrm_api3_importer_Import($params) {
     install_groupid();
 
-	$importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
+    $importer = NULL;
+    if ($params["endpoint"] == "https://actionnetwork.org") {
+	    $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
+    } else {
+        $importer = new CiviCRMContactImporter($params["endpoint"], "x", $params["key"]);
+    }
 
     $filter = NULL;
     $rule = NULL;

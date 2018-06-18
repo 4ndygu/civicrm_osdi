@@ -19,9 +19,10 @@
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-    <path>civicrm/osdi/response</path>
-    <page_callback>CRM_Osdi_Page_OSDIResponse</page_callback>
-    <title>OSDIResponse</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <path>civicrm/osdi/webhook</path>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+    <page_callback>CRM_Osdi_Page_Webhook</page_callback>
+    <title>Webhook</title>
   </item>
 </menu>
