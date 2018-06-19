@@ -36,8 +36,8 @@ function civicrm_api3_importer_Import($params) {
     install_groupid();
 
     $importer = NULL;
-    if ($params["endpoint"] == "https://actionnetwork.org") {
-	    $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
+    if (strpos($params["endpoint"], "actionnetwork.org") !== False) {
+	$importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
     } else {
         $importer = new CiviCRMContactImporter($params["endpoint"], "x", $params["key"]);
     }
@@ -65,9 +65,9 @@ function civicrm_api3_importer_Import($params) {
 
     $returnValues["group"] = $group;
 
-	$count = $importer->pull_endpoint_data($filter, $rule, $group, $zone);
-
-	$returnValues["count"] = $count; 
+    $count = $importer->pull_endpoint_data($filter, $rule, $group, $zone);
+ 
+    $returnValues["count"] = $count; 
 
     $returnValues["session"] = $_SESSION["extractors"];
  

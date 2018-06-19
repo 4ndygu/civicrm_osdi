@@ -39,7 +39,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         $this->raw_client = new GuzzleHttp\Client();
 
         // setup queue
-        $this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+        //$this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
     }
 
     public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {

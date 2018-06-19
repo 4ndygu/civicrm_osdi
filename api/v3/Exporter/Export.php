@@ -78,27 +78,31 @@ function civicrm_api3_exporter_Export($params) {
         //nextPage
         $config = CRM_Core_Config::singleton();
         $paramscopy = $params;
-        $response["_links"]["self"] = CRM_Utils_System::url("civicrm/osdi/response", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
+        $response["_links"]["self"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
         if (!$singleuser) {
             $paramscopy["page"]++;
-			$response["_links"]["next"] = CRM_Utils_System::url("civicrm/osdi/response", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
+            $response["_links"]["next"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
         }
         $response["_links"]["osdi:people"] = array();
 
-        $response["embedded"]["osdi:people"] = array();
+        $response["_embedded"]["osdi:people"] = array();
         foreach ($result["values"] as $contact) {
             // generate the link give nthe ID first
             $newparams = $params;
             $newparams["limit"] = 1;
             $newparams["id"] = $contact["id"];
-			$contactURL = CRM_Utils_System::url("civicrm/osdi/response", URLformat($newparams), TRUE, NULL, FALSE, TRUE);
-            $response["_links"]["osdi:people"][] = $contactURL;
+	    $contactURL = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($newparams), TRUE, NULL, FALSE, TRUE);
+
+	    $URLarray = array();
+	    $URLarray["href"] = $contactURL;
+	    $response["_links"]["osdi:people"][] = $URLarray;
+
  
             $newcontact = convertContactOSDI($contact);
 
             $newcontact["_links"]["self"]["href"] = $contactURL;
 
-            $response["embedded"]["osdi:people"][] = $newcontact;
+            $response["_embedded"]["osdi:people"][] = $newcontact;
         }
     }
 

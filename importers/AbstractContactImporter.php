@@ -22,27 +22,23 @@ abstract class AbstractContactImporter
     public function pull_endpoint_data($filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
         $counter = 0;
 
-        // create an entry point to retrieve the data
-        var_dump($this->entrypoint);
-        $resource_root = $this->entrypoint->get();// return the main resource
-        var_dump($resource_root);
+	// create an entry point to retrieve the data
+	$resource_root = $this->entrypoint->get();// return the main resource
 
         if ($resource_root->get("osdi:people") == NULL) {
             $counter = 1;
             return $counter;
-        }
+	}
 
         // shunt the root into the queue
         if (!isset($_SESSION["extractors"])) {
             $_SESSION["extractors"] = array();
-        } 
+	} 
+
 
         $final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone, $this->apikey);
+	//$_SESSION["extractors"][] = serialize($final_data);
 
-        var_dump($resource_root->get("osdi:people"));
-        var_dump($final_data);
-        //$_SESSION["extractors"][] = serialize($final_data);
-        
         return $counter;
     }
 

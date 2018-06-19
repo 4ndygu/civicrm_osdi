@@ -8,6 +8,18 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use Ekino\HalClient\Resource;
 use Ekino\HalClient\HttpClient\FileGetContentsHttpClient;
 
+if (!function_exists('getallheaders')) {
+    function getallheaders() {
+        $headers = [];
+	foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;    
+	    }
+	}
+	return $headers;
+    }
+}
+
 class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
   public function run() {
@@ -20,7 +32,11 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
     // check key and header in values
     $headers = getallheaders();
 
-    $apikey = isset($headers["OSDI-API-Token"]) ? $headers["OSDI-API-Token"] : null;
+    $apikey = isset($headers["Osdi-Api-Token"]) ? $headers["Osdi-Api-Token"] : null;
+    if ($apikey == NULL) {
+        $apikey = isset($headers["OSDI-API-Token"]) ? $headers["OSDI-API-Token"] : null;
+    }
+
     $object = isset($headers["Object"]) ? $headers["Object"] : null;
     // Check CMS's permission for (presumably) anonymous users.
     if ($apikey != "demokey") {
@@ -48,13 +64,13 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
         $result = civicrm_api3('Exporter', 'export', $params);
 
-        header('Content-Type: application/json');
-        print json_encode($result["values"], JSON_PRETTY_PRINT);
+	header('Content-Type:application/hal+json', TRUE, 200);
+        print json_encode($result["values"]);
     } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $contact = json_decode(file_get_contents('php://input'), True);
 
         if ($contact == NULL) {
-            header('Content-Type: application/json');
+	    header('Content-Type:application/hal+json', TRUE, 500);
             print "post was null";
 
             CRM_Utils_System::civiExit();
@@ -94,8 +110,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
                     'contact_type' => 'Individual',
                     'sequential' => 1
                 ));
-            }
-
+	    }
             print json_encode(convertContactOSDI($result["values"][0]), JSON_PRETTY_PRINT);
         }
     }

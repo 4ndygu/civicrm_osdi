@@ -200,7 +200,6 @@ function osdi_civicrm_navigationMenu(&$menu) {
 function osdi_civicrm_permission(&$permissions) {
   //Until the Joomla/Civi integration is fixed, don't declare new perms
   // for Joomla installs
-  var_dump(CRM_Core_Config::singleton()->userPermissionClass->isModulePermissionSupported());
   if (CRM_Core_Config::singleton()->userPermissionClass->isModulePermissionSupported()) {
     $permissions = array_merge($permissions, CRM_Osdi_Permission::getOsdiPermissions());
   }

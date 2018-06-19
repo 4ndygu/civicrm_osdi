@@ -291,14 +291,14 @@
 
         var endpoint = null;
 		if (data["endpoint"] == 1) {
-            var endpoint = "https://actionnetwork.org/api/v2/people/";
+            var endpoint = "https://actionnetwork.org/api/v2";
         } else if (data["endpoint"] == 2) {
 		    var endpoint = data["civiendpoint"];
         }
 
         if (data["resource"] == 1) {
             console.log("calling api");
-            console.log(data);
+            console.log(JSON.stringify(data));
             CRM.api3('Importer', 'import', {
                 "sitekey": data["sitekey"], 
                 "zone": data["zone"], 
@@ -308,6 +308,7 @@
                 "required": data["required"],
                 "endpoint": endpoint}).done(function(result) {
                     console.log(result["values"]["session"]);
+                    console.log(String(result));
                     var returnedCount = result["values"]["count"];
                     if (returnedCount == 0) {
                         alert("Jobs added to queue successfully.");

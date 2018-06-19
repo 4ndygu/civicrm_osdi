@@ -31,7 +31,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
         $this->client = new FileGetContentsHttpClient($this->endpoint, array(
             'OSDI-API-Token' => $this->apikey,
             'Object' => 'Contact',
-            'Content-Type' => "application/json"
+            'Content-Type' => "application/hal+json"
         ));
 
         $this->entrypoint = new EntryPoint('/osdi/webhook', $this->client);
@@ -40,7 +40,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
         $this->raw_client = new GuzzleHttp\Client();
 
         // setup queue
-        $this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
+        //$this->queue = CRM_OSDIQueue_Helper::singleton()->getQueue();
     }
 
     public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
@@ -51,7 +51,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
         $response = $this->raw_client->request('GET', $full_uri, [
             'headers' => [
                 'OSDI-API-Token' => $this->apikey,
-                'Content-Type' => "application/json"
+                'Content-Type' => "application/hal+json"
             ]
         ]);
 
@@ -155,6 +155,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
         $tempqueue->createItem($task);
     }
 }
+
 
 ?>
 
