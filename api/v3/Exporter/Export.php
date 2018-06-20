@@ -46,10 +46,30 @@ function civicrm_api3_exporter_Export($params) {
 
     $result = NULL;
     if (strtolower($params["object"]) == "contact") {
+        // unset params so future urls dont get fucked
+        unset($params["object"]);
+        unset($params["version"]);
+
         // dump the contacts
 
         $result = NULL;
-        $singleuser = false;
+	$singleuser = false;
+
+	// get the list of optional parameters
+	$tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+        $optionals= civicrm_api3('CustomField', 'get', array(
+            'custom_group_id' => $tag
+        ));
+
+	$idnamemapping = array();
+	$ingestcustomparams= ['modified_date'];
+	if (sizeof($optionals["values"] != 0)) {
+            foreach ($optionals["values"] as $custom_field) {
+		$ingestcustomparams[] = "custom_" . $custom_field["id"];
+		$idnamemapping["custom_" . $custom_field["id"]] = $custom_field["name"];
+	    }
+	}
+
         if (array_key_exists("id", $params)) {
             $result = civicrm_api3('Contact', 'get', array(
                 'contact_type' => "Individual",
@@ -67,26 +87,38 @@ function civicrm_api3_exporter_Export($params) {
                 'sequential' => 1,
                 'options' => array("offset" => $offset, "limit" => $limit)
             ));
-        }
+	}
 
         $apikey = (array_key_exists("apikey", $params) ? $params["apikey"] : "apikey");
         $sitekey = (array_key_exists("sitekey", $params) ? $params["sitekey"] : "sitekey");
 
         $response["properties"] = array();
-        $response["properties"]["page"] = $offset / 25;
-        $response["properties"]["per_page"] = $result["count"];
+	$response["properties"]["page"] = $offset / 25;
+	$response["properties"]["per_page"] = $result["count"];
+
         //nextPage
         $config = CRM_Core_Config::singleton();
         $paramscopy = $params;
         $response["_links"]["self"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
         if (!$singleuser) {
             $paramscopy["page"]++;
-            $response["_links"]["next"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
+	    $nextarray = array();
+	    $nextarray["href"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
+	    $response["_links"]["next"] = $nextarray;
         }
         $response["_links"]["osdi:people"] = array();
 
         $response["_embedded"]["osdi:people"] = array();
-        foreach ($result["values"] as $contact) {
+	foreach ($result["values"] as $contact) {
+
+            // pull custom params
+	    $optionals = civicrm_api3('Contact', 'get', array(
+                'contact_type' => "Individual",
+		'sequential' => 1,
+		'id' => $contact["id"],
+		'return' => $ingestcustomparams,
+	    ));
+
             // generate the link give nthe ID first
             $newparams = $params;
             $newparams["limit"] = 1;
@@ -98,12 +130,23 @@ function civicrm_api3_exporter_Export($params) {
 	    $response["_links"]["osdi:people"][] = $URLarray;
 
  
-            $newcontact = convertContactOSDI($contact);
+	    $newcontact = convertContactOSDI($contact);
+	    $newcontact["modified_date"] = $optionals["values"][0]["modified_date"];
+	    $newcontact["custom_fields"] = array();
+	    foreach ($idnamemapping as $key => $value) {
+                $newcontact["custom_fields"][$value] = $optionals["values"][0][$key];
+	    }
+	    //$newcontact["modified_date"] = $optionals["values"][$contact["id"]]
 
             $newcontact["_links"]["self"]["href"] = $contactURL;
 
             $response["_embedded"]["osdi:people"][] = $newcontact;
-        }
+	}
+
+	// if no users show up, don't provide a next option
+	if (sizeof($response["_embedded"]["osdi:people"]) == 0) {
+            unset($response["_links"]["next"]);
+	}
     }
 
     return civicrm_api3_create_success($response, $params, 'Exporter', 'export');

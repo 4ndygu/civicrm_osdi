@@ -307,8 +307,7 @@
                 "rule": rule, 
                 "required": data["required"],
                 "endpoint": endpoint}).done(function(result) {
-                    console.log(result["values"]["session"]);
-                    console.log(String(result));
+                    console.log(result["values"]);
                     var returnedCount = result["values"]["count"];
                     if (returnedCount == 0) {
                         alert("Jobs added to queue successfully.");

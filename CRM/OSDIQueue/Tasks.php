@@ -78,7 +78,9 @@ class CRM_OSDIQueue_Tasks {
         // load the ID into your group
 	// load the AN ID into custom_fields
 	$custom_fields = $contact["custom_fields"];
-	$custom_fields["ID_" . sha1($apikey)] = $contact["identifiers"][0];
+	if (isset($contact["identifiers"])) {
+            $custom_fields["ID_" . sha1($apikey)] = $contact["identifiers"][0];
+	}
 
         // current key is sha1 of the /civicrm endpoint
         $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
