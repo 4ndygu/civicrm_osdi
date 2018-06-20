@@ -81,7 +81,8 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
 	    $client = new FileGetContentsHttpClient("https://www.google.com");
 	    $contactarray = $contact["person"];
-        $person = Resource::create($client, $contactarray);
+	    $person = Resource::create($client, $contactarray);
+	    //var_dump($contactarray); 
 
         if (ActionNetworkContactImporter::validate_endpoint_data($person, NULL)) {
             // remember custom fields!

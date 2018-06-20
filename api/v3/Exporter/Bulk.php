@@ -66,6 +66,7 @@ function civicrm_api3_exporter_Bulk($params) {
   $client = new \GuzzleHttp\Client([
       'headers' => [
           'OSDI-API-Token' => $params["key"],
+          'Object' => 'Contact',
           'Content-Type' => 'application/json'
       ]
   ]);
@@ -164,8 +165,8 @@ function civicrm_api3_exporter_Bulk($params) {
               $result = $client->post($params["endpoint"], [
                   "body" => json_encode($body)
               ]);
- 
-              $returnValues["results"][] = $result;
+
+              $returnValues["results"][] = $result->getBody()->getContents();
               $count++;
           }
       }
