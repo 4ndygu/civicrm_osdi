@@ -81,7 +81,7 @@ function civicrm_api3_exporter_Export($params) {
    
             // now convert this daet to the CIVI time zone
             if ($date != false) {
-                $date = date('Y-m-d H:i:s', $date - 60 * (int) $_SESSION["server_time_zone"]);
+                $date = date('Y-m-d H:i:s', $date - 3600 * (int) $_SESSION["server_time_zone"]);
             } else {
                 $date = "1980-01-01";
             }
