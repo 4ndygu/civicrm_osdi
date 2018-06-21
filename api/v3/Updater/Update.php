@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../importers/ActionNetworkContactImporter.php';
+require_once __DIR__ . '/../../../importers/CiviCRMContactImporter.php';
 
 use CRM_Osdi_ExtensionUtil as E;
 
@@ -56,7 +57,12 @@ function civicrm_api3_updater_Update($params) {
     }
 
 	// run the importer
-    $importer = new ActionNetworkContactImporter($params["endpoint"], "x", $params["key"]);
+    $importer = NULL;
+    if (strpos($params["endpoint"], "actionnetwork.org") !== False) {
+        $importer = new ActionNetworkContactImporter($params["endpoint"], "x", $params["key"]);
+    } else {
+        $importer = new CiviCRMContactImporter($params["endpoint"], "x", $params["key"]);
+    }
     $result = $importer->update_endpoint_data($date, $filter, $rule, $group, $zone);
 
 	$returnValues = array();

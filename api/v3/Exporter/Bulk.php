@@ -67,7 +67,7 @@ function civicrm_api3_exporter_Bulk($params) {
       'headers' => [
           'OSDI-API-Token' => $params["key"],
           'Object' => 'Contact',
-          'Content-Type' => 'application/json'
+          'Content-Type' => 'application/hal+json'
       ]
   ]);
 
@@ -77,7 +77,7 @@ function civicrm_api3_exporter_Bulk($params) {
   // check if group is there
   $group = -1;
   if (isset($params["group"])) $group = $params["group"];
-  if ($params["group"] == "") $group = -1;
+  if ($group == "") $group = -1;
 
   // use a sha1 of the key with the endpoint to generate our identifier
   $hash = "ID_" . sha1($params["key"]);
@@ -154,7 +154,7 @@ function civicrm_api3_exporter_Bulk($params) {
 
           $newer = True;
           if (isset($params["updateendpoint"])) {
-              if ($params["updateendpoint"] == 1) $newer = contact_newer($contact, $params["updateendpoint"], $params["key"], $zone);
+              if ($params["updatejob"] == 1) $newer = contact_newer($contact, $params["updateendpoint"], $params["key"], $zone);
           }
 
           if (validate_array_data($contact, $params["required"]) and $newer) {
@@ -192,6 +192,7 @@ function contact_newer($contact, $updateendpoint, $key, $zone) {
     $response = $raw_client->request('GET', $query_string, [
         'headers' => [
             'OSDI-API-Token' => $key,
+            'Object' => 'Contact',
             'Content-Type' => "application/json"
         ]
     ]);
@@ -205,7 +206,7 @@ function contact_newer($contact, $updateendpoint, $key, $zone) {
 
     $newdate = $data["_embedded"]["osdi:people"][0]["modified_date"];
 
-    $modified_date = strtotime($cividate) - 60 * $zone;
+    $modified_date = strtotime($cividate) - 3600 * $zone;
     return $modified_date > strtotime($newdate);
 }
 

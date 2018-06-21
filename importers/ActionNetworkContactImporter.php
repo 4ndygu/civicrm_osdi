@@ -90,7 +90,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
 
         if (sizeof($result["values"]) == 0) return True;
 
-        $converted_date = strtotime($modified_result["values"][0]["modified_date"]) - 60 * $zone;
+        $converted_date = strtotime($modified_result["values"][0]["modified_date"]) - 3600 * $zone;
 
         if ($converted_date > strtotime($date)) {
             return False;

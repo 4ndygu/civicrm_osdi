@@ -37,7 +37,6 @@ abstract class AbstractContactImporter
 
 
 	$final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone, $this->apikey);
-	$_SESSION["extractors"] = array();
 	$_SESSION["extractors"][] = serialize($final_data);
 
         return $counter;

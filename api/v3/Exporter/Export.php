@@ -44,6 +44,54 @@ function civicrm_api3_exporter_Export($params) {
         $limit = $params["limit"];
     }
 
+    $filter = NULL;
+    if (array_key_exists("filter", $params)) {
+        $filter = $params["filter"];
+    }
+
+    // split the string
+    // if first part isnt modified date set back to null
+    $comparison = NULL;
+    $date = NULL;
+    $emailquery = NULL;
+    if ($filter != NULL) {
+        $pieces = preg_split("/\s+/", $filter);
+        $validquery = ($pieces[0] == "modified_date" or $pieces[0] == "email_address") ? True : False;
+        if ($pieces[0] == "modified_date" and sizeof($pieces) >= 3) {
+            //set this to generate a reasonable datetime later
+            if (sizeof($pieces) == 3) $pieces[3] = "";
+            $comparison = $pieces[1];
+            // check if reasonable
+            $comparisons = array(
+                "eq" => "=",
+                "gt" => ">=",
+                "lt" => "<="
+            );
+
+            if (!array_key_exists(trim($comparison), $comparisons)) {
+                $comparison = NULL;
+                $date = NULL;
+            } else {
+                $comparison = $comparisons[$comparison];
+            }
+
+            // TODO: validate this input
+            $datepieces = array($pieces[2], $pieces[3]);
+            $date = strtotime(substr(trim(join(" ", $datepieces)), 1, -1));
+   
+            // now convert this daet to the CIVI time zone
+            if ($date != false) {
+                $date = date('Y-m-d H:i:s', $date - 60 * (int) $_SESSION["server_time_zone"]);
+            } else {
+                $date = "1980-01-01";
+            }
+        } else if ($pieces[0] == "email_address" and sizeof($pieces) >= 3) {
+            if ($pieces[1] == "eq") {
+                $emailquery = substr(trim($pieces[2]), 1, -1);
+            }
+        }
+    }
+
     $result = NULL;
     if (strtolower($params["object"]) == "contact") {
         // unset params so future urls dont get fucked
@@ -82,12 +130,22 @@ function civicrm_api3_exporter_Export($params) {
             ));
             $singleuser = true;
         } else {
-            $result = civicrm_api3('Contact', 'get', array(
+            $queryparams = array( 
                 'contact_type' => "Individual",
                 'sequential' => 1,
                 'options' => array("offset" => $offset, "limit" => $limit)
-            ));
-	}
+            );
+            if ($emailquery != NULL) {
+                $queryparams["email"] = $emailquery;
+            }
+            if ($comparison != NULL) {
+                if ($comparison == "") { $queryparams["modified_date"] = $date; }
+                else {
+                    $queryparams["modified_date"] = array($comparison => $date);
+                }
+            }
+            $result = civicrm_api3('Contact', 'get', $queryparams);
+	    }
 
         $apikey = (array_key_exists("apikey", $params) ? $params["apikey"] : "apikey");
         $sitekey = (array_key_exists("sitekey", $params) ? $params["sitekey"] : "sitekey");
@@ -229,8 +287,10 @@ function convertContactOSDI($contact) {
 
         if (sizeof($result["values"] != 0)) {
             foreach ($resultfields["values"] as $custom_field) {
-                $newcontact["custom_fields"][$custom_field["name"]] 
-                    = $result["values"][0]["custom_" . $custom_field["id"]];
+                if (isset($result["values"][0])) {
+                    $newcontact["custom_fields"][$custom_field["name"]] 
+                        = $result["values"][0]["custom_" . $custom_field["id"]];
+                }
             }
         }
     }

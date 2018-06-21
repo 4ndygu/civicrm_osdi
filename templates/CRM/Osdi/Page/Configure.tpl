@@ -411,9 +411,21 @@
 		e.preventDefault();
 	});
 
-        CRM.$("#TimeForm").submit(function(e) {
-            CRM.api3('')
-        });
+    CRM.$("#TimeForm").submit(function(e) {
+        var data = new Object();
+
+        var formResults = CRM.$("#OSDIRequestForm").serializeArray().map(function(x){
+            data[x.name] = x.value;}
+        ); 
+
+        console.log("calling api");
+        console.log(JSON.stringify(data));
+        CRM.api3('Importer', 'SetTime', {
+            "server_time_zone": data["zone"]}).done(function(result) {
+                console.log(result);
+                alert(''.concat("Zone: ", result["values"]["result_zone"], " set successfully."));
+            });
+    });
 </script>
 {/literal}
 

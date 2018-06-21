@@ -45,12 +45,13 @@ class CiviCRMContactImporter extends AbstractContactImporter
 
     public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
         // TODO: sanitize this input later
-        $query_string = "/people?filter=modified_date gt '" . $date . "'";
+        $query_string = "/osdi/webhook?filter=modified_date gt '" . $date . "'";
         $full_uri = $this->endpoint . $query_string;
 
         $response = $this->raw_client->request('GET', $full_uri, [
             'headers' => [
                 'OSDI-API-Token' => $this->apikey,
+                'Object' => 'Contact',
                 'Content-Type' => "application/hal+json"
             ]
         ]);
@@ -91,7 +92,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
 
         if (sizeof($result["values"]) == 0) return True;
 
-        $converted_date = strtotime($modified_result["values"][0]["modified_date"]) - 60 * $zone;
+        $converted_date = strtotime($modified_result["values"][0]["modified_date"]) - 3600 * $zone;
 
         if ($converted_date > strtotime($date)) {
             return False;
