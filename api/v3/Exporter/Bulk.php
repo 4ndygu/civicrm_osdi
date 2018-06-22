@@ -14,6 +14,7 @@ include "Export.php";
 function _civicrm_api3_exporter_Bulk_spec(&$spec) {
   $spec['key']['api.required'] = 1;
   $spec['endpoint']['api.required'] = 1;
+  $spec['allow_restart']['api.required'] = 0;
   $spec['group']['api.required'] = 0;
   $spec['updatejob']['api.required'] = 0;
   $spec['updateendpoint']['api.required'] = 0;
@@ -35,6 +36,7 @@ function civicrm_api3_exporter_Bulk($params) {
   $returnValues = array();
   $returnValues["results"] = array();
   $initcode = -100;
+  $completedcode = -1;
 
   // grab current date
   $date = "1980-01-01";
@@ -52,6 +54,11 @@ function civicrm_api3_exporter_Bulk($params) {
       }
   }
 
+  $allow_restart = False;
+  if (isset($params["allow_restart"])) {
+      $allow_restart = ($params["allow_restart"] == 1) ? True : False;
+  }
+
   // handle validation
   if (!isset($params["required"])) {
       $params["required"] = "";
@@ -67,7 +74,7 @@ function civicrm_api3_exporter_Bulk($params) {
       'headers' => [
           'OSDI-API-Token' => $params["key"],
           'Object' => 'Contact',
-          'Content-Type' => 'application/hal+json'
+          'Content-Type' => 'application/json'
       ]
   ]);
 
@@ -102,6 +109,18 @@ function civicrm_api3_exporter_Bulk($params) {
 	  $_SESSION["exporters_offset"][$second_key] = 0;
 
       $returnValues["count"] = $initcode;
+      return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
+  }
+
+  if ($offset === "DONE") {
+      // if RESTART is on, or if this is an update job, restart the job and return
+      if ($params["updatejob"] == 1 or $allow_restart) {
+          $_SESSION["exporters_offset"][$second_key] = 0;
+          $returnValues["count"] = $initcode;
+          return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
+      }
+
+      $returnValues["count"] = $completedcode;
       return civicrm_api3_create_success($returnValues, $params, 'Exporter', 'Bulk');
   }
 
@@ -174,8 +193,8 @@ function civicrm_api3_exporter_Bulk($params) {
       $offset = $offset + 100;
       $_SESSION["exporters_offset"][$second_key] = $offset;
   } else {
-      unset($_SESSION["exporters_offset"][$second_key]);
-      $count = -1;
+      $_SESSION["exporters_offset"][$second_key] = "DONE";
+      $count = $completedcode;
   }
 
   $returnValues["count"] = $count;

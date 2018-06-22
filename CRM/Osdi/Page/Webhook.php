@@ -64,13 +64,13 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
         $result = civicrm_api3('Exporter', 'export', $params);
 
-	header('Content-Type:application/hal+json', TRUE, 200);
+	    header('Content-Type:application/hal+json', TRUE, 200);
         print json_encode($result["values"]);
     } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $contact = json_decode(file_get_contents('php://input'), True);
 
         if ($contact == NULL) {
-	    header('Content-Type:application/hal+json', TRUE, 500);
+	        header('Content-Type:application/hal+json', TRUE, 500);
             print "post was null";
 
             CRM_Utils_System::civiExit();

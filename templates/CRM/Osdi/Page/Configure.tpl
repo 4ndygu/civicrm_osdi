@@ -350,10 +350,15 @@
             CRM.api3('Exporter', 'bulk', {
                 "sitekey": data["sitekey"], 
                 "zone": data["zone"],
+                "allow_restart": 1,
                 "group": data["group"],
                 "required": data["required"],
                 "key": data["apikey"],
                 "endpoint": endpoint}).done(function(result) {
+                    if ("error_message" in result) {
+                        alert(result["error_message"]);
+                        return;
+                    } 
                     console.log(result["values"]["session"]);
 					var returnedCount = '' + result["values"]["count"];
                     if (returnedCount == -1) {
