@@ -31,7 +31,7 @@ function _civicrm_api3_exporter_Export_spec(&$spec) {
  */
 function civicrm_api3_exporter_Export($params) {
     //TODO: convert to tertiary operators
-	$offset = 0;
+    $offset = 0;
     if (!array_key_exists("page", $params)) {
         $params["page"] = 0;
     } else {
@@ -101,22 +101,22 @@ function civicrm_api3_exporter_Export($params) {
         // dump the contacts
 
         $result = NULL;
-	$singleuser = false;
+        $singleuser = false;
 
-	// get the list of optional parameters
-	$tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+        // get the list of optional parameters
+        $tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
         $optionals= civicrm_api3('CustomField', 'get', array(
             'custom_group_id' => $tag
         ));
 
-	$idnamemapping = array();
-	$ingestcustomparams= ['modified_date'];
-	if (sizeof($optionals["values"] != 0)) {
+        $idnamemapping = array();
+        $ingestcustomparams= ['modified_date'];
+        if (sizeof($optionals["values"] != 0)) {
             foreach ($optionals["values"] as $custom_field) {
-		$ingestcustomparams[] = "custom_" . $custom_field["id"];
-		$idnamemapping["custom_" . $custom_field["id"]] = $custom_field["name"];
-	    }
-	}
+                $ingestcustomparams[] = "custom_" . $custom_field["id"];
+                $idnamemapping["custom_" . $custom_field["id"]] = $custom_field["name"];
+            }
+        }
 
         if (array_key_exists("id", $params)) {
             $result = civicrm_api3('Contact', 'get', array(
@@ -145,14 +145,14 @@ function civicrm_api3_exporter_Export($params) {
                 }
             }
             $result = civicrm_api3('Contact', 'get', $queryparams);
-	    }
+        }
 
         $apikey = (array_key_exists("apikey", $params) ? $params["apikey"] : "apikey");
         $sitekey = (array_key_exists("sitekey", $params) ? $params["sitekey"] : "sitekey");
 
         $response["properties"] = array();
-	$response["properties"]["page"] = $offset / 25;
-	$response["properties"]["per_page"] = $result["count"];
+        $response["properties"]["page"] = $offset / 25;
+        $response["properties"]["per_page"] = $result["count"];
 
         //nextPage
         $config = CRM_Core_Config::singleton();
@@ -160,51 +160,49 @@ function civicrm_api3_exporter_Export($params) {
         $response["_links"]["self"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
         if (!$singleuser) {
             $paramscopy["page"]++;
-	    $nextarray = array();
-	    $nextarray["href"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
-	    $response["_links"]["next"] = $nextarray;
+            $nextarray = array();
+            $nextarray["href"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
+            $response["_links"]["next"] = $nextarray;
         }
+
         $response["_links"]["osdi:people"] = array();
 
         $response["_embedded"]["osdi:people"] = array();
-	foreach ($result["values"] as $contact) {
-
+        foreach ($result["values"] as $contact) {
             // pull custom params
-	    $optionals = civicrm_api3('Contact', 'get', array(
+            $optionals = civicrm_api3('Contact', 'get', array(
                 'contact_type' => "Individual",
-		'sequential' => 1,
-		'id' => $contact["id"],
-		'return' => $ingestcustomparams,
-	    ));
+                'sequential' => 1,
+                'id' => $contact["id"],
+                'return' => $ingestcustomparams,
+            ));
 
             // generate the link give nthe ID first
             $newparams = $params;
             $newparams["limit"] = 1;
             $newparams["id"] = $contact["id"];
-	    $contactURL = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($newparams), TRUE, NULL, FALSE, TRUE);
 
-	    $URLarray = array();
-	    $URLarray["href"] = $contactURL;
-	    $response["_links"]["osdi:people"][] = $URLarray;
+            $contactURL = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($newparams), TRUE, NULL, FALSE, TRUE);
 
- 
-	    $newcontact = convertContactOSDI($contact);
-	    $newcontact["modified_date"] = $optionals["values"][0]["modified_date"];
-	    $newcontact["custom_fields"] = array();
-	    foreach ($idnamemapping as $key => $value) {
+            $URLarray = array();
+            $URLarray["href"] = $contactURL;
+            $response["_links"]["osdi:people"][] = $URLarray;
+
+            $newcontact = convertContactOSDI($contact);
+            $newcontact["modified_date"] = $optionals["values"][0]["modified_date"];
+            $newcontact["custom_fields"] = array();
+            foreach ($idnamemapping as $key => $value) {
                 $newcontact["custom_fields"][$value] = $optionals["values"][0][$key];
-	    }
-	    //$newcontact["modified_date"] = $optionals["values"][$contact["id"]]
+            }
 
             $newcontact["_links"]["self"]["href"] = $contactURL;
-
             $response["_embedded"]["osdi:people"][] = $newcontact;
-	}
+        }
 
-	// if no users show up, don't provide a next option
-	if (sizeof($response["_embedded"]["osdi:people"]) == 0) {
+        // if no users show up, don't provide a next option
+        if (sizeof($response["_embedded"]["osdi:people"]) == 0) {
             unset($response["_links"]["next"]);
-	}
+        }
     }
 
     return civicrm_api3_create_success($response, $params, 'Exporter', 'export');
@@ -221,46 +219,46 @@ function URLformat($params) {
 }
 
 function convertContactOSDI($contact) {
-	$newcontact = array();
-	$newcontact["family_name"] = $contact["last_name"];
-	$newcontact["given_name"] = $contact["first_name"];
-	$newcontact["additional_name"] = $contact["middle_name"];
-	$newcontact["honorific_prefix"] = $contact["prefix_id"];
-	$newcontact["honorific_suffix"] = $contact["suffix_id"];
-	$newcontact["gender_id"] = $contact["gender_id"];
-	$newcontact["employer"] = $contact["current_employer"];
+    $newcontact = array();
+    $newcontact["family_name"] = $contact["last_name"];
+    $newcontact["given_name"] = $contact["first_name"];
+    $newcontact["additional_name"] = $contact["middle_name"];
+    $newcontact["honorific_prefix"] = $contact["prefix_id"];
+    $newcontact["honorific_suffix"] = $contact["suffix_id"];
+    $newcontact["gender_id"] = $contact["gender_id"];
+    $newcontact["employer"] = $contact["current_employer"];
 
-	$newcontact["email_addresses"][0]["address"] = $contact["email"];
-	$newcontact["email_addresses"][0]["primary"] = True;
-	 
-	$newcontact["postal_addresses"][0]["primary"] = True;
-	$newcontact["postal_addresses"][0]["address_lines"][0] = $contact["street_address"];
-	$newcontact["postal_addresses"][0]["locality"] = $contact["city"];
-	$newcontact["postal_addresses"][0]["region"] = $contact["state_province_name"];
-	$newcontact["postal_addresses"][0]["country"] = $contact["country"];
-	$newcontact["postal_addresses"][0]["postal_code"] = $contact["postal_code"] . $contact["postal_code_suffix"];
+    $newcontact["email_addresses"][0]["address"] = $contact["email"];
+    $newcontact["email_addresses"][0]["primary"] = True;
+     
+    $newcontact["postal_addresses"][0]["primary"] = True;
+    $newcontact["postal_addresses"][0]["address_lines"][0] = $contact["street_address"];
+    $newcontact["postal_addresses"][0]["locality"] = $contact["city"];
+    $newcontact["postal_addresses"][0]["region"] = $contact["state_province_name"];
+    $newcontact["postal_addresses"][0]["country"] = $contact["country"];
+    $newcontact["postal_addresses"][0]["postal_code"] = $contact["postal_code"] . $contact["postal_code_suffix"];
 
-	$newcontact["phone_numbers"][0] = array(
-		"primary" => True,
-		"number" => $contact["phone"]
-	);
-	$newcontact["phone_numbers"][0]["do_not_call"] = $contact["do_not_phone"];
+    $newcontact["phone_numbers"][0] = array(
+        "primary" => True,
+        "number" => $contact["phone"]
+    );
+    $newcontact["phone_numbers"][0]["do_not_call"] = $contact["do_not_phone"];
 
-	$tokenized_bday = explode("-", $contact["birth_date"]);
+    $tokenized_bday = explode("-", $contact["birth_date"]);
     if (sizeof($tokenized_bday) == 3) {
         $newcontact["birthdate"]["month"] = $tokenized_bday[2];
         $newcontact["birthdate"]["day"] = $tokenized_bday[1];
         $newcontact["birthdate"]["year"] = $tokenized_bday[0];
     }
 
-	$newcontact["preferred_language"] = $contact["preferred_language"];
+    $newcontact["preferred_language"] = $contact["preferred_language"];
 
-	$optionalparams = array("modified_date", "created_date", "identifiers");
-	foreach ($optionalparams as $param) {
-		if (isset($newcontact[$param])) {        
-			$newcontact[$param] = $contact[$param];
-		}
-	}
+    $optionalparams = array("modified_date", "created_date", "identifiers");
+    foreach ($optionalparams as $param) {
+        if (isset($newcontact[$param])) {        
+            $newcontact[$param] = $contact[$param];
+        }
+    }
 
     // grab custom fields in group
     $resultfields = civicrm_api3('CustomField', 'get', array(
@@ -299,9 +297,9 @@ function convertContactOSDI($contact) {
     if (!$selffound) {
         $fieldresult = civicrm_api3('CustomField', 'create', array(
             'custom_group_id' => $_SESSION["OSDIGROUPID"],
-	    'label' => $key,
-	    'data_type' => 'String',
-	    'html_type' => "Text"
+        'label' => $key,
+        'data_type' => 'String',
+        'html_type' => "Text"
         ));
     }
 
