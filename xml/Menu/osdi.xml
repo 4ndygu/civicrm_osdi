@@ -25,4 +25,10 @@
     <page_callback>CRM_Osdi_Page_Webhook</page_callback>
     <title>Webhook</title>
   </item>
+  <item>
+    <path>civicrm/osdi/mapping</path>
+    <page_callback>CRM_Osdi_Page_Mapping</page_callback>
+    <title>Mapping</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

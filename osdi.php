@@ -37,6 +37,7 @@ function osdi_civicrm_install() {
  */
 function osdi_civicrm_postInstall() {
   install_groupid();
+  install_matching();
 
   _osdi_civix_civicrm_postInstall();
 }
@@ -67,6 +68,79 @@ function install_groupid() {
   $_SESSION["OSDIGROUPID"] = "osditags";
 }
 
+function install_matching() {
+  // set ID for later
+  $id = -1;
+  $id2 = -1;
+
+  // generate mapping (get or set)
+  $firstitem = civicrm_api3('Mapping', 'get', array(
+      'name' => "osdi_contact",
+  ));
+
+  if (sizeof($firstitem["values"]) == 0) {
+      $mappingresult = civicrm_api3('Mapping', 'create', array(
+          'name' => "osdi_contact",
+          'description' => "field matching rules for OSDI Contacts",
+          'mapping_type_id' => "Import Contact",
+      ));
+      $id = $mappingresult["id"];
+  } else {
+      $id = $firstitem["id"];
+  }
+
+  // do same for remote fields
+  $seconditem = civicrm_api3('Mapping', 'get', array(
+      'name' => "osdi_contact_remote",
+  ));
+  
+  if (sizeof($seconditem["values"]) == 0) {
+      $remoteresult = civicrm_api3('Mapping', 'create', array(
+          'name' => "osdi_contact_remote",
+          'description' => "field matching rules for OSDI Contacts (remote)",
+          'mapping_type_id' => "Import Contact",
+      ));
+      $id2 = $remoteresult["id"];
+  } else {
+      $id2 = $seconditem["id"];
+  }
+
+  $_SESSION["OSDIContactMatchingRule"] = "osdi_contact";
+  $_SESSION["OSDIContactMatchingRuleRemote"] = "osdi_contact_remote";
+
+  $result = civicrm_api3('Contact', 'getfields', [
+      'api_action' => "",
+  ]);
+  $fields = array_keys($result["values"]);
+
+  // generate mapping for each fieldS
+  $default_mappings = include('config.php');
+  foreach ($fields as $field) {
+      $first = $field;
+      $second = $field;
+      // check if in default
+      if (isset($default_mappings[$first])) {
+          $second = $default_mappings[$first];
+      }
+
+      // shunt the forward direction
+      $result = civicrm_api3('MappingField', 'create', [
+          'mapping_id' => $id,
+          'name' => $first,
+          'value' => $second,
+          'column_number'=> 1
+      ]);
+
+      // shunt the backward direction
+      $result = civicrm_api3('MappingField', 'create', [
+          'mapping_id' => $id2,
+          'name' => $second,
+          'value' => $first,
+          'column_number'=> 1
+      ]);
+  }
+}
+
 /**
  * Implements hook_civicrm_uninstall().
  *
@@ -83,6 +157,7 @@ function osdi_civicrm_uninstall() {
  */
 function osdi_civicrm_enable() {
   install_groupid();
+  install_matching();
 
   _osdi_civix_civicrm_enable();
 }
