@@ -76,6 +76,7 @@
                             for (var property in result2["values"]) {
                                 if (!result2["values"].hasOwnProperty(property)) continue;
 
+                                preexisting[result2["values"][property]["name"]] = result2["values"][property]["value"];
                                 console.log(property);
                                 itemid = ''.concat('#', result2["values"][property]["name"]);
                                 CRM.$(itemid).val(result2["values"][property]["value"]);
@@ -102,6 +103,7 @@
                         for (var property in result2["values"]) {
                             if (!result2["values"].hasOwnProperty(property)) continue;
 
+                            preexisting[result2["values"][property]["name"]] = result2["values"][property]["value"];
                             console.log(property);
                             itemid = ''.concat('#', result2["values"][property]["name"]);
                             CRM.$(itemid).val(result2["values"][property]["value"]);
