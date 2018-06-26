@@ -430,6 +430,8 @@
                 console.log(result);
                 alert(''.concat("Zone: ", result["values"]["result_zone"], " set successfully."));
             });
+
+        e.preventDefault();
     });
 </script>
 {/literal}

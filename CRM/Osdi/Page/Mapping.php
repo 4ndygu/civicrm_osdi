@@ -8,8 +8,7 @@ class CRM_Osdi_Page_Mapping extends CRM_Core_Page {
     CRM_Utils_System::setTitle(E::ts('Mapping'));
 
     // grab fields for column1
-    $leftside = array();
-    $rightside = array();
+    $names = array();
 
     $firstitemid = civicrm_api3('Mapping', 'get', array(
         'name' => "osdi_contact",
@@ -21,12 +20,14 @@ class CRM_Osdi_Page_Mapping extends CRM_Core_Page {
     ));
 
     foreach ($firstitem["values"] as $key => $value) {
-        $leftside[] = $value["name"];
-        $rightside[] = $value["value"];
+        $item = array();
+        $item["first"] = $value["name"];
+        $item["second"] = $value["value"];
+        $item["id"] = $value["id"];
+        $names[] = $item;
     }
 
-    $this->assign('names', $leftside);
-    $this->assign('values', $rightside);
+    $this->assign('names', $names);
 
     parent::run();
   }
