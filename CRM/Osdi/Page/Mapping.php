@@ -16,7 +16,8 @@ class CRM_Osdi_Page_Mapping extends CRM_Core_Page {
 
     $firstitem = civicrm_api3('MappingField', 'get', array(
         'mapping_id' => $firstitemid["id"],
-        'sequential' => 1
+        'sequential' => 1,
+        'options' => ['limit' => 0],
     ));
 
     foreach ($firstitem["values"] as $key => $value) {

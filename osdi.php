@@ -110,6 +110,7 @@ function install_matching() {
 
   $result = civicrm_api3('Contact', 'getfields', [
       'api_action' => "",
+
   ]);
   $fields = array_keys($result["values"]);
 

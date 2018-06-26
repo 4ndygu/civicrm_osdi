@@ -89,8 +89,6 @@ function civicrm_api3_mapping_Set($params) {
         }
         $returnValues["message"] = "new item initialized";
     } else {
-        var_dump($id);
-        var_dump($idremote);
         // just grab everyone
         $result = civicrm_api3('MappingField', 'get', [
             'sequential' => 1,
@@ -121,10 +119,6 @@ function civicrm_api3_mapping_Set($params) {
         // if old, load changes
         foreach ($changes as $key => $value) {
             if (!isset($idmapping[$key])) continue;
-
-            var_dump($key);
-            var_dump($valuemapping[$key]);
-            var_dump($idmappingremote[$valuemapping[$key]]);
 
             // find the ID for the current value via the mapping
             $result = civicrm_api3('MappingField', 'create', [

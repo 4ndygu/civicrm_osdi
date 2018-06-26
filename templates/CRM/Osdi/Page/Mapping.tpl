@@ -24,7 +24,7 @@
                 <p>{$name.first}</p>
             </td>
             <td>
-                <input type="text" name={$name.first} value={$name.second}>
+                <input type="text" id={$name.first} name={$name.first} value={$name.second}>
             </td>
         </tr>
     {/foreach}
@@ -56,8 +56,59 @@
 
     // change up the UI on select / input change
     CRM.$('#EndpointSelector').change(function(){
-        if(CRM.$('#EndpointSelector').val() == '1'){
-        } else if (CRM.$('#EndpointSelector').val() == '2') {
+        //alert(CRM.$('#EndpointSelector').val());
+        if(CRM.$('#EndpointSelector').val() == '2') {
+            if (CRM.$('#EndpointInputter').val().trim() != "") {
+                var querystring = ''.concat('OSDI_', CRM.$('#EndpointInputter').val());
+                CRM.api3('Mapping', 'get', {
+                    "name": querystring
+                }).done(function(result) {
+                    console.log(result);
+                    if (result["values"].length == 0) {
+                        alert("This group doesn't exist yet. Create it first!");
+                    } else {
+                        CRM.api3('MappingField', 'get', {
+                            "mapping_id": result["id"],
+                            "sequential": 1
+                        }).done(function(result2) {
+                            // replace the values in the table
+                            console.log(result2);
+                            for (var property in result2["values"]) {
+                                if (!result2["values"].hasOwnProperty(property)) continue;
+
+                                console.log(property);
+                                itemid = ''.concat('#', result2["values"][property]["name"]);
+                                CRM.$(itemid).val(result2["values"][property]["value"]);
+                            }
+                        });
+                    }
+                });
+            }
+        } else if (CRM.$('#EndpointSelector').val() == '1') {
+            //load AN
+            CRM.api3('Mapping', 'get', {
+                "name": "OSDI_actionnetwork"
+            }).done(function(result) {
+                console.log(result);
+                if (result["values"].length == 0) {
+                    alert("This group doesn't exist yet. Create it first!");
+                } else {
+                    CRM.api3('MappingField', 'get', {
+                        "mapping_id": result["id"],
+                        "sequential": 1
+                    }).done(function(result2) {
+                        // replace the values in the table
+                        console.log(result2);
+                        for (var property in result2["values"]) {
+                            if (!result2["values"].hasOwnProperty(property)) continue;
+
+                            console.log(property);
+                            itemid = ''.concat('#', result2["values"][property]["name"]);
+                            CRM.$(itemid).val(result2["values"][property]["value"]);
+                        }
+                    });
+                }
+            });
 
         }
     });
@@ -71,11 +122,9 @@
         var formResults = CRM.$("#MappingForm").serializeArray().map(function(x){
             data[x.name] = x.value;
         });
-        console.log(data);
 
         var changes = new Object();
         for (var property in data) {
-            console.log(property);
             if (preexisting[property].trim() != data[property].trim()) {
                 changes[property] = data[property];
             }
@@ -94,9 +143,9 @@
             "endpoint" : endpoint
         }).done(function(result) {
             if (result["values"]["message"] = "new item initialized") {
-                alert("New Group initialized with these configs.");
+                alert("Updated.");
             } else if (result["values"]["message"] = "updated") {
-                alert("New Configs in the group are updated.");
+                alert("Updated.");
             }
         });
     });
