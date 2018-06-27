@@ -129,8 +129,6 @@
 
         var changes = new Object();
         for (var property in data) {
-            console.log(preexisting[property].trim())
-            console.log(data[property].trim())
             if (preexisting[property].trim() != data[property].trim()) {
                 changes[property] = data[property];
             }
