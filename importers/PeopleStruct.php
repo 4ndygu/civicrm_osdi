@@ -13,8 +13,8 @@ class PeopleStruct {
     public function __construct($person, $rule, $groupid, $apikey) {
         $this->person = $person;
         $this->rule = $rule;
-	$this->groupid = $groupid;
-	$this->apikey = $apikey;
+	    $this->groupid = $groupid;
+	    $this->apikey = $apikey;
     }
 }
 ?>

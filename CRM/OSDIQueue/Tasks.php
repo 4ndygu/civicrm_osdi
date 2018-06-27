@@ -70,9 +70,11 @@ class CRM_OSDIQueue_Tasks {
         // this ultimately getVs passed to the api
         $params = array();
 
-        // grab all fields\
+        // grab all fields
+        $url = CRM_Utils_System::url("civicrm");
+        if ($apikey != "demokey") $url = "actionnetwork";
         $resultid = civicrm_api3('Mapping', 'get', array(
-            'name' => "OSDI_" . CRM_Utils_System::url("civicrm")
+            'name' => "OSDIREMOTE_" . $url
         ));
 
         $fieldresults = civicrm_api3('MappingField', 'get', array(
@@ -95,7 +97,7 @@ class CRM_OSDIQueue_Tasks {
             }
 
             // call convert function
-            $newcontact = convertOSDIContact($fieldmapping,  $contact);
+            $newcontact = convertOSDIContact($fieldmapping, $contact);
         }
 
         // load the ID into your group
@@ -189,57 +191,44 @@ class CRM_OSDIQueue_Tasks {
     }
 }
 
-function isJson($string) {
-    json_decode($string);
-    return (json_last_error() == JSON_ERROR_NONE);
-}
-
-function buildBranch($value, $code, &$newcontact) {
+function getBranch($code, $resultkey, $contact, &$newcontact) {
     $pieces = explode($code, '|');
-    $numItems = count($pieces);
-    $counter = 0;
-
-    $branch = array();
-    $originalbranch = &$branch;
-
+    $clone = clone $contact;
     foreach ($pieces as $piece) {
-        if(++$counter === $numItems) {
-            $branch[$piece] = $value;
-            break;
-        } else {
-            $branch[$piece] = array();
-            $branch = $branch[$piece];
-        }
+        $clone = $clone[$piece];
     }
-
-    $newcontact = array_merge($originalbranch, $newcontact);
+    $newcontact[$resultkey] = $clone;
 }
 
 function convertOSDIContact($fieldmapping, $contact) {
     $newcontact = array();
-    foreach ($contact as $key => $value) {
-        if (isset($fieldmapping[$key])) {
-            // parse the language
-            if (isJson($fieldmapping[$key])) {
-                // this is a split item
-                $jsondecoded = json_decode($fieldmapping[$key]);
-                $separator = $jsondecoded["split"];
+    foreach ($fieldmapping as $key => $value) {
+        if (isJson(stripcslashes($fieldmapping[$key]))) {
+            // this is a split item
+            $jsondecoded = json_decode($key);
+            $separator = $jsondecoded["split"];
 
-                $pieces = explode($value, $separator);
+            $pieces = explode($value, $separator);
+            $finalvalue = array();
+            foreach ($jsondecoded as $jsonkey => $jsonvalue) {
+                if ($jsonkey == "split") continue;
+                else {
+                    $smallpieces = explode($jsonvalue, '|');
+                    $clone = clone $contact;
+                    foreach ($smallpieces as $smallpiece) {
+                        $clone = $clone[$smallpiece];
+                    }
 
-                $counter = 0;
-                foreach ($pieces as $piece) {
-                    buildBranch($piece, $jsondecoded[$counter], $newcontact);
-                    $counter = $counter + 1;
+                    $finalvalue[] = $clone;
                 }
-            } else if (strpos($fieldmapping[$key], '|') !== false) {
-                buildBranch($value, $fieldmapping[$key], $newcontact);
-            } else {
-                $newcontact[$fieldmapping[$key]] = $value;
             }
+
+            $finalvaluestring = join("-", $finalvalue);
+            $newcontact[$value] = $finalvaluestring;
+        } else if (strpos($key, '|') !== false) {
+            getBranch($key, $value, $contact, $newcontact);
         } else {
-            var_dump("mapping not found!");
-            $newcontact[$key] = $value;
+            $newcontact[$value] = $contact[$value];
         }
     }
 

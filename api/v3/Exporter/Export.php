@@ -188,7 +188,18 @@ function civicrm_api3_exporter_Export($params) {
             $URLarray["href"] = $contactURL;
             $response["_links"]["osdi:people"][] = $URLarray;
 
-            $newcontact = convertContactOSDI($contact);
+            $url = CRM_Utils_System::url("civicrm");
+            if ($apikey != "demokey") $url = "actionnetwork";
+            $resultid = civicrm_api3('Mapping', 'get', array(
+                'name' => "OSDIREMOTE_" . $url
+            ));
+            $fieldresults = civicrm_api3('MappingField', 'get', array(
+                'mapping_id' => $resultid["id"],
+                'sequential' => 1,
+                'options' => ['limit' => 0],
+            ));
+
+            $newcontact = convertContactOSDI($contact, $fieldresults["values"]);
             $newcontact["modified_date"] = $optionals["values"][0]["modified_date"];
             $newcontact["custom_fields"] = array();
             foreach ($idnamemapping as $key => $value) {
@@ -218,46 +229,51 @@ function URLformat($params) {
     return $finalstring;
 }
 
-function convertContactOSDI($contact) {
+function convertContactOSDI($contact, $fieldmapping) {
     $newcontact = array();
-    $newcontact["family_name"] = $contact["last_name"];
-    $newcontact["given_name"] = $contact["first_name"];
-    $newcontact["additional_name"] = $contact["middle_name"];
-    $newcontact["honorific_prefix"] = $contact["prefix_id"];
-    $newcontact["honorific_suffix"] = $contact["suffix_id"];
-    $newcontact["gender_id"] = $contact["gender_id"];
-    $newcontact["employer"] = $contact["current_employer"];
 
-    $newcontact["email_addresses"][0]["address"] = $contact["email"];
-    $newcontact["email_addresses"][0]["primary"] = True;
-     
-    $newcontact["postal_addresses"][0]["primary"] = True;
-    $newcontact["postal_addresses"][0]["address_lines"][0] = $contact["street_address"];
-    $newcontact["postal_addresses"][0]["locality"] = $contact["city"];
-    $newcontact["postal_addresses"][0]["region"] = $contact["state_province_name"];
-    $newcontact["postal_addresses"][0]["country"] = $contact["country"];
-    $newcontact["postal_addresses"][0]["postal_code"] = $contact["postal_code"] . $contact["postal_code_suffix"];
+    if (sizeof($fieldmapping) == 0) {
+        $newcontact["family_name"] = $contact["last_name"];
+        $newcontact["given_name"] = $contact["first_name"];
+        $newcontact["additional_name"] = $contact["middle_name"];
+        $newcontact["honorific_prefix"] = $contact["prefix_id"];
+        $newcontact["honorific_suffix"] = $contact["suffix_id"];
+        $newcontact["gender_id"] = $contact["gender_id"];
+        $newcontact["employer"] = $contact["current_employer"];
 
-    $newcontact["phone_numbers"][0] = array(
-        "primary" => True,
-        "number" => $contact["phone"]
-    );
-    $newcontact["phone_numbers"][0]["do_not_call"] = $contact["do_not_phone"];
+        $newcontact["email_addresses"][0]["address"] = $contact["email"];
+        $newcontact["email_addresses"][0]["primary"] = True;
 
-    $tokenized_bday = explode("-", $contact["birth_date"]);
-    if (sizeof($tokenized_bday) == 3) {
-        $newcontact["birthdate"]["month"] = $tokenized_bday[2];
-        $newcontact["birthdate"]["day"] = $tokenized_bday[1];
-        $newcontact["birthdate"]["year"] = $tokenized_bday[0];
-    }
+        $newcontact["postal_addresses"][0]["primary"] = True;
+        $newcontact["postal_addresses"][0]["address_lines"][0] = $contact["street_address"];
+        $newcontact["postal_addresses"][0]["locality"] = $contact["city"];
+        $newcontact["postal_addresses"][0]["region"] = $contact["state_province_name"];
+        $newcontact["postal_addresses"][0]["country"] = $contact["country"];
+        $newcontact["postal_addresses"][0]["postal_code"] = $contact["postal_code"] . $contact["postal_code_suffix"];
 
-    $newcontact["preferred_language"] = $contact["preferred_language"];
+        $newcontact["phone_numbers"][0] = array(
+            "primary" => True,
+            "number" => $contact["phone"]
+        );
+        $newcontact["phone_numbers"][0]["do_not_call"] = $contact["do_not_phone"];
 
-    $optionalparams = array("modified_date", "created_date", "identifiers");
-    foreach ($optionalparams as $param) {
-        if (isset($newcontact[$param])) {        
-            $newcontact[$param] = $contact[$param];
+        $tokenized_bday = explode("-", $contact["birth_date"]);
+        if (sizeof($tokenized_bday) == 3) {
+            $newcontact["birthdate"]["month"] = $tokenized_bday[2];
+            $newcontact["birthdate"]["day"] = $tokenized_bday[1];
+            $newcontact["birthdate"]["year"] = $tokenized_bday[0];
         }
+
+        $newcontact["preferred_language"] = $contact["preferred_language"];
+
+        $optionalparams = array("created_date", "identifiers");
+        foreach ($optionalparams as $param) {
+            if (isset($newcontact[$param])) {
+                $newcontact[$param] = $contact[$param];
+            }
+        }
+    } else {
+        $newcontact = generateOSDIContact($fieldmapping, $newcontact);
     }
 
     // grab custom fields in group
@@ -305,6 +321,64 @@ function convertContactOSDI($contact) {
 
     // add this to newcountacts
     $newcontact["custom_fields"][$key] = $result["id"];
+
+    return $newcontact;
+}
+
+
+function isJson($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+}
+
+function buildBranch($value, $code, &$newcontact) {
+    $pieces = explode($code, '|');
+    $numItems = count($pieces);
+    $counter = 0;
+
+    $branch = array();
+    $originalbranch = &$branch;
+
+    foreach ($pieces as $piece) {
+        if(++$counter === $numItems) {
+            $branch[$piece] = $value;
+            break;
+        } else {
+            $branch[$piece] = array();
+            $branch = $branch[$piece];
+        }
+    }
+
+    $newcontact = array_merge($originalbranch, $newcontact);
+}
+
+function generateOSDIContact($fieldmapping, $contact) {
+    $newcontact = array();
+    foreach ($contact as $key => $value) {
+        if (isset($fieldmapping[$key])) {
+            // parse the language
+            if (isJson($fieldmapping[$key])) {
+                // this is a split item
+                $jsondecoded = json_decode($fieldmapping[$key]);
+                $separator = $jsondecoded["split"];
+
+                $pieces = explode($value, $separator);
+
+                $counter = 0;
+                foreach ($pieces as $piece) {
+                    buildBranch($piece, $jsondecoded[$counter], $newcontact);
+                    $counter = $counter + 1;
+                }
+            } else if (strpos($fieldmapping[$key], '|') !== false) {
+                buildBranch($value, $fieldmapping[$key], $newcontact);
+            } else {
+                $newcontact[$fieldmapping[$key]] = $value;
+            }
+        } else {
+            var_dump("mapping not found!");
+            $newcontact[$key] = $value;
+        }
+    }
 
     return $newcontact;
 }

@@ -158,7 +158,7 @@
         var formResults = CRM.$("#MappingForm").serializeArray().map(function(x){
             preexisting[x.name] = x.value;
         });
-        
+
     });
 </script>
 {/literal}
