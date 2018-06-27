@@ -80,6 +80,7 @@
                                 console.log(property);
                                 itemid = ''.concat('#', result2["values"][property]["name"]);
                                 CRM.$(itemid).val(result2["values"][property]["value"]);
+                                console.log(preexisting);
                             }
                         });
                     }
@@ -108,6 +109,7 @@
                             itemid = ''.concat('#', result2["values"][property]["name"]);
                             CRM.$(itemid).val(result2["values"][property]["value"]);
                         }
+                        console.log(preexisting);
                     });
                 }
             });
@@ -127,6 +129,8 @@
 
         var changes = new Object();
         for (var property in data) {
+            console.log(preexisting[property].trim())
+            console.log(data[property].trim())
             if (preexisting[property].trim() != data[property].trim()) {
                 changes[property] = data[property];
             }
@@ -150,6 +154,11 @@
                 alert("Updated.");
             }
         });
+
+        var formResults = CRM.$("#MappingForm").serializeArray().map(function(x){
+            preexisting[x.name] = x.value;
+        });
+        
     });
 </script>
 {/literal}

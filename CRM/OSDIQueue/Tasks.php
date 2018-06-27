@@ -95,7 +95,7 @@ class CRM_OSDIQueue_Tasks {
             }
 
             // call convert function
-            convertOSDIContact();
+            $newcontact = convertOSDIContact($fieldmapping,  $contact);
         }
 
         // load the ID into your group
@@ -123,9 +123,9 @@ class CRM_OSDIQueue_Tasks {
                 if (sizeof($results["values"]) == 0) {
                     $results = civicrm_api3('CustomField', 'create', array(
                         'custom_group_id' => $_SESSION["OSDIGROUPID"],
-			'label' => $custom_field,
+			            'label' => $custom_field,
                         'data_type' => 'String',
-			'html_type' => "Text"
+			            'html_type' => "Text"
                     ));
                 } 
                 $id = $results["id"]; 
@@ -137,9 +137,9 @@ class CRM_OSDIQueue_Tasks {
             if (!$currentCRMFound) { 
                 $results = civicrm_api3('CustomField', 'create', array(
                         'custom_group_id' => $_SESSION["OSDIGROUPID"],
-			'label' => $custom_field,
+			            'label' => $custom_field,
                         'data_type' => 'String',
-			'html_type' => "Text"
+			            'html_type' => "Text"
                 ));
             }
 
@@ -182,15 +182,68 @@ class CRM_OSDIQueue_Tasks {
 
         //$dupes = CRM_Dedupe_Finder::dupes($rule);
         $mergestatus = CRM_Dedupe_Merger::batchMerge($rule);
-        var_dump("MERTGING");
+        var_dump("MERGING");
         var_dump($mergestatus);
 
 		return True;
     }
 }
 
-function convertOSDIContact() {
-    
+function isJson($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+}
+
+function buildBranch($value, $code, &$newcontact) {
+    $pieces = explode($code, '|');
+    $numItems = count($pieces);
+    $counter = 0;
+
+    $branch = array();
+    $originalbranch = &$branch;
+
+    foreach ($pieces as $piece) {
+        if(++$counter === $numItems) {
+            $branch[$piece] = $value;
+            break;
+        } else {
+            $branch[$piece] = array();
+            $branch = $branch[$piece];
+        }
+    }
+
+    $newcontact = array_merge($originalbranch, $newcontact);
+}
+
+function convertOSDIContact($fieldmapping, $contact) {
+    $newcontact = array();
+    foreach ($contact as $key => $value) {
+        if (isset($fieldmapping[$key])) {
+            // parse the language
+            if (isJson($fieldmapping[$key])) {
+                // this is a split item
+                $jsondecoded = json_decode($fieldmapping[$key]);
+                $separator = $jsondecoded["split"];
+
+                $pieces = explode($value, $separator);
+
+                $counter = 0;
+                foreach ($pieces as $piece) {
+                    buildBranch($piece, $jsondecoded[$counter], $newcontact);
+                    $counter = $counter + 1;
+                }
+            } else if (strpos($fieldmapping[$key], '|') !== false) {
+                buildBranch($value, $fieldmapping[$key], $newcontact);
+            } else {
+                $newcontact[$fieldmapping[$key]] = $value;
+            }
+        } else {
+            var_dump("mapping not found!");
+            $newcontact[$key] = $value;
+        }
+    }
+
+    return $newcontact;
 }
 
 ?>
