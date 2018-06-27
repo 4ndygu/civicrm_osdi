@@ -25,10 +25,10 @@ class CRM_OSDIQueue_Tasks {
         $contact_id = -1;
         if ($contact["custom_fields"] != NULL) {
             $hash = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
-	    if (isset($contact["custom_fields"][$hash])) {
-                $contact_id = $contact["custom_fields"][$hash];
+            if (isset($contact["custom_fields"][$hash])) {
+                    $contact_id = $contact["custom_fields"][$hash];
             }
-	}
+	    }
 
         // if not, match by dedupe rule
         if ($contact_id == -1) {
@@ -50,7 +50,7 @@ class CRM_OSDIQueue_Tasks {
                     $actualField = $field["rule_field"];
                     if ($actualField == "email") {
                         $getParams[$actualField] = $contact["email_addresses"][0]["address"];
-		    } else {
+		            } else {
                         $getParams[$actualField] = $contact[CRM_OSDIQueue_Tasks::$OSDICiviArray[$actualField]];
                     }
                 }
@@ -69,18 +69,41 @@ class CRM_OSDIQueue_Tasks {
 
         // this ultimately getVs passed to the api
         $params = array();
-        $params["first_name"] = $contact["given_name"];
-        $params["last_name"] = $contact["family_name"];
-        $params["email"] = $contact["email_addresses"][0]["address"];
-        $params["display_name"] = $contact["family_name"];
-        $params["contact_type"] = "Individual";
+
+        // grab all fields\
+        $resultid = civicrm_api3('Mapping', 'get', array(
+            'name' => "OSDI_" . CRM_Utils_System::url("civicrm")
+        ));
+
+        $fieldresults = civicrm_api3('MappingField', 'get', array(
+            'mapping_id' => $resultid["id"],
+            'sequential' => 1,
+            'options' => ['limit' => 0],
+        ));
+
+        if (sizeof($fieldresults["values"]) == 0) {
+            $params["first_name"] = $contact["given_name"];
+            $params["last_name"] = $contact["family_name"];
+            $params["email"] = $contact["email_addresses"][0]["address"];
+            $params["display_name"] = $contact["family_name"];
+            $params["contact_type"] = "Individual";
+        } else {
+            // load into array
+            $fieldmapping = array();
+            foreach ($fieldresults["values"] as $fieldresult) {
+                $fieldmapping[$fieldresult["name"]] = $fieldresult["value"];
+            }
+
+            // call convert function
+            convertOSDIContact();
+        }
 
         // load the ID into your group
-	// load the AN ID into custom_fields
-	$custom_fields = $contact["custom_fields"];
-	if (isset($contact["identifiers"])) {
-            $custom_fields["ID_" . sha1($apikey)] = $contact["identifiers"][0];
-	}
+        // load the AN ID into custom_fieldss
+        $custom_fields = $contact["custom_fields"];
+        if (isset($contact["identifiers"])) {
+                $custom_fields["ID_" . sha1($apikey)] = $contact["identifiers"][0];
+        }
 
         // current key is sha1 of the /civicrm endpoint
         $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
@@ -165,4 +188,9 @@ class CRM_OSDIQueue_Tasks {
 		return True;
     }
 }
+
+function convertOSDIContact() {
+    
+}
+
 ?>
