@@ -178,7 +178,22 @@ function civicrm_api3_exporter_Bulk($params) {
           }
 
           if (validate_array_data($contact, $params["required"]) and $newer) {
-              $newcontact = convertContactOSDI($contact);
+              $resultid = civicrm_api3('Mapping', 'get', array(
+                  'name' => "OSDI_" . $url
+	      ));
+
+              $fieldresults = civicrm_api3('MappingField', 'get', array(
+                  'mapping_id' => $resultid["id"],
+                  'sequential' => 1,
+                  'options' => ['limit' => 0],
+	      ));
+	      
+	      $fieldmapping = array();
+	      foreach ($fieldresults["values"] as $fieldresult) {
+	          $fieldmapping[$fieldresult["name"]] = $fieldresult["value"];
+	      }
+
+              $newcontact = convertContactOSDI($contact, $fieldmapping);
               $body = array();
               $body["person"] = $newcontact;
 
@@ -186,15 +201,6 @@ function civicrm_api3_exporter_Bulk($params) {
               else {
                   $url = $params["endpoint_root"];
               }
-
-              $resultid = civicrm_api3('Mapping', 'get', array(
-                  'name' => "OSDIREMOTE_" . $url
-              ));
-              $fieldresults = civicrm_api3('MappingField', 'get', array(
-                  'mapping_id' => $resultid["id"],
-                  'sequential' => 1,
-                  'options' => ['limit' => 0],
-              ));
 
               $result = $client->post($params["endpoint"], [
                   "body" => json_encode($body)

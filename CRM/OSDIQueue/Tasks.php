@@ -212,11 +212,6 @@ function isJson($string) {
     return (json_last_error() == JSON_ERROR_NONE);
 }
 
-function isJson($string) {
-    json_decode($string);
-    return (json_last_error() == JSON_ERROR_NONE);
-}
-
 function convertOSDIContact($fieldmapping, $contact) {
     $newcontact = array();
     foreach ($fieldmapping as $key => $value) {
@@ -232,7 +227,7 @@ function convertOSDIContact($fieldmapping, $contact) {
                 if ($jsonkey == "split") continue;
                 else {
                     $smallpieces = explode('|', $jsonvalue);
-                    $clone = $contact;
+		    $clone = $contact;
 		    foreach ($smallpieces as $smallpiece) {
 			if (!isset($clone[$smallpiece])) {
 			    $valid = False;

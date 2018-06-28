@@ -69,7 +69,8 @@
                     } else {
                         CRM.api3('MappingField', 'get', {
                             "mapping_id": result["id"],
-                            "sequential": 1
+                            "sequential": 1,
+                            "options": {"limit": 0} 
                         }).done(function(result2) {
                             // replace the values in the table
                             console.log(result2);
@@ -95,7 +96,8 @@
                 } else {
                     CRM.api3('MappingField', 'get', {
                         "mapping_id": result["id"],
-                        "sequential": 1
+                        "sequential": 1,
+                        "options": {"limit": 0} 
                     }).done(function(result2) {
                         // replace the values in the table
                         console.log(result2);

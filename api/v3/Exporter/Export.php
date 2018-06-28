@@ -264,7 +264,7 @@ function convertContactOSDI($contact, $fieldmapping) {
             }
         }
     } else {
-        $newcontact = generateOSDIContact($fieldmapping, $newcontact);
+	$newcontact = generateOSDIContact($fieldmapping, $contact);
     }
 
     // grab custom fields in group
@@ -316,53 +316,54 @@ function convertContactOSDI($contact, $fieldmapping) {
     return $newcontact;
 }
 
+function isJson($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+}
 
 function buildBranch($value, $code, &$newcontact) {
     $pieces = explode('|', $code);
     $numItems = count($pieces);
     $counter = 0;
 
-    $branch = array();
+    $branch = &$newcontact;
     $originalbranch = &$branch;
 
     foreach ($pieces as $piece) {
         if(++$counter === $numItems) {
             $branch[$piece] = $value;
             break;
-        } else {
-            $branch[$piece] = array();
-            $branch = $branch[$piece];
+	} else {
+	    if (!isset($branch[$piece])) $branch[$piece] = array();
+            $branch = &$branch[$piece];
         }
     }
 
-    $newcontact = array_merge($originalbranch, $newcontact);
+    //$newcontact = array_merge($originalbranch, $newcontact);
 }
 
 function generateOSDIContact($fieldmapping, $contact) {
     $newcontact = array();
-    foreach ($contact as $key => $value) {
-        if (isset($fieldmapping[$key])) {
-            // parse the language
-            if (isJson($fieldmapping[$key])) {
-                // this is a split item
-                $jsondecoded = json_decode($fieldmapping[$key]);
-                $separator = $jsondecoded["split"];
+    foreach($fieldmapping as $key => $value) {
+	if (!isset($contact[$key])) continue;
 
-                $pieces = explode($value, $separator);
+	// parse the language
+        if (isJson(stripcslashes($value)) and strpos($value, "split")) {
+	    // this is a split item
+            $jsondecoded = json_decode($value, True);
+	    $separator = $jsondecoded["split"];
 
-                $counter = 0;
-                foreach ($pieces as $piece) {
-                    buildBranch($piece, $jsondecoded[$counter], $newcontact);
-                    $counter = $counter + 1;
-                }
-            } else if (strpos($fieldmapping[$key], '|') !== false) {
-                buildBranch($value, $fieldmapping[$key], $newcontact);
-            } else {
-                $newcontact[$fieldmapping[$key]] = $value;
+	    $pieces = explode($separator, $contact[$key]);
+
+            $counter = 0;
+            foreach ($pieces as $piece) {
+                buildBranch($piece, $jsondecoded[$counter], $newcontact);
+                $counter = $counter + 1;
             }
+	} else if (strpos($value, '|') !== false) {
+            if ($contact[$key] != "") buildBranch($contact[$key], $value, $newcontact);
         } else {
-            var_dump("mapping not found!");
-            $newcontact[$key] = $value;
+            $newcontact[$value] = $contact[$key];
         }
     }
 

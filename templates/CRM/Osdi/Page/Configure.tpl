@@ -340,8 +340,11 @@
 
 		if (data["endpoint"] == 1) {
             var endpoint = "https://actionnetwork.org/api/v2/people/";
+            var endpointroot = "https://actionetwork.org/api/v2/";
         } else if (data["endpoint"] == 2) {
-            var endpoint = data["civiendpoint"];
+            var endpointroot = data["civiendpoint"];
+            endpointroot = endpointroot.substring(0, endpointroot.indexOf("/civicrm"))
+                + "/civicrm";
         }
 
         if (data["resource"] == 1) {
@@ -351,6 +354,7 @@
                 "sitekey": data["sitekey"], 
                 "zone": data["zone"],
                 "allow_restart": 1,
+                "endpoint_root": endpointroot,
                 "group": data["group"],
                 "required": data["required"],
                 "key": data["apikey"],
