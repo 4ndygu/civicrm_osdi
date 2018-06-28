@@ -326,13 +326,8 @@ function convertContactOSDI($contact, $fieldmapping) {
 }
 
 
-function isJson($string) {
-    json_decode($string);
-    return (json_last_error() == JSON_ERROR_NONE);
-}
-
 function buildBranch($value, $code, &$newcontact) {
-    $pieces = explode($code, '|');
+    $pieces = explode('|', $code);
     $numItems = count($pieces);
     $counter = 0;
 

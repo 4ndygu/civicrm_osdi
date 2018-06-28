@@ -44,12 +44,13 @@
     }
 
     var preexisting = new Object();
+    preexisting["endpoint"] = "";
+    preexisting["civiendpoint"] = "";
 
     CRM.$(document).ready(function() {
         var formResults = CRM.$("#MappingForm").serializeArray().map(function(x){
             preexisting[x.name] = x.value;
         })
-        preexisting["endpoint"] = "";
         console.log("this is the loaded object");
         console.log(preexisting);
     });
@@ -63,7 +64,6 @@
                 CRM.api3('Mapping', 'get', {
                     "name": querystring
                 }).done(function(result) {
-                    console.log(result);
                     if (result["values"].length == 0) {
                         alert("This group doesn't exist yet. Create it first!");
                     } else {
@@ -77,10 +77,8 @@
                                 if (!result2["values"].hasOwnProperty(property)) continue;
 
                                 preexisting[result2["values"][property]["name"]] = result2["values"][property]["value"];
-                                console.log(property);
                                 itemid = ''.concat('#', result2["values"][property]["name"]);
                                 CRM.$(itemid).val(result2["values"][property]["value"]);
-                                console.log(preexisting);
                             }
                         });
                     }
@@ -105,7 +103,6 @@
                             if (!result2["values"].hasOwnProperty(property)) continue;
 
                             preexisting[result2["values"][property]["name"]] = result2["values"][property]["value"];
-                            console.log(property);
                             itemid = ''.concat('#', result2["values"][property]["name"]);
                             CRM.$(itemid).val(result2["values"][property]["value"]);
                         }
@@ -128,6 +125,10 @@
         });
 
         var changes = new Object();
+        if (data["endpoint"] == 1) {
+            preexisting["civiendpoint"] = "";
+        }
+
         for (var property in data) {
             if (preexisting[property].trim() != data[property].trim()) {
                 changes[property] = data[property];
