@@ -92,9 +92,10 @@ class CRM_OSDIQueue_Tasks {
         } else {
             // load into array
             $fieldmapping = array();
-            foreach ($fieldresults["values"] as $fieldresult) {
+	    foreach ($fieldresults["values"] as $fieldresult) {
+		if (!isset($fieldresult["name"])) continue;
                 $fieldmapping[$fieldresult["name"]] = $fieldresult["value"];
-            }
+	    }
 
             // call convert function
             $newcontact = convertOSDIContact($fieldmapping, $contact);
@@ -192,12 +193,23 @@ class CRM_OSDIQueue_Tasks {
 }
 
 function getBranch($code, $resultkey, $contact, &$newcontact) {
-    $pieces = explode($code, '|');
-    $clone = clone $contact;
+    $pieces = explode('|', $code);
+    $clone = $contact;
+
+    $valid = True;
     foreach ($pieces as $piece) {
+	if (!isset($clone[$piece])) {
+             $valid = False;
+	     break;
+	}
         $clone = $clone[$piece];
     }
-    $newcontact[$resultkey] = $clone;
+    if ($valid) $newcontact[$resultkey] = $clone;
+}
+
+function isJson($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
 }
 
 function isJson($string) {
@@ -208,32 +220,45 @@ function isJson($string) {
 function convertOSDIContact($fieldmapping, $contact) {
     $newcontact = array();
     foreach ($fieldmapping as $key => $value) {
-        if (isJson(stripcslashes($fieldmapping[$key]))) {
-            // this is a split item
-            $jsondecoded = json_decode($key);
+        if (isJson(stripcslashes($key)) and strpos($key, 'split') !== False) {
+	    // this is a split item
+            $jsondecoded = json_decode($key, True);
             $separator = $jsondecoded["split"];
 
-            $pieces = explode($value, $separator);
-            $finalvalue = array();
+            $pieces = explode($separator, $value);
+	    $finalvalue = array();
+	    $valid = True;
             foreach ($jsondecoded as $jsonkey => $jsonvalue) {
                 if ($jsonkey == "split") continue;
                 else {
-                    $smallpieces = explode($jsonvalue, '|');
-                    $clone = clone $contact;
-                    foreach ($smallpieces as $smallpiece) {
-                        $clone = $clone[$smallpiece];
-                    }
+                    $smallpieces = explode('|', $jsonvalue);
+                    $clone = $contact;
+		    foreach ($smallpieces as $smallpiece) {
+			if (!isset($clone[$smallpiece])) {
+			    $valid = False;
+		            break;
+			}
+			$clone = $clone[$smallpiece];
+		    }
+
+		    if (!$valid) break;
 
                     $finalvalue[] = $clone;
                 }
             }
 
-            $finalvaluestring = join("-", $finalvalue);
-            $newcontact[$value] = $finalvaluestring;
+	    if ($valid) {
+                $finalvaluestring = join("-", $finalvalue);
+	        $newcontact[$value] = $finalvaluestring;
+	    }
         } else if (strpos($key, '|') !== false) {
             getBranch($key, $value, $contact, $newcontact);
-        } else {
-            $newcontact[$value] = $contact[$value];
+	} else {
+	    if (!isset($contact[$key])) {
+	        //var_dump($key . " was not in the OSDI contact.");
+	    } else {
+                $newcontact[$value] = $contact[$key];
+            }
         }
     }
 
