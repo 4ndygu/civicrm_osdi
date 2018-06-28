@@ -189,17 +189,8 @@ function civicrm_api3_exporter_Export($params) {
             $response["_links"]["osdi:people"][] = $URLarray;
 
             $url = CRM_Utils_System::url("civicrm");
-            if ($apikey != "demokey") $url = "actionnetwork";
-            $resultid = civicrm_api3('Mapping', 'get', array(
-                'name' => "OSDIREMOTE_" . $url
-            ));
-            $fieldresults = civicrm_api3('MappingField', 'get', array(
-                'mapping_id' => $resultid["id"],
-                'sequential' => 1,
-                'options' => ['limit' => 0],
-            ));
 
-            $newcontact = convertContactOSDI($contact, $fieldresults["values"]);
+            $newcontact = convertContactOSDI($contact, array());
             $newcontact["modified_date"] = $optionals["values"][0]["modified_date"];
             $newcontact["custom_fields"] = array();
             foreach ($idnamemapping as $key => $value) {
@@ -313,9 +304,9 @@ function convertContactOSDI($contact, $fieldmapping) {
     if (!$selffound) {
         $fieldresult = civicrm_api3('CustomField', 'create', array(
             'custom_group_id' => $_SESSION["OSDIGROUPID"],
-        'label' => $key,
-        'data_type' => 'String',
-        'html_type' => "Text"
+            'label' => $key,
+            'data_type' => 'String',
+            'html_type' => "Text"
         ));
     }
 

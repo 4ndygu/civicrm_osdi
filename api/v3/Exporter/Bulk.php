@@ -14,6 +14,7 @@ include "Export.php";
 function _civicrm_api3_exporter_Bulk_spec(&$spec) {
   $spec['key']['api.required'] = 1;
   $spec['endpoint']['api.required'] = 1;
+  $spec['endpoint_root']['api.required'] = 1;
   $spec['allow_restart']['api.required'] = 0;
   $spec['group']['api.required'] = 0;
   $spec['updatejob']['api.required'] = 0;
@@ -180,6 +181,20 @@ function civicrm_api3_exporter_Bulk($params) {
               $newcontact = convertContactOSDI($contact);
               $body = array();
               $body["person"] = $newcontact;
+
+              if (strpos($params["endpoint"], "actionnetwork") !== False) $url = "actionnetwork";
+              else {
+                  $url = $params["endpoint_root"];
+              }
+
+              $resultid = civicrm_api3('Mapping', 'get', array(
+                  'name' => "OSDIREMOTE_" . $url
+              ));
+              $fieldresults = civicrm_api3('MappingField', 'get', array(
+                  'mapping_id' => $resultid["id"],
+                  'sequential' => 1,
+                  'options' => ['limit' => 0],
+              ));
 
               $result = $client->post($params["endpoint"], [
                   "body" => json_encode($body)

@@ -112,7 +112,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
                     'sequential' => 1
                 ));
 	    }
-            print json_encode(convertContactOSDI($result["values"][0]), JSON_PRETTY_PRINT);
+            print json_encode(convertContactOSDI($result["values"][0], array()), JSON_PRETTY_PRINT);
         }
     }
 
