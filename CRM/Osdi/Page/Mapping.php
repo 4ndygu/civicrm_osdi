@@ -21,8 +21,20 @@ class CRM_Osdi_Page_Mapping extends CRM_Core_Page {
     ));
 
     foreach ($firstitem["values"] as $key => $value) {
+        $addOn = "";
+        if (substr($value["name"], 0, 6 ) == "custom") {
+            // grab the actual name too
+            $result = civicrm_api3('CustomField', 'get', array(
+                'sequential' => 1,
+                'id' => (int) substr($value["name"], 7)
+            ));
+
+            $addOn = "/" . $result["values"][0]["name"];
+            var_dump($addOn);
+        }
         $item = array();
         $item["first"] = $value["name"];
+        $item["firstname"] = $value["name"] . $addOn;
         $item["second"] = $value["value"];
         $item["id"] = $value["id"];
         $names[] = $item;

@@ -9,7 +9,7 @@
     <p>If CiviCRM selected, please enter the (https preferred) url to your /civicrm endpoint</p>
     <input id="EndpointInputter" type="text" name="civiendpoint">
 
-    <table style="width:100%">
+    <table id="MappingTable" style="width:100%">
     <tr>
         <th>ID</th>
         <th>Civi</th>
@@ -21,7 +21,7 @@
                 <p>{$name.id}</p>
             </td>
             <td>
-                <p>{$name.first}</p>
+                <p>{$name.firstname}</p>
             </td>
             <td>
                 <input type="text" id={$name.first} name={$name.first} value={$name.second}>
@@ -76,10 +76,16 @@
                             console.log(result2);
                             for (var property in result2["values"]) {
                                 if (!result2["values"].hasOwnProperty(property)) continue;
+                                if (property == "endpoint" || property == "civiendpoint") continue;
 
                                 preexisting[result2["values"][property]["name"]] = result2["values"][property]["value"];
                                 itemid = ''.concat('#', result2["values"][property]["name"]);
-                                CRM.$(itemid).val(result2["values"][property]["value"]);
+                                // if item exists replace, if not generate
+                                if(CRM.$(itemid).length) {
+                                    CRM.$(itemid).val(result2["values"][property]["value"]);
+                                } else {
+
+                                }
                             }
                         });
                     }
@@ -103,6 +109,7 @@
                         console.log(result2);
                         for (var property in result2["values"]) {
                             if (!result2["values"].hasOwnProperty(property)) continue;
+                            if (property == "endpoint" || property == "civiendpoint") continue;
 
                             preexisting[result2["values"][property]["name"]] = result2["values"][property]["value"];
                             itemid = ''.concat('#', result2["values"][property]["name"]);

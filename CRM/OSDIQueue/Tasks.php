@@ -21,6 +21,24 @@ class CRM_OSDIQueue_Tasks {
         $rule = $contactresource->rule;
         $apikey = $contactresource->apikey;
 
+        // load the mapping first
+        // grab all fields
+        $url = CRM_Utils_System::url("civicrm");
+        if ($apikey != "demokey") $url = "actionnetwork";
+        $resultid = civicrm_api3('Mapping', 'get', array(
+            'name' => "OSDIREMOTE_" . $url
+        ));
+
+        if (isset($resultid["id"])) {
+            $fieldresults = civicrm_api3('MappingField', 'get', array(
+                'mapping_id' => $resultid["id"],
+                'sequential' => 1,
+                'options' => ['limit' => 0],
+            ));
+        } else {
+            var_dump("error with resultid");
+        }
+
         // check if our ID is stored already
         $contact_id = -1;
         if ($contact["custom_fields"] != NULL) {
@@ -70,19 +88,6 @@ class CRM_OSDIQueue_Tasks {
         // this ultimately getVs passed to the api
         $params = array();
 
-        // grab all fields
-        $url = CRM_Utils_System::url("civicrm");
-        if ($apikey != "demokey") $url = "actionnetwork";
-        $resultid = civicrm_api3('Mapping', 'get', array(
-            'name' => "OSDIREMOTE_" . $url
-        ));
-
-        $fieldresults = civicrm_api3('MappingField', 'get', array(
-            'mapping_id' => $resultid["id"],
-            'sequential' => 1,
-            'options' => ['limit' => 0],
-        ));
-
         if (sizeof($fieldresults["values"]) == 0) {
             $params["first_name"] = $contact["given_name"];
             $params["last_name"] = $contact["family_name"];
@@ -92,13 +97,13 @@ class CRM_OSDIQueue_Tasks {
         } else {
             // load into array
             $fieldmapping = array();
-	    foreach ($fieldresults["values"] as $fieldresult) {
-		if (!isset($fieldresult["name"])) continue;
+            foreach ($fieldresults["values"] as $fieldresult) {
+                if (!isset($fieldresult["name"])) continue;
                 $fieldmapping[$fieldresult["name"]] = $fieldresult["value"];
-	    }
+            }
 
             // call convert function
-            $newcontact = convertOSDIContact($fieldmapping, $contact);
+            $params = convertOSDIContact($fieldmapping, $contact);
         }
 
         // load the ID into your group
@@ -112,42 +117,46 @@ class CRM_OSDIQueue_Tasks {
         $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
         $currentCRMFound = False;
 
+        $tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+
         try {
             foreach ($custom_fields as $custom_field => $custom_value) {
                 if ($custom_field == $key) $currentCRMFound = True;
 
                 // each custom field should be searchable
                 $results = civicrm_api3('CustomField', 'get', array(
-                    'custom_group_id' => $_SESSION["OSDIGROUPID"],
+                    'custom_group_id' => $tag,
                     'name' => $custom_field,
                 ));
 
                 // if custom field doesn't exist, create
                 if (sizeof($results["values"]) == 0) {
                     $results = civicrm_api3('CustomField', 'create', array(
-                        'custom_group_id' => $_SESSION["OSDIGROUPID"],
+                        'custom_group_id' => $tag,
 			            'label' => $custom_field,
                         'data_type' => 'String',
 			            'html_type' => "Text"
                     ));
                 } 
-                $id = $results["id"]; 
-                $params["custom_" . $id] = $custom_value;
+                $id = $results["id"];
+
+                // search for field item here given the mapping
+                if (!isset($params["custom_" . $id])) {
+                    $params["custom_" . $id] = $custom_value;
+                }
             }
 
             // generate the field for this instance if it isn't generated. 
             // DONT import it. only do that on export
             if (!$currentCRMFound) { 
                 $results = civicrm_api3('CustomField', 'create', array(
-                        'custom_group_id' => $_SESSION["OSDIGROUPID"],
+                        'custom_group_id' => $tag,
 			            'label' => $custom_field,
                         'data_type' => 'String',
 			            'html_type' => "Text"
                 ));
             }
 
-	    var_dump($params);
-	    $params["debug"] = 1;
             // if contact exists, supply with id to update instead
             if ($contact_id == -1) {
                 $params["dupe_check"] = 1;
@@ -216,43 +225,41 @@ function convertOSDIContact($fieldmapping, $contact) {
     $newcontact = array();
     foreach ($fieldmapping as $key => $value) {
         if (isJson(stripcslashes($key)) and strpos($key, 'split') !== False) {
-	    // this is a split item
+	        // this is a split item
             $jsondecoded = json_decode($key, True);
             $separator = $jsondecoded["split"];
 
-            $pieces = explode($separator, $value);
-	    $finalvalue = array();
-	    $valid = True;
+            $finalvalue = array();
+            $valid = True;
             foreach ($jsondecoded as $jsonkey => $jsonvalue) {
                 if ($jsonkey == "split") continue;
                 else {
                     $smallpieces = explode('|', $jsonvalue);
-		    $clone = $contact;
-		    foreach ($smallpieces as $smallpiece) {
-			if (!isset($clone[$smallpiece])) {
-			    $valid = False;
-		            break;
-			}
-			$clone = $clone[$smallpiece];
-		    }
+                    $clone = $contact;
+                    foreach ($smallpieces as $smallpiece) {
+                        if (!isset($clone[$smallpiece])) {
+                            $valid = False;
+                            break;
+                        }
+                        $clone = $clone[$smallpiece];
+                    }
 
-		    if (!$valid) break;
-
+                    if (!$valid) break;
                     $finalvalue[] = $clone;
                 }
             }
 
-	    if ($valid) {
+            if ($valid) {
                 $finalvaluestring = join("-", $finalvalue);
-	        $newcontact[$value] = $finalvaluestring;
-	    }
+                $newcontact[$value] = $finalvaluestring;
+            }
         } else if (strpos($key, '|') !== false) {
             getBranch($key, $value, $contact, $newcontact);
-	} else {
-	    if (!isset($contact[$key])) {
-	        //var_dump($key . " was not in the OSDI contact.");
-	    } else {
-                $newcontact[$value] = $contact[$key];
+        } else {
+            if (!isset($contact[$key])) {
+                //var_dump($key . " was not in the OSDI contact.");
+            } else {
+                    $newcontact[$value] = $contact[$key];
             }
         }
     }

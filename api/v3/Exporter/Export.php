@@ -223,6 +223,39 @@ function URLformat($params) {
 function convertContactOSDI($contact, $fieldmapping) {
     $newcontact = array();
 
+    // grab all custom fields
+    $osdigrouptag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+    $resultfields = civicrm_api3('CustomField', 'get', array(
+        'sequential' => 1,
+        'custom_group_id' => $osdigrouptag
+    ));
+
+    // load all custom fields, add yourself too
+    $customparams = array();
+    $customfields = array();
+    $customparams["id"] = $contact["contact_id"];
+    $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
+    $selffound = False;
+
+    foreach ($resultfields["values"] as $custom_field) {
+        $customfields[] = "custom_" . $custom_field["id"];
+        if ($custom_field["name"] == $key) $selffound = True;
+    }
+    $customparams["return"] = $customfields;
+    $customparams["sequential"] = 1;
+
+    // load yourself into the custom fields
+    if (!$selffound) {
+        $tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+
+        $fieldresult = civicrm_api3('CustomField', 'create', array(
+            'custom_group_id' => $tag,
+            'label' => $key,
+            'data_type' => 'String',
+            'html_type' => "Text"
+        ));
+    }
+
     if (sizeof($fieldmapping) == 0) {
         $newcontact["family_name"] = $contact["last_name"];
         $newcontact["given_name"] = $contact["first_name"];
@@ -263,51 +296,41 @@ function convertContactOSDI($contact, $fieldmapping) {
                 $newcontact[$param] = $contact[$param];
             }
         }
-    } else {
-	$newcontact = generateOSDIContact($fieldmapping, $contact);
-    }
 
-    // grab custom fields in group
-    $resultfields = civicrm_api3('CustomField', 'get', array(
-        'sequential' => 1,
-        'custom_group_id' => $_SESSION["OSDIGROUPID"]
-    ));
+        $newcontact["custom_fields"] = array();
+        if (sizeof($customparams["return"]) != 0) {
+            $result = civicrm_api3('Contact', 'get', $customparams);
 
-    // load all custom fields, add yourself too
-    $customparams = array();
-    $customfields = array();
-    $customparams["id"] = $contact["contact_id"];
-    $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
-    $selffound = False;
-
-    foreach ($resultfields["values"] as $custom_field) {
-        $customfields[] = "custom_" . $custom_field["id"]; 
-        if ($custom_field["name"] == $key) $selffound = True;
-    }
-    $customparams["return"] = $customfields;
-
-    $newcontact["custom_fields"] = array();
-    if (sizeof($customparams["return"]) != 0) {
-        $result = civicrm_api3('Contact', 'get', $customparams);
-
-        if (sizeof($result["values"] != 0)) {
-            foreach ($resultfields["values"] as $custom_field) {
-                if (isset($result["values"][0])) {
-                    $newcontact["custom_fields"][$custom_field["name"]] 
-                        = $result["values"][0]["custom_" . $custom_field["id"]];
+            if (sizeof($result["values"] != 0)) {
+                foreach ($resultfields["values"] as $custom_field) {
+                    if (isset($result["values"][0])) {
+                        $newcontact["custom_fields"][$custom_field["name"]]
+                            = $result["values"][0]["custom_" . $custom_field["id"]];
+                    }
                 }
             }
         }
-    }
 
-    // load yourself into the custom fields
-    if (!$selffound) {
-        $fieldresult = civicrm_api3('CustomField', 'create', array(
-            'custom_group_id' => $_SESSION["OSDIGROUPID"],
-            'label' => $key,
-            'data_type' => 'String',
-            'html_type' => "Text"
-        ));
+    } else {
+        if (sizeof($customparams["return"]) != 0) {
+            $result = civicrm_api3('Contact', 'get', $customparams);
+
+            if (sizeof($result["values"] != 0)) {
+                $mergearray = array();
+                foreach ($resultfields["values"] as $custom_field) {
+                    if (isset($result["values"][0])) {
+                        $mergearray["custom_" . $custom_field["id"]]
+                            = $result["values"][0]["custom_" . $custom_field["id"]];
+                    }
+                }
+
+                $contact = array_merge($contact, $mergearray);
+            }
+        }
+
+        $newcontact = generateOSDIContact($fieldmapping, $contact);
+        var_dump($newcontact);
+        return;
     }
 
     // add this to newcountacts
@@ -345,22 +368,22 @@ function buildBranch($value, $code, &$newcontact) {
 function generateOSDIContact($fieldmapping, $contact) {
     $newcontact = array();
     foreach($fieldmapping as $key => $value) {
-	if (!isset($contact[$key])) continue;
+        if (!isset($contact[$key])) continue;
 
-	// parse the language
+        // parse the language
         if (isJson(stripcslashes($value)) and strpos($value, "split")) {
-	    // this is a split item
+            // this is a split item
             $jsondecoded = json_decode($value, True);
-	    $separator = $jsondecoded["split"];
+            $separator = $jsondecoded["split"];
 
-	    $pieces = explode($separator, $contact[$key]);
+            $pieces = explode($separator, $contact[$key]);
 
             $counter = 0;
             foreach ($pieces as $piece) {
                 buildBranch($piece, $jsondecoded[$counter], $newcontact);
                 $counter = $counter + 1;
             }
-	} else if (strpos($value, '|') !== false) {
+        } else if (strpos($value, '|') !== false) {
             if ($contact[$key] != "") buildBranch($contact[$key], $value, $newcontact);
         } else {
             $newcontact[$value] = $contact[$key];

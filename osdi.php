@@ -124,6 +124,16 @@ function install_matching() {
           $second = $default_mappings[$first];
       }
 
+      if (substr($field, 0, 6) == "custom") {
+          // gert the field name
+          $result = civicrm_api3('CustomField', 'get', array(
+              'sequential' => 1,
+              'id' => substr($field, 7)
+          ));
+
+          $second = "custom_fields|" . $result["values"][0]["name"];
+      }
+
       // shunt the forward direction
       $result = civicrm_api3('MappingField', 'create', [
           'mapping_id' => $id,

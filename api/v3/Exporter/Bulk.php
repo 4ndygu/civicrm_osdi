@@ -177,15 +177,21 @@ function civicrm_api3_exporter_Bulk($params) {
               if ($params["updatejob"] == 1) $newer = contact_newer($contact, $params["updateendpoint"], $params["key"], $zone);
           }
 
+          $url = "";
+          if (strpos($params["endpoint"], "actionnetwork") !== False) $url = "actionnetwork";
+          else {
+              $url = $params["endpoint_root"];
+          }
+
           if (validate_array_data($contact, $params["required"]) and $newer) {
               $resultid = civicrm_api3('Mapping', 'get', array(
                   'name' => "OSDI_" . $url
 	      ));
 
-              $fieldresults = civicrm_api3('MappingField', 'get', array(
-                  'mapping_id' => $resultid["id"],
-                  'sequential' => 1,
-                  'options' => ['limit' => 0],
+          $fieldresults = civicrm_api3('MappingField', 'get', array(
+              'mapping_id' => $resultid["id"],
+              'sequential' => 1,
+              'options' => ['limit' => 0],
 	      ));
 	      
 	      $fieldmapping = array();
@@ -193,21 +199,16 @@ function civicrm_api3_exporter_Bulk($params) {
 	          $fieldmapping[$fieldresult["name"]] = $fieldresult["value"];
 	      }
 
-              $newcontact = convertContactOSDI($contact, $fieldmapping);
-              $body = array();
-              $body["person"] = $newcontact;
+          $newcontact = convertContactOSDI($contact, $fieldmapping);
+          $body = array();
+          $body["person"] = $newcontact;
 
-              if (strpos($params["endpoint"], "actionnetwork") !== False) $url = "actionnetwork";
-              else {
-                  $url = $params["endpoint_root"];
-              }
+          $result = $client->post($params["endpoint"], [
+              "body" => json_encode($body)
+          ]);
 
-              $result = $client->post($params["endpoint"], [
-                  "body" => json_encode($body)
-              ]);
-
-              $returnValues["results"][] = $result->getBody()->getContents();
-              $count++;
+          $returnValues["results"][] = $result->getBody()->getContents();
+          $count++;
           }
       }
 
