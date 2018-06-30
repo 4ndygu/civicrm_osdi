@@ -103,7 +103,7 @@ class CRM_OSDIQueue_Tasks {
             }
 
             // call convert function
-            $params = convertOSDIContact($fieldmapping, $contact);
+	    $params = convertOSDIContact($fieldmapping, $contact);
         }
 
         // load the ID into your group
@@ -144,7 +144,7 @@ class CRM_OSDIQueue_Tasks {
                 if (!isset($params["custom_" . $id])) {
                     $params["custom_" . $id] = $custom_value;
                 }
-            }
+	    }
 
             // generate the field for this instance if it isn't generated. 
             // DONT import it. only do that on export
