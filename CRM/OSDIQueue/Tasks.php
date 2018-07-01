@@ -103,7 +103,7 @@ class CRM_OSDIQueue_Tasks {
             }
 
             // call convert function
-	    $params = convertOSDIContact($fieldmapping, $contact);
+	        $params = convertOSDIContact($fieldmapping, $contact);
         }
 
         // load the ID into your group
@@ -117,9 +117,10 @@ class CRM_OSDIQueue_Tasks {
         $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
         $currentCRMFound = False;
 
-        $tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+        $tag = Civi::settings()->get('OSDIGROUPID');
 
         try {
+            $need_update = false;
             foreach ($custom_fields as $custom_field => $custom_value) {
                 if ($custom_field == $key) $currentCRMFound = True;
 
@@ -137,14 +138,47 @@ class CRM_OSDIQueue_Tasks {
                         'data_type' => 'String',
 			            'html_type' => "Text"
                     ));
-                } 
-                $id = $results["id"];
+
+                    $OSDIvalue = "custom_fields|" . $key;
+
+                    // grab one side of the remote
+                    $firstitem = civicrm_api3('Mapping', 'get', array(
+                        'name' => "osdi_contact",
+                    ));
+
+                    // do same for remote fields
+                    $seconditem = civicrm_api3('Mapping', 'get', array(
+                        'name' => "osdi_contact_remote",
+                    ));
+
+                    // shunt the forward direction
+                    $result = civicrm_api3('MappingField', 'create', [
+                        'mapping_id' => $firstitem["id"],
+                        'name' => $key,
+                        'value' => $OSDIvalue,
+                        'column_number'=> 1
+                    ]);
+
+                    // shunt the backward direction
+                    $result = civicrm_api3('MappingField', 'create', [
+                        'mapping_id' => $seconditem["id"],
+                        'name' => $OSDIvalue,
+                        'value' => $key,
+                        'column_number'=> 1
+                    ]);
+
+                    // call the update function
+                    $need_update = True;
+                }
 
                 // search for field item here given the mapping
+                // this ONLY works if field matching has failed earlier
+                $id = $results["id"];
                 if (!isset($params["custom_" . $id])) {
                     $params["custom_" . $id] = $custom_value;
                 }
-	    }
+	        }
+            if ($need_update) $result = civicrm_api3('Mapping', 'Update', array());
 
             // generate the field for this instance if it isn't generated. 
             // DONT import it. only do that on export

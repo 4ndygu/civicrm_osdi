@@ -81,7 +81,8 @@ function civicrm_api3_exporter_Export($params) {
    
             // now convert this daet to the CIVI time zone
             if ($date != false) {
-                $date = date('Y-m-d H:i:s', $date - 3600 * (int) $_SESSION["server_time_zone"]);
+                $date = date('Y-m-d H:i:s',
+                    $date - 3600 * (int) Civi::settings()->get("server_time_zone"));
             } else {
                 $date = "1980-01-01";
             }
@@ -104,7 +105,8 @@ function civicrm_api3_exporter_Export($params) {
         $singleuser = false;
 
         // get the list of optional parameters
-        $tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+        $tag = Civi::settings()->get('OSDIGROUPID');
+
         $optionals= civicrm_api3('CustomField', 'get', array(
             'custom_group_id' => $tag
         ));
@@ -224,7 +226,8 @@ function convertContactOSDI($contact, $fieldmapping) {
     $newcontact = array();
 
     // grab all custom fields
-    $osdigrouptag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+    $osdigrouptag = Civi::settings()->get('OSDIGROUPID');
+
     $resultfields = civicrm_api3('CustomField', 'get', array(
         'sequential' => 1,
         'custom_group_id' => $osdigrouptag
@@ -246,7 +249,7 @@ function convertContactOSDI($contact, $fieldmapping) {
 
     // load yourself into the custom fields
     if (!$selffound) {
-        $tag = isset($_SESSION["OSDIGROUPID"]) ? $_SESSION["OSDIGROUPID"] : "osditags";
+        $tag = Civi::settings()->get('OSDIGROUPID');
 
         $fieldresult = civicrm_api3('CustomField', 'create', array(
             'custom_group_id' => $tag,
@@ -254,6 +257,41 @@ function convertContactOSDI($contact, $fieldmapping) {
             'data_type' => 'String',
             'html_type' => "Text"
         ));
+
+        $OSDIvalue = "custom_fields|" . $key;
+
+        // grab one side of the remote
+        $firstitem = civicrm_api3('Mapping', 'get', array(
+            'name' => "osdi_contact",
+        ));
+
+        // do same for remote fields
+        $seconditem = civicrm_api3('Mapping', 'get', array(
+            'name' => "osdi_contact_remote",
+        ));
+
+        // shunt the forward direction
+        $result = civicrm_api3('MappingField', 'create', [
+            'mapping_id' => $firstitem["id"],
+            'name' => $key,
+            'value' => $OSDIvalue,
+            'column_number'=> 1
+        ]);
+
+        // shunt the backward direction
+        $result = civicrm_api3('MappingField', 'create', [
+            'mapping_id' => $seconditem["id"],
+            'name' => $OSDIvalue,
+            'value' => $key,
+            'column_number'=> 1
+        ]);
+
+        // call the update function
+        $result = civicrm_api3('Mapping', 'Update', [
+        ]);
+
+        // load new map into fieldmapping if we're using it
+        if (sizeof($fieldmapping) == 0) $fieldmapping[$key] = $OSDIvalue;
     }
 
     if (sizeof($fieldmapping) == 0) {

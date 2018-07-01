@@ -37,7 +37,7 @@ function osdi_civicrm_install() {
  */
 function osdi_civicrm_postInstall() {
   install_groupid();
-  install_matching();
+  //install_matching();
 
   _osdi_civix_civicrm_postInstall();
 }
@@ -61,11 +61,11 @@ function install_groupid() {
       } 
 
       $id = $result["id"];
-      $_SESSION["OSDIGROUPID"] = "osditags";
+      Civi::settings()->set('OSDIGROUPID', 'osditags');
   }
 
   $id = $result["id"];
-  $_SESSION["OSDIGROUPID"] = "osditags";
+  Civi::settings()->set('OSDIGROUPID', 'osditags');
 }
 
 function install_matching() {
@@ -105,8 +105,8 @@ function install_matching() {
       $id2 = $seconditem["id"];
   }
 
-  $_SESSION["OSDIContactMatchingRule"] = "osdi_contact";
-  $_SESSION["OSDIContactMatchingRuleRemote"] = "osdi_contact_remote";
+  Civi::settings()->set('OSDIContactMatchingRule', 'osdi_contact');
+  Civi::settings()->set('OSDIContactMatchingRuleRemote', 'osdi_contact_remote');
 
   $result = civicrm_api3('Contact', 'getfields', [
       'api_action' => "",

@@ -23,8 +23,9 @@ function _civicrm_api3_importer_SetTime_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_importer_SetTime($params) {
-    $_SESSION["server_time_zone"] = $params["zone"];
+    Civi::settings()->set('server_time_zone', $params["zone"]);
 
-    $returnValues["result_zone"] = $_SESSION["server_time_zone"];
+    $returnValues["result_zone"] = Civi::settings()->get("server_time_zone");
+
     return civicrm_api3_create_success($returnValues, $params, 'Importer', 'SetTime');
 }

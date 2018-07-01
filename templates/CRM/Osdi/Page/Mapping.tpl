@@ -32,6 +32,7 @@
 
     <button>Submit Form</button>
 </form>
+<button id="UpdateMappings">Update Endpoint Mappings</button>
 {literal}
 <script type="text/javascript">
 
@@ -168,6 +169,21 @@
         });
 
     });
+
+    CRM.$("#UpdateMappings").click(function(e) {
+        e.preventDefault();
+
+        CRM.api3('Mapping', 'Update', {
+
+        }).done(function(result) {
+            console.log(result);
+            if (result["is_error"] == 1) {
+                alert("Error: " + result["error_message"]);
+            } else {
+                alert("Mapping Updated.");
+            }
+        })
+    })
 </script>
 {/literal}
 
