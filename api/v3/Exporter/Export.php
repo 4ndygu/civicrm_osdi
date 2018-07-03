@@ -367,8 +367,6 @@ function convertContactOSDI($contact, $fieldmapping) {
         }
 
         $newcontact = generateOSDIContact($fieldmapping, $contact);
-        var_dump($newcontact);
-        return;
     }
 
     // add this to newcountacts
