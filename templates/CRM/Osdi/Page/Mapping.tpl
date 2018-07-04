@@ -7,19 +7,16 @@
         <option value="2">CiviCRM</option>
     </select>
     <p>If CiviCRM selected, please enter the (https preferred) url to your /civicrm endpoint</p>
+    <label>Endpoint for CiviCRM:</label>
     <input id="EndpointInputter" type="text" name="civiendpoint">
 
     <table id="MappingTable" style="width:100%">
     <tr>
-        <th>ID</th>
         <th>Civi</th>
         <th>External</th>
     </tr>
     {foreach from=$names item=name}
         <tr>
-            <td>
-                <p>{$name.id}</p>
-            </td>
             <td>
                 <p>{$name.firstname}</p>
             </td>
