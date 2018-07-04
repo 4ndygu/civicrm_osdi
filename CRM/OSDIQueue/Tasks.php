@@ -29,6 +29,9 @@ class CRM_OSDIQueue_Tasks {
             'name' => "OSDIREMOTE_" . $url
         ));
 
+	$fieldresults = array();
+	$fieldresults["values"] = array();
+
         if (isset($resultid["id"])) {
             $fieldresults = civicrm_api3('MappingField', 'get', array(
                 'mapping_id' => $resultid["id"],
