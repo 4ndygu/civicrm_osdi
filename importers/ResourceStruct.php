@@ -11,14 +11,16 @@ class ResourceStruct {
     public $group;
     public $zone;
     public $apikey;
+    public $endpoint;
 
-    public function __construct($resource, $rule, $filter, $group, $zone, $apikey) {
+    public function __construct($resource, $rule, $filter, $group, $zone, $apikey, $endpoint) {
         $this->rule = $rule;
         $this->resource = $resource;
         $this->filter = $filter;
         $this->group = $group;
 	$this->zone = $zone;
 	$this->apikey = $apikey;
+	$this->endpoint = $endpoint;
     }
 }
 ?>

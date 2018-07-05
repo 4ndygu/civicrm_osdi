@@ -122,14 +122,14 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         return True;
     }
 
-    public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey) {
+    public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey, $endpoint) {
         // this queue is created as a temp copy to preserve the static function
         $tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
         $peoplestruct = new PeopleStruct($page->getProperties(), $rule, $groupid, $apikey);
 
         $task = new CRM_Queue_Task(
-            array('CRM_OSDIQueue_Tasks', 'AddContact'), //call back method
+            array('CRM_OSDIQueue_Tasks', 'AddContact'), //call dback method
             array(serialize($peoplestruct))
         );
 

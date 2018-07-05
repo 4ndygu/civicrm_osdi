@@ -89,7 +89,7 @@ function civicrm_api3_importer_Schedule($params) {
             if (ActionNetworkContactImporter::validate_endpoint_data($person, $rootdata->filter)) {
                 $returnValues["person"][$properties["email_addresses"][0]["address"]]["new"] = ActionNetworkContactImporter::is_newest_endpoint_data($person, $date, $zone);
                 if (ActionNetworkContactImporter::is_newest_endpoint_data($person, $date, $zone)) {
-                    ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule, $rootdata->group, $apikey);
+                    ActionNetworkContactImporter::add_task_with_page($person, $rootdata->rule, $rootdata->group, $apikey, $rootdata->endpoint);
                     $counter++;
                 }
             }
@@ -111,7 +111,7 @@ function civicrm_api3_importer_Schedule($params) {
 	// i throw it into tthe back to prevent starvation in event of multiple extractors
 	CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
 
-    $returned_data = new ResourceStruct($root, $rootdata->rule, $rootdata->filter, $rootdata->group, $zone, $apikey);
+    $returned_data = new ResourceStruct($root, $rootdata->rule, $rootdata->filter, $rootdata->group, $zone, $apikey, $rootdata->endpoint);
 	$_SESSION["extractors"][] = serialize($returned_data);
 
 	$returnValues["status"] = "partially completed";

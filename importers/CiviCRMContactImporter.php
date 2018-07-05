@@ -61,7 +61,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
         $data = json_decode($response_string, true);
 
         $data = Resource::create($this->client, $data);
-        $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone, $this->apikey);
+        $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
 
         // shunt the root into the queue
         if (!isset($_SESSION["extractors"])) {
@@ -124,11 +124,11 @@ class CiviCRMContactImporter extends AbstractContactImporter
         return True;
     }
 
-    public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey) {
+    public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey, $endpoint) {
         // this queue is created as a temp copy to preserve the static function
         $tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
-        $peoplestruct = new PeopleStruct($page->getProperties(), $rule, $groupid, $apikey);
+        $peoplestruct = new PeopleStruct($page->getProperties(), $rule, $groupid, $apikey, $endpoint);
 
         $task = new CRM_Queue_Task(
             array('CRM_OSDIQueue_Tasks', 'AddContact'), //call back method
@@ -145,7 +145,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
         // this queue is created as a temp copy to preserve the static function
         $tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
-        $peoplestruct = new PeopleStruct(array(), $rule, -1, NULL);
+        $peoplestruct = new PeopleStruct(array(), $rule, -1, NULL, "");
 
         $task = new CRM_Queue_Task(
             array('CRM_OSDIQueue_Tasks', 'MergeContacts'), //call back method

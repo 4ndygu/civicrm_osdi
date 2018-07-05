@@ -22,6 +22,7 @@ abstract class AbstractContactImporter
     public function pull_endpoint_data($filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
         $counter = 0;
 
+        var_dump($this->entrypoint);
 	// create an entry point to retrieve the data
 	$resource_root = $this->entrypoint->get();// return the main resource
 
@@ -36,7 +37,7 @@ abstract class AbstractContactImporter
 	} 
 
 
-	$final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone, $this->apikey);
+	$final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
 	$_SESSION["extractors"][] = serialize($final_data);
 
         return $counter;
@@ -45,7 +46,7 @@ abstract class AbstractContactImporter
     abstract public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1);
     abstract public static function validate_endpoint_data($data);
     abstract public static function is_newest_endpoint_data($data, $date, $zone);
-	abstract public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey);
+	abstract public static function add_task_with_page($page, $rule = NULL, $groupid = -1, $apikey, $endpoint);
 }
 ?>
 

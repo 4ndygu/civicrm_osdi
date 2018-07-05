@@ -321,6 +321,8 @@
 	<button>Set Remote Time zone</button>
 </form>
 
+<button id="SetKey">Update API Key</button>
+
 {literal}
 <script type="text/javascript">
 
@@ -437,6 +439,20 @@
             });
 
         e.preventDefault();
+    });
+
+    CRM.$("#SetKey").click(function(e) {
+        e.preventDefault();
+
+        CRM.api3('Key', 'Generate', {
+        }).done(function(result) {
+            console.log(result);
+            if (result["is_error"] == 1) {
+                alert("Error: " + result["error_message"]);
+            } else {
+                alert(result["values"]["message"]);
+            }
+        });
     });
 </script>
 {/literal}

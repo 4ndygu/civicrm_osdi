@@ -23,14 +23,15 @@ class CRM_OSDIQueue_Tasks {
 
         // load the mapping first
         // grab all fields
-        $url = CRM_Utils_System::url("civicrm");
+        $url = $contactresource->endpoint;
+        var_dump($url);
         if ($apikey != "demokey") $url = "actionnetwork";
         $resultid = civicrm_api3('Mapping', 'get', array(
             'name' => "OSDIREMOTE_" . $url
         ));
 
-	$fieldresults = array();
-	$fieldresults["values"] = array();
+        $fieldresults = array();
+        $fieldresults["values"] = array();
 
         if (isset($resultid["id"])) {
             $fieldresults = civicrm_api3('MappingField', 'get', array(
