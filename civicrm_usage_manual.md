@@ -12,9 +12,24 @@ There are three things that you should do on a fresh install in order to make th
 
 #### 1. Setting a server time zone
 
-#### 2. Generating an API Key
+If you scroll down the /civicrm/osdi/configure endpoint, you'll come across a dropdown menu that looks like this:
+![timezone config image](https://raw.githubusercontent.com/4ndygu/civicrm_osdi/master/civicrm_timezone_config.png)
+
+This sets the time zone on the *server* where the civicrm instance is running. Please first select a timezone and configure it to your server settings.
+
+#### 2. Generating an API Key and enabling permissions
+
+Undernearth the timezone configuration button, there should be a button that says "Update API Key". You must click it first in order to save the API key. If you do, you should get a notification that looks something like this:
+
+![button config image](https://raw.githubusercontent.com/4ndygu/civicrm_osdi/master/civicrm_key_response.png)
+
+The red bar will be an API key. You can refresh the API key by simply clicking it again. In order to POST out to the /civicrm/osdi/webhook endpoint, you must supply this key under the OSDI-API-Token header.
+
+In order to access the webhook (required for Civi to Civi sync), you must enable "webhook permissions". Go to `Administer -> Users and Permissions -> Permissions (Access Control) -> Drupal Access Control. Then, enable the `OSDI sample application: allow webhook posts` permissions for anonymous users.
 
 #### 3. Configure a Mapping
+
+This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. 
 
 #### 4. (Optional) Refresh for mapping to consider custom fields.
 
