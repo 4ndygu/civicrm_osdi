@@ -1,3 +1,23 @@
+### Installation
+
+In order to install the app, simply put this code in the root of the extensions directory. Then, use `composer install` in order to install the dependencies on this application.
+
+When the extension is installed, three things will be installed with it:
+
+- a default mapping from civicrm to OSDI
+- a default mapping from OSDI to civicrm
+- a custom group called osditags
+
+There are three things that you should do on a fresh install in order to make this extension work optimally:
+
+#### 1. Setting a server time zone
+
+#### 2. Generating an API Key
+
+#### 3. Configure a Mapping
+
+#### 4. (Optional) Refresh for mapping to consider custom fields.
+
 ### how to set up sync
 
 In order to implement 2-way sync, we have implemented 4 main functions.
@@ -68,7 +88,9 @@ parameters. We provide the following extra parameters:
 
     key - this is the api key
     endpoint - this is the root of the api's people endpoint, such as https://actionnetwork.org/api/v2/people/
+    endpoint_root - this is the root of the api endpoint proper. Via the UI, this is generated automatically
     group - this is analogous to the groupID from the config page
+    allow_restart - if 0, the job will not restart when completed. if 1, the job will.
     updatejob - set this to 1 if you want to update
     updateendpoint - set this to the endpoint of the external party's person signup helper
     required - this is the same as the space-delimited Required field 
