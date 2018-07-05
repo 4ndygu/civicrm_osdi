@@ -199,7 +199,8 @@ function civicrm_api3_exporter_Bulk($params) {
 	          $fieldmapping[$fieldresult["name"]] = $fieldresult["value"];
 	      }
 
-          $newcontact = convertContactOSDI($contact, $fieldmapping);
+	      $newcontact = convertContactOSDI($contact, $fieldmapping);
+
           $body = array();
           $body["person"] = $newcontact;
 

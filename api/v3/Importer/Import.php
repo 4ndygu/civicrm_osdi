@@ -19,7 +19,6 @@ function _civicrm_api3_importer_Import_spec(&$spec) {
   $spec['zone']['api.required'] = 0;
   $spec['required']['api.required'] = 0;
   $spec['rule']['api.required'] = 0;
-  $spec['sitekey']['api.required'] = 0;
   $spec['endpoint']['api.required'] = 1;
 }
 

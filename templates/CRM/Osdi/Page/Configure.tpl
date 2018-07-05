@@ -14,10 +14,7 @@
 	<br>
 	<p>CiviCRM endpoint</p> 
 	<input type="text" name="civiendpoint" id="civiendpoint">
-    <br>
-	<p>Site Key:</p> 
-	<input type="text" name="sitekey" id="sitekey">
-	<br>
+        <br>
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
 	<br>
@@ -132,10 +129,7 @@
 	<br>
 	<p>CiviCRM endpoint</p> 
 	<input type="text" name="civiendpoint" id="civiendpoint">
-    <br>
-	<p>Site Key:</p> 
-	<input type="text" name="sitekey" id="sitekey">
-    <br>
+        <br>
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
     <br>
@@ -354,7 +348,6 @@
             console.log("calling api");
             console.log(data);
             CRM.api3('Exporter', 'bulk', {
-                "sitekey": data["sitekey"], 
                 "zone": data["zone"],
                 "allow_restart": 1,
                 "endpoint_root": endpointroot,
@@ -403,7 +396,6 @@
             console.log("calling api");
             console.log(JSON.stringify(data));
             CRM.api3('Importer', 'import', {
-                "sitekey": data["sitekey"], 
                 "zone": data["zone"], 
                 "group": data["group"], 
                 "key": data["apikey"], 

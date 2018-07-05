@@ -16,7 +16,6 @@ use Hateoas\HateoasBuilder;
 function _civicrm_api3_exporter_Export_spec(&$spec) {
   $spec['object']['api.required'] = 1;
   $spec['apikey']['api.required'] = 0;
-  $spec['sitekey']['api.required'] = 0;
   $spec['group']['api.required'] = 0;
 }
 
@@ -150,8 +149,6 @@ function civicrm_api3_exporter_Export($params) {
         }
 
         $apikey = (array_key_exists("apikey", $params) ? $params["apikey"] : "apikey");
-        $sitekey = (array_key_exists("sitekey", $params) ? $params["sitekey"] : "sitekey");
-
         $response["properties"] = array();
         $response["properties"]["page"] = $offset / 25;
         $response["properties"]["per_page"] = $result["count"];

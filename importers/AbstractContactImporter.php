@@ -22,7 +22,6 @@ abstract class AbstractContactImporter
     public function pull_endpoint_data($filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
         $counter = 0;
 
-        var_dump($this->entrypoint);
 	// create an entry point to retrieve the data
 	$resource_root = $this->entrypoint->get();// return the main resource
 

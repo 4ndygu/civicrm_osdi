@@ -126,7 +126,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // this queue is created as a temp copy to preserve the static function
         $tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
-        $peoplestruct = new PeopleStruct($page->getProperties(), $rule, $groupid, $apikey);
+        $peoplestruct = new PeopleStruct($page->getProperties(), $rule, $groupid, $apikey, $endpoint);
 
         $task = new CRM_Queue_Task(
             array('CRM_OSDIQueue_Tasks', 'AddContact'), //call dback method
@@ -143,7 +143,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter
         // this queue is created as a temp copy to preserve the static function
         $tempqueue = CRM_OSDIQueue_Helper::singleton()->getQueue();
 
-        $peoplestruct = new PeopleStruct(array(), $rule, -1, NULL);
+        $peoplestruct = new PeopleStruct(array(), $rule, -1, NULL, NULL);
 
         $task = new CRM_Queue_Task(
             array('CRM_OSDIQueue_Tasks', 'MergeContacts'), //call back method

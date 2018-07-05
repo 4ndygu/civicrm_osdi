@@ -24,7 +24,6 @@ class CRM_OSDIQueue_Tasks {
         // load the mapping first
         // grab all fields
         $url = $contactresource->endpoint;
-        var_dump($url);
         if ($apikey != "demokey") $url = "actionnetwork";
         $resultid = civicrm_api3('Mapping', 'get', array(
             'name' => "OSDIREMOTE_" . $url
@@ -41,6 +40,7 @@ class CRM_OSDIQueue_Tasks {
             ));
         } else {
             var_dump("error with resultid");
+            return True;
         }
 
         // check if our ID is stored already
@@ -195,7 +195,8 @@ class CRM_OSDIQueue_Tasks {
                 ));
             }
 
-            // if contact exists, supply with id to update instead
+	    // if contact exists, supply with id to update instead
+	    $params["contact_type"] = "Individual";
             if ($contact_id == -1) {
                 $params["dupe_check"] = 1;
                 $params["check_permission"] = 1;
