@@ -29,9 +29,13 @@ In order to access the webhook (required for Civi to Civi sync), you must enable
 
 #### 3. Configure a Mapping
 
-This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. 
+This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. The endpoint for editing the mapping endpoint is at `/civicrm/osdi/mapping`. You will be presented with a page that contains the default contact to OSDI endpoint, which looks like this:
 
 #### 4. (Optional) Refresh for mapping to consider custom fields.
+
+On the bottom of the /mapping page, there is a button that is labeled `Update Endpoint Mappings`. If you have new extensions in the future that add more custom fields or in any other way have new custom fields, you can click this button to update the default mappings (and all other mappings that are newly created) with these custom fields.
+
+This function is called every time the extension syncs with a new Civi endpoint, as well as the first time it connects to ActionNetwork.
 
 ### how to set up sync
 
