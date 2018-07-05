@@ -24,7 +24,7 @@ class CRM_OSDIQueue_Tasks {
         // load the mapping first
         // grab all fields
         $url = $contactresource->endpoint;
-        if ($apikey != "demokey") $url = "actionnetwork";
+        if (substr($apikey, 0, 4) != "OSDI") $url = "actionnetwork";
         $resultid = civicrm_api3('Mapping', 'get', array(
             'name' => "OSDIREMOTE_" . $url
         ));

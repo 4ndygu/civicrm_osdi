@@ -24,7 +24,7 @@ function _civicrm_api3_key_Generate_spec(&$spec) {
 function civicrm_api3_key_Generate($params) {
     $bytes = openssl_random_pseudo_bytes(500);
     $res = base_convert($bytes, 10, 26);
-    $key = strtr($res, '0123456789', 'qrstuvwxyz');
+    $key = "OSDI_" . strtr($res, '0123456789', 'qrstuvwxyz');
 
     // store it
     Civi::settings()->set("security_key", $key);
