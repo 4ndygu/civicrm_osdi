@@ -29,7 +29,13 @@ In order to access the webhook (required for Civi to Civi sync), you must enable
 
 #### 3. Configure a Mapping
 
-This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. The endpoint for editing the mapping endpoint is at `/civicrm/osdi/mapping`. You will be presented with a page that contains the default contact to OSDI endpoint, which looks like this:
+This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. The endpoint for editing the mapping endpoint is at `/civicrm/osdi/mapping`. You will be presented with a page that contains the default contact to OSDI endpoint, which looks like this: 
+
+![osdi mapping image](https://raw.githubusercontent.com/4ndygu/civicrm_osdi/master/civicrm_mapping.png)
+
+You can load a groupat first by either moving the dropdown menu to ActionNetwork, or by filling out the endpoint in the textbox and moving the dropdown menu to CiviCRM. If a mapping is already loaded, the corresponding fields will load on the page. If the mapping does not exist, the browser will alert you, and you can click the Submit Form button at the end to generate the group.
+
+Then, you may edit the fields as you wish and update with the Submit Form button. If you want to generate a subfield in an OSDI JSON object, you must user the `|` character as a special character. For instance, a mapping from `custom_12 -> custom_fields|xxxxx` will first generate a custom_fields array if it does not exist in the created OSDI contact, then place the value of the custom_12 field with the `xxxxx` key. 
 
 #### 4. (Optional) Refresh for mapping to consider custom fields.
 
