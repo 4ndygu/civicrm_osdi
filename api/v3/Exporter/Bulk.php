@@ -210,7 +210,13 @@ function civicrm_api3_exporter_Bulk($params) {
 
           $returnValues["results"][] = $result->getBody()->getContents();
           $count++;
-          }
+	  } else {
+	      $errorarray = array();
+	      $errorarray["newer"] = $newer;
+	      $errorarray["name"] = $contact["first_name"] . ' ' . $contact["last_name"];
+	      $errorarray["valid"] = validate_array_data($contact, $params["required"]);
+	      $returnValues["results"][] = $errorarray;
+	  }
       }
 
       $offset = $offset + 100;
@@ -243,7 +249,7 @@ function contact_newer($contact, $updateendpoint, $key, $zone) {
     $data = json_decode($response_string, true);
 
     if (sizeof($data["_embedded"]["osdi:people"]) == 0) {
-        return False;
+        return True;
     }
 
     $newdate = $data["_embedded"]["osdi:people"][0]["modified_date"];
