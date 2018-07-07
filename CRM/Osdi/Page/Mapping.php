@@ -30,7 +30,6 @@ class CRM_Osdi_Page_Mapping extends CRM_Core_Page {
             ));
 
             $addOn = "/" . $result["values"][0]["name"];
-            var_dump($addOn);
         }
         $item = array();
         $item["first"] = $value["name"];

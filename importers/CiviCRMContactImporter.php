@@ -57,7 +57,7 @@ class CiviCRMContactImporter extends AbstractContactImporter
         ]);
 
         // wrap everything into a hal-client resource so nobody knows I used Guzzle
-        $response_string = $response->getBody()->getContents();
+	$response_string = $response->getBody()->getContents();
         $data = json_decode($response_string, true);
 
         $data = Resource::create($this->client, $data);
