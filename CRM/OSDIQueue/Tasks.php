@@ -51,8 +51,7 @@ class CRM_OSDIQueue_Tasks {
       ));
     }
     else {
-      var_dump("error with resultid");
-      return TRUE;
+      var_dump("mapping not found");
     }
 
     // Check if our ID is stored already.
@@ -135,17 +134,11 @@ class CRM_OSDIQueue_Tasks {
 
     // Current key is sha1 of the /civicrm endpoint.
     $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
-    $currentCRMFound = FALSE;
-
     $tag = Civi::settings()->get('OSDIGROUPID');
 
     try {
       $need_update = FALSE;
       foreach ($custom_fields as $custom_field => $custom_value) {
-        if ($custom_field == $key) {
-          $currentCRMFound = TRUE;
-        }
-
         // Each custom field should be searchable.
         $results = civicrm_api3('CustomField', 'get', array(
           'custom_group_id' => $tag,
@@ -206,10 +199,15 @@ class CRM_OSDIQueue_Tasks {
 
       // Generate the field for this instance if it isn't generated.
       // DONT import it. only do that on export.
-      if (!$currentCRMFound) {
+      $results = civicrm_api3('CustomField', 'get', array(
+          'custom_group_id' => $tag,
+          'label' => $key,
+      ));
+
+      if (sizeof($results["values"]) == 0) {
         $results = civicrm_api3('CustomField', 'create', array(
           'custom_group_id' => $tag,
-          'label' => $custom_field,
+          'label' => $key,
           'data_type' => 'String',
           'html_type' => "Text",
         ));
