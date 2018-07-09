@@ -194,7 +194,12 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
             }
           }
 
-          $result = civicrm_api3('Contact', 'create', $params);
+          $params["dupe_check"] = 1;
+          try {
+            $result = civicrm_api3('Contact', 'create', $params);
+          } catch (Exception $e) {
+            var_dump("dupe");
+          }
         }
         print json_encode(convertContactOSDI($result["values"][0], array()), JSON_PRETTY_PRINT);
       }
