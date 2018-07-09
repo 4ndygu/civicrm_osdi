@@ -167,6 +167,9 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
             $yearitems[] = isset($contactarray["birthdate"]["month"])
               ? $contactarray["birthdate"]["month"] : "";
             $params["birth_date"] = join("-", $yearitems);
+
+            $items = explode("-", $params["birth_date"]);
+            if (sizeof($items) != 3) unset($params["birth_date"]);
           }
 
           // load all custom fields
