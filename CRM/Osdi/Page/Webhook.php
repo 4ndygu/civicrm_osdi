@@ -92,6 +92,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
         return;
       }
 
+      //dummy $client just so i can use the ekino hal library
       $client = new FileGetContentsHttpClient("https://www.google.com");
       $contactarray = $contact["person"];
       $person = Resource::create($client, $contactarray);
@@ -115,15 +116,77 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
           ));
         }
         else {
-          $result = civicrm_api3('Contact', 'create', array(
+          // load all relevant parameters
+          $params = array(
             'id' => $result["id"],
             'first_name' => $contactarray["given_name"],
             'last_name' => $contactarray["family_name"],
             'email' => $contactarray["email_addresses"][0]["address"],
+            'preferred_language' => isset($contactarray["preferred_language"]) ? $contactarray["preferred_language"] : "",
+            'prefix_id' => isset($contactarray["honorific_prefix"]) ? $contactarray["honorific_prefix"] : "",
+            'suffix_id' => isset($contactarray["honorific_suffix"]) ? $contactarray["honorific_suffix"] : "",
+            'current_employer' => isset($contactarray["employer"]) ? $contactarray["employer"] : "",
             'display_name' => $contactarray["family_name"],
             'contact_type' => 'Individual',
             'sequential' => 1,
-          ));
+          );
+
+          if (isset($contactarray["postal_addresses"])) {
+            if (sizeof($contactarray["postal_addresses"]) != 0) {
+              $params["city"] = isset($contactarray["postal_addresses"][0]["locality"])
+                ? $contactarray["postal_addresses"][0]["locality"] : "";
+              $params["state_province_name"] = isset($contactarray["postal_addresses"][0]["region"])
+                ? $contactarray["postal_addresses"][0]["region"] : "";
+              $params["country"] = isset($contactarray["postal_addresses"][0]["country"])
+                ? $contactarray["postal_addresses"][0]["country"] : "";
+              $params["postal_code"] = isset($contactarray["postal_addresses"][0]["postal_code"])
+                ? $contactarray["postal_addresses"][0]["postal_code"] : "";
+              if (isset($contactarray["postal_addresses"][0]["address_lines"])) {
+                if (sizeof($contactarray["postal_addresses"][0]["address_lines"]) != 0) {
+                  $params["street_address"] = $contactarray["postal_addresses"][0]["address_lines"][0];
+                }
+              }
+            }
+          }
+
+          if (isset($contactarray["phone_numbers"])) {
+            if (sizeof($contactarray["phone_numbers"]) != 0) {
+              $params["phone"] = isset($contactarray["phone_numbers"][0]["number"])
+                  ? $contactarray["phone_numbers"][0]["number"] : "";
+              $params["do_not_phone"] = isset($contactarray["phone_numbers"][0]["do_not_call"])
+                ? $contactarray["phone_numbers"][0]["do_not_call"] : "";
+            }
+          }
+
+          if (isset($contactarray["birthdate"])) {
+            $yearitems = array();
+            $yearitems[] = isset($contactarray["birthdate"]["year"])
+              ? $contactarray["birthdate"]["year"] : "";
+            $yearitems[] = isset($contactarray["birthdate"]["day"])
+              ? $contactarray["birthdate"]["day"] : "";
+            $yearitems[] = isset($contactarray["birthdate"]["month"])
+              ? $contactarray["birthdate"]["month"] : "";
+            $params["birth_date"] = join("-", $yearitems);
+          }
+
+          // load all custom fields
+          if (isset($contactarray["custom_fields"])) {
+            foreach ($contactarray["custom_fields"] as $custom_key => $custom_value) {
+              // check if the key exists
+              $keyexistsresult = civicrm_api3('CustomField', 'get', array(
+                'sequential' => 1,
+                'label' => $custom_key
+              ));
+
+              // if yes, set the value
+              if (sizeof($keyexistsresult["values"]) != 0) {
+                $custom_id = $keyexistsresult["values"][0]["id"];
+                $params["custom_" . $custom_id] = $custom_value;
+              }
+            }
+          }
+
+          $result = civicrm_api3('Contact', 'create', $params);
         }
         print json_encode(convertContactOSDI($result["values"][0], array()), JSON_PRETTY_PRINT);
       }
