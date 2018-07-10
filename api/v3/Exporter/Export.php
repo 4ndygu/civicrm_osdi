@@ -119,19 +119,6 @@ function civicrm_api3_exporter_Export($params) {
     // Get the list of optional parameters.
     $tag = Civi::settings()->get('OSDIGROUPID');
 
-    $optionals = civicrm_api3('CustomField', 'get', array(
-      'custom_group_id' => $tag,
-    ));
-
-    $idnamemapping = array();
-    $ingestcustomparams = ['modified_date'];
-    if (sizeof($optionals["values"] != 0)) {
-      foreach ($optionals["values"] as $custom_field) {
-        $ingestcustomparams[] = "custom_" . $custom_field["id"];
-        $idnamemapping["custom_" . $custom_field["id"]] = $custom_field["name"];
-      }
-    }
-
     if (array_key_exists("id", $params)) {
       $result = civicrm_api3('Contact', 'get', array(
         'contact_type' => "Individual",
@@ -189,7 +176,7 @@ function civicrm_api3_exporter_Export($params) {
         'contact_type' => "Individual",
         'sequential' => 1,
         'id' => $contact["id"],
-        'return' => $ingestcustomparams,
+        'return' => ["modified_date"],
       ));
 
       // Generate the link give nthe ID first.
@@ -207,10 +194,6 @@ function civicrm_api3_exporter_Export($params) {
 
       $newcontact = convertContactOSDI($contact, array());
       $newcontact["modified_date"] = $optionals["values"][0]["modified_date"];
-      $newcontact["custom_fields"] = array();
-      foreach ($idnamemapping as $key => $value) {
-        $newcontact["custom_fields"][$value] = $optionals["values"][0][$key];
-      }
 
       $newcontact["_links"]["self"]["href"] = $contactURL;
       $response["_embedded"]["osdi:people"][] = $newcontact;
@@ -256,13 +239,15 @@ function convertContactOSDI($contact, $fieldmapping) {
   $customparams = array();
   $customfields = array();
   $customparams["id"] = $contact["contact_id"];
-  $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm"));
+  $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm", NULL, TRUE, NULL, FALSE, TRUE));
   $selffound = FALSE;
+  $selfname = "";
 
   foreach ($resultfields["values"] as $custom_field) {
     $customfields[] = "custom_" . $custom_field["id"];
     if ($custom_field["name"] == $key) {
       $selffound = TRUE;
+      $selfname = $custom_field["name"];
     }
   }
   $customparams["return"] = $customfields;
@@ -365,7 +350,7 @@ function convertContactOSDI($contact, $fieldmapping) {
         foreach ($resultfields["values"] as $custom_field) {
           if (isset($result["values"][0])) {
             $newcontact["custom_fields"][$custom_field["name"]]
-                            = $result["values"][0]["custom_" . $custom_field["id"]];
+               = $result["values"][0]["custom_" . $custom_field["id"]];
           }
         }
       }
@@ -381,7 +366,7 @@ function convertContactOSDI($contact, $fieldmapping) {
         foreach ($resultfields["values"] as $custom_field) {
           if (isset($result["values"][0])) {
             $mergearray["custom_" . $custom_field["id"]]
-                            = $result["values"][0]["custom_" . $custom_field["id"]];
+              = $result["values"][0]["custom_" . $custom_field["id"]];
           }
         }
 
@@ -392,9 +377,8 @@ function convertContactOSDI($contact, $fieldmapping) {
     $newcontact = generateOSDIContact($fieldmapping, $contact);
   }
 
-  // Add this to newcountacts.
+  // Add this to newcontacts.
   $newcontact["custom_fields"][$key] = $result["id"];
-
   return $newcontact;
 }
 

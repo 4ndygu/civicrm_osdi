@@ -64,6 +64,15 @@ function install_groupid() {
       Civi::settings()->set('OSDIGROUPID', 'osditags');
   }
 
+  // add the existing ID to this group
+  $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm", NULL, TRUE, NULL, FALSE, TRUE));
+  $fieldresult = civicrm_api3('CustomField', 'create', array(
+    'custom_group_id' => $id,
+    'label' => $key,
+    'data_type' => 'String',
+    'html_type' => "Text",
+  ));
+
   $id = $result["id"];
   Civi::settings()->set('OSDIGROUPID', 'osditags');
 }

@@ -103,7 +103,11 @@ function civicrm_api3_exporter_Bulk($params) {
   }
 
   // Use a sha1 of the key with the endpoint to generate our identifier.
-  $hash = "CIVI_ID_" . sha1($params["key"]);
+  // change the hash to the URL if Civi, key if actionnetwork
+  $hash = "CIVI_ID_actionnetwork";
+  if (strpos($params["endpoint"], "actionnetwork.org") !== FALSE) {
+    $hash = "CIVI_ID_" . sha1($params["endpoint"]);
+  }
   $second_key = $params["endpoint"] . $hash;
 
   if (isset($params["updatejob"])) {

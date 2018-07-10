@@ -57,7 +57,8 @@ class CRM_OSDIQueue_Tasks {
     // Check if our ID is stored already.
     $contact_id = -1;
     if ($contact["custom_fields"] != NULL) {
-      $hash = "CIVI_ID_" . sha1($url);
+      $hash = "CIVI_ID_actionnetwork";
+      if (strpos($url, "actionnetwork.org") !== FALSE) $hash = "CIVI_ID_" . sha1($url);
       if (isset($contact["custom_fields"][$hash])) {
         $contact_id = $contact["custom_fields"][$hash];
       }
@@ -129,11 +130,12 @@ class CRM_OSDIQueue_Tasks {
     // load the AN ID into custom_fieldss.
     $custom_fields = $contact["custom_fields"];
     if (isset($contact["identifiers"])) {
-      $custom_fields["CIVI_ID_" . sha1($apikey)] = $contact["identifiers"][0];
+      $custom_fields["CIVI_ID_actionnetwork"] = $contact["identifiers"][0];
     }
 
     // Current key is sha1 of the /civicrm endpoint.
-    $key = "CIVI_ID_" . sha1($url);
+    $key = "CIVI_ID_actionnetwork";
+    if (strpos($url, "actionnetwork.org") !== FALSE) $key = "CIVI_ID_" . sha1($url);
     $tag = Civi::settings()->get('OSDIGROUPID');
 
     try {
@@ -224,7 +226,6 @@ class CRM_OSDIQueue_Tasks {
 
       // If contact exists, supply with id to update instead.
       $params["contact_type"] = "Individual";
-      $params["debug"] = 1;
       if ($contact_id == -1 or $contact_id == "") {
         $params["dupe_check"] = 1;
         $params["check_permission"] = 1;
@@ -240,9 +241,10 @@ class CRM_OSDIQueue_Tasks {
         }
       }
       else {
+        var_dump($params["id"]);
         $params["dupe_check"] = 1;
         $params["check_permission"] = 1;
-        //$params["id"] = $contact_id;
+        $params["id"] = $contact_id;
 
         $result = civicrm_api3('Contact', 'create', $params);
 
