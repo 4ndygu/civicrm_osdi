@@ -57,14 +57,14 @@ class CRM_OSDIQueue_Tasks {
     // Check if our ID is stored already.
     $contact_id = -1;
     if ($contact["custom_fields"] != NULL) {
-      $hash = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm"));
+      $hash = "CIVI_ID_" . sha1($url);
       if (isset($contact["custom_fields"][$hash])) {
         $contact_id = $contact["custom_fields"][$hash];
       }
     }
 
     // If not, match by dedupe rule.
-    if ($contact_id == -1) {
+    if ($contact_id == -1 or $contact_id == "") {
       $getParams = array();
       $getParams["sequential"] = 1;
       $getParams["contact_type"] = "Individual";
@@ -133,7 +133,7 @@ class CRM_OSDIQueue_Tasks {
     }
 
     // Current key is sha1 of the /civicrm endpoint.
-    $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm"));
+    $key = "CIVI_ID_" . sha1($url);
     $tag = Civi::settings()->get('OSDIGROUPID');
 
     try {
@@ -224,7 +224,8 @@ class CRM_OSDIQueue_Tasks {
 
       // If contact exists, supply with id to update instead.
       $params["contact_type"] = "Individual";
-      if ($contact_id == -1) {
+      $params["debug"] = 1;
+      if ($contact_id == -1 or $contact_id == "") {
         $params["dupe_check"] = 1;
         $params["check_permission"] = 1;
 
@@ -239,7 +240,9 @@ class CRM_OSDIQueue_Tasks {
         }
       }
       else {
-        $params["id"] = $contact_id;
+        $params["dupe_check"] = 1;
+        $params["check_permission"] = 1;
+        //$params["id"] = $contact_id;
 
         $result = civicrm_api3('Contact', 'create', $params);
 
@@ -262,6 +265,8 @@ class CRM_OSDIQueue_Tasks {
         }
       }
 
+      var_dump($result);
+
       // Add to group as well.
       if ($group != -1 and $group != NULL) {
         $result2 = civicrm_api3('GroupContact', 'create', array(
@@ -271,7 +276,7 @@ class CRM_OSDIQueue_Tasks {
       }
     }
     catch (Exception $e) {
-      var_dump($e);
+      //var_dump($e);
       return TRUE;
     }
 
@@ -343,8 +348,7 @@ function convertOSDIContact($fieldmapping, $contact) {
       $finalvalue = array();
       $valid = TRUE;
       foreach ($jsondecoded as $jsonkey => $jsonvalue) {
-        if ($jsonkey == "split") {
-          continue;
+        if ($jsonkey === "split") {
         }
         else {
           $smallpieces = explode('|', $jsonvalue);
