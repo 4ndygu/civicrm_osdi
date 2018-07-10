@@ -40,8 +40,6 @@ function _civicrm_api3_importer_Import_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_importer_Import($params) {
-  install_groupid();
-
   $importer = NULL;
   if (strpos($params["endpoint"], "actionnetwork.org") !== FALSE) {
     $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
