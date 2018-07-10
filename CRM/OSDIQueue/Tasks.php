@@ -57,7 +57,7 @@ class CRM_OSDIQueue_Tasks {
     // Check if our ID is stored already.
     $contact_id = -1;
     if ($contact["custom_fields"] != NULL) {
-      $hash = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
+      $hash = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm"));
       if (isset($contact["custom_fields"][$hash])) {
         $contact_id = $contact["custom_fields"][$hash];
       }
@@ -129,11 +129,11 @@ class CRM_OSDIQueue_Tasks {
     // load the AN ID into custom_fieldss.
     $custom_fields = $contact["custom_fields"];
     if (isset($contact["identifiers"])) {
-      $custom_fields["ID_" . sha1($apikey)] = $contact["identifiers"][0];
+      $custom_fields["CIVI_ID_" . sha1($apikey)] = $contact["identifiers"][0];
     }
 
     // Current key is sha1 of the /civicrm endpoint.
-    $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
+    $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm"));
     $tag = Civi::settings()->get('OSDIGROUPID');
 
     try {
@@ -213,6 +213,15 @@ class CRM_OSDIQueue_Tasks {
         ));
       }
 
+      // for creating and/or updating the address later
+      $addressparams = [
+        'location_type_id' => "Home",
+        'street_address' => isset($params["street_address"]) ? $params["street_address"] : "",
+        'city' => isset($params["city"]) ? $params["city"] : "",
+        'state_province_id' => isset($params["state_province_id"]) ? $params["state_province_id"] : "",
+        'country_id' => isset($params["country_id"]) ? $params["country_id"] : "",
+      ];
+
       // If contact exists, supply with id to update instead.
       $params["contact_type"] = "Individual";
       if ($contact_id == -1) {
@@ -220,11 +229,37 @@ class CRM_OSDIQueue_Tasks {
         $params["check_permission"] = 1;
 
         $result = civicrm_api3('Contact', 'create', $params);
+
+        $addressparams["contact_id"] = $result["id"];
+
+        // create address
+        if (isset($params["country_id"]) || isset($params["city"])
+          || isset($params["street_address"]) || isset($params["state_province_id"])) {
+          $result = civicrm_api3('Address', 'create', $addressparams);
+        }
       }
       else {
         $params["id"] = $contact_id;
 
         $result = civicrm_api3('Contact', 'create', $params);
+
+        // check if this contact has an address
+        $result = civicrm_api3('Address', 'get', [
+          'sequential' => 1,
+          'contact_id' => $params["id"],
+        ]);
+
+
+        $addressparams["contact_id"] = $params["id"];
+        if (sizeof($result["values"]) != 0) {
+          $addressparams["id"] = $result["values"][0]["id"];
+        }
+
+        // create address or update
+        if (isset($params["country_id"]) || isset($params["city"])
+          || isset($params["street_address"]) || isset($params["state_province_id"])) {
+          $result = civicrm_api3('Address', 'create', $addressparams);
+        }
       }
 
       // Add to group as well.

@@ -96,7 +96,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
       $client = new FileGetContentsHttpClient("https://www.google.com");
       $contactarray = $contact["person"];
       $person = Resource::create($client, $contactarray);
-      // var_dump($contactarray);
+
       if (ActionNetworkContactImporter::validate_endpoint_data($person, NULL)) {
         // Remember custom fields!
         $result = civicrm_api3('Contact', 'get', array(
@@ -170,8 +170,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
             $items = explode("-", $params["birth_date"]);
             foreach ($items as $item) {
-              if ($item == "") { 
-                var_dump($contactarray["birthdate"]);
+              if ($item == "") {
                 unset($params["birth_date"]);
               }
             }

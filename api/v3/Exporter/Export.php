@@ -256,7 +256,7 @@ function convertContactOSDI($contact, $fieldmapping) {
   $customparams = array();
   $customfields = array();
   $customparams["id"] = $contact["contact_id"];
-  $key = "ID_" . sha1(CRM_Utils_System::url("civicrm"));
+  $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm"));
   $selffound = FALSE;
 
   foreach ($resultfields["values"] as $custom_field) {

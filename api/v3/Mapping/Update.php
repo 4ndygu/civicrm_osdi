@@ -33,9 +33,19 @@ function _civicrm_api3_mapping_Update_spec(&$spec) {
 function civicrm_api3_mapping_Update($params) {
   $response = array();
 
+  // add custom fields that are new to this group
+  $custom_results = civicrm_api3('CustomField', 'get', [
+    'sequential' => 1,
+    'custom_group_id' => Civi::settings()->get('OSDIGROUPID')
+  ]);
+
   // First grab all standard mappings and load into array.
   $firstitem = civicrm_api3('Mapping', 'get', array(
     'name' => "osdi_contact_remote",
+  ));
+  // First grab all standard mappings and load into array.
+  $seconditem = civicrm_api3('Mapping', 'get', array(
+    'name' => "osdi_contact",
   ));
 
   $result = civicrm_api3('MappingField', 'get', [
@@ -45,8 +55,33 @@ function civicrm_api3_mapping_Update($params) {
   ]);
 
   $fieldmapping = array();
+  $searchmapping = array();
   foreach ($result["values"] as $value) {
     $fieldmapping[$value["name"]] = $value["value"];
+    $searchmapping[$value["value"]] = $value["name"];
+  }
+
+  // make sure custom fields taht are NEW are pushed to this group before we update
+  foreach ($custom_results["values"] as $custom_result) {
+    if (!isset($searchmapping["custom_" . $custom_result["id"]])) {
+      // add it!!!\
+      $result = civicrm_api3('MappingField', 'create', [
+        'mapping_id' => $firstitem["id"],
+        'name' => "custom_fields|" . $custom_result["name"],
+        'value' => "custom_" . $custom_result["id"],
+        'column_number' => 1,
+      ]);
+
+      // Shunt the backward direction.
+      $result = civicrm_api3('MappingField', 'create', [
+        'mapping_id' => $seconditem["id"],
+        'name' => "custom_" . $custom_result["id"],
+        'value' => "custom_fields|" . $custom_result["name"],
+        'column_number' => 1,
+      ]);
+
+      $fieldmapping["custom_fields|" . $custom_result["name"]] = "custom_" . $custom_result["id"];
+    }
   }
 
   // Now grab everyone who starts with OSDI or OSDIREMOTE.
