@@ -53,7 +53,7 @@ function install_groupid() {
           'max_multiple' => 0,
       ));
   } catch (CiviCRM_API3_Exception $e) {
-      if ($e->getErrorCode() == "already exists") {
+      if ($e->getErrorCode() === "already exists") {
           $result = civicrm_api3('CustomGroup', 'get', array(
               'title' => "osditags",
               'sequential' => 1
@@ -66,12 +66,16 @@ function install_groupid() {
 
   // add the existing ID to this group
   $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm", NULL, TRUE, NULL, FALSE, TRUE));
-  $fieldresult = civicrm_api3('CustomField', 'create', array(
-    'custom_group_id' => $id,
-    'label' => $key,
-    'data_type' => 'String',
-    'html_type' => "Text",
-  ));
+  try {
+    $fieldresult = civicrm_api3('CustomField', 'create', array(
+      'custom_group_id' => $id,
+      'label' => $key,
+      'data_type' => 'String',
+      'html_type' => "Text",
+    ));
+  } catch (CiviCRM_API3_Exception $e) {
+    if ($e->getErrorCode() !== "already exists") throw $e;
+  }
 
   $id = $result["id"];
   Civi::settings()->set('OSDIGROUPID', 'osditags');
@@ -144,20 +148,28 @@ function install_matching() {
       }
 
       // shunt the forward direction
-      $result = civicrm_api3('MappingField', 'create', [
+      try {
+        $result = civicrm_api3('MappingField', 'create', [
           'mapping_id' => $id,
           'name' => $first,
           'value' => $second,
           'column_number'=> 1
-      ]);
+        ]);
+      } catch (CiviCRM_API3_Exception $e) {
+        if ($e->getErrorCode() !== "already exists") throw $e;
+      }
 
       // shunt the backward direction
-      $result = civicrm_api3('MappingField', 'create', [
-          'mapping_id' => $id2,
-          'name' => $second,
-          'value' => $first,
-          'column_number'=> 1
-      ]);
+      try {
+        $result = civicrm_api3('MappingField', 'create', [
+            'mapping_id' => $id2,
+            'name' => $second,
+            'value' => $first,
+            'column_number'=> 1
+        ]);
+      } catch (CiviCRM_API3_Exception $e) {
+        if ($e->getErrorCode() !== "already exists") throw $e;
+      }
   }
 }
 
