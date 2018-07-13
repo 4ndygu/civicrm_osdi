@@ -241,6 +241,14 @@ class CRM_OSDIQueue_Tasks {
         // create address
         if (isset($params["country_id"]) || isset($params["city"])
           || isset($params["street_address"]) || isset($params["state_province_id"])) {
+          // change up the state
+          if (isset($params["state_province_id"])) {
+            $states = include 'config.php';
+            $params["state_province_id"] = $states[$params["state_province_id"]];
+          }
+
+          var_dump($addressparams);
+
           $result = civicrm_api3('Address', 'create', $addressparams);
         }
       }
@@ -265,6 +273,13 @@ class CRM_OSDIQueue_Tasks {
         // create address or update
         if (isset($params["country_id"]) || isset($params["city"])
           || isset($params["street_address"]) || isset($params["state_province_id"])) {
+          // change up the state
+          if (isset($params["state_province_id"])) {
+            $states = include 'config.php';
+            $params["state_province_id"] = $states[$params["state_province_id"]];
+          }
+
+          var_dump($addressparams);
           $result = civicrm_api3('Address', 'create', $addressparams);
         }
       }
