@@ -152,7 +152,7 @@ class CRM_OSDIQueue_Tasks {
         ));
 
         // If custom field doesn't exist, create.
-        if (sizeof($results["values"]) == 0) {
+	if (sizeof($results["values"]) == 0) {
           $results = civicrm_api3('CustomField', 'create', array(
             'custom_group_id' => $tag,
             'label' => $custom_field,
@@ -160,7 +160,7 @@ class CRM_OSDIQueue_Tasks {
             'html_type' => "Text",
           ));
 
-          $OSDIvalue = "custom_fields|" . $key;
+          $OSDIvalue = "custom_fields|" . $custom_field;
 
           // Grab one side of the remote.
           $firstitem = civicrm_api3('Mapping', 'get', array(
@@ -172,10 +172,10 @@ class CRM_OSDIQueue_Tasks {
             'name' => "osdi_contact_remote",
           ));
 
-          // Shunt the forward direction.
+	  // Shunt the forward direction.
           $result = civicrm_api3('MappingField', 'create', [
             'mapping_id' => $firstitem["id"],
-            'name' => $key,
+            'name' => "custom_" . $results["id"],
             'value' => $OSDIvalue,
             'column_number' => 1,
           ]);
@@ -184,7 +184,7 @@ class CRM_OSDIQueue_Tasks {
           $result = civicrm_api3('MappingField', 'create', [
             'mapping_id' => $seconditem["id"],
             'name' => $OSDIvalue,
-            'value' => $key,
+            'value' => "custom_" . $results["id"],
             'column_number' => 1,
           ]);
 
@@ -200,8 +200,8 @@ class CRM_OSDIQueue_Tasks {
         }
       }
       if ($need_update) {
-        $result = civicrm_api3('Mapping', 'Update', array());
-      }
+        //$result = civicrm_api3('Mapping', 'Update', array()); 
+      } 
 
       // Generate the field for this instance if it isn't generated.
       // DONT import it. only do that on export.
@@ -403,5 +403,6 @@ function convertOSDIContact($fieldmapping, $contact) {
     }
   }
 
+  var_dump($newcontact);
   return $newcontact;
 }

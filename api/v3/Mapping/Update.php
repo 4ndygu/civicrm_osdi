@@ -50,7 +50,7 @@ function civicrm_api3_mapping_Update($params) {
 
   $result = civicrm_api3('MappingField', 'get', [
     'sequential' => 1,
-    'mapping_id' => $firstitem["id"],
+    'mapping_id' => $seconditem["id"],
     'options' => ['limit' => 0],
   ]);
 
@@ -60,9 +60,10 @@ function civicrm_api3_mapping_Update($params) {
     $fieldmapping[$value["name"]] = $value["value"];
     $searchmapping[$value["value"]] = $value["name"];
   }
-
   // make sure custom fields taht are NEW are pushed to this group before we update
   foreach ($custom_results["values"] as $custom_result) {
+    // NOTE: this triggers if you delete a custom_field and add another
+    // grab the name of this ID's custom field and check if match
     if (!isset($searchmapping["custom_" . $custom_result["id"]])) {
       // add it!!!\
       $result = civicrm_api3('MappingField', 'create', [
@@ -87,10 +88,11 @@ function civicrm_api3_mapping_Update($params) {
   // Now grab everyone who starts with OSDI or OSDIREMOTE.
   $result = civicrm_api3('Mapping', 'get', [
     'sequential' => 1,
-    'name' => ['LIKE' => "OSDIREMOTE%"],
+    'name' => ['LIKE' => "OSDI_%"],
   ]);
 
   foreach ($result["values"] as $value) {
+    var_dump($value);
     // Grab the actual values.
     $values = civicrm_api3("MappingField", "get", array(
       "sequential" => 1,
@@ -100,9 +102,10 @@ function civicrm_api3_mapping_Update($params) {
 
     $fieldmappingcopy = $fieldmapping;
     foreach ($values["values"] as $valuetwo) {
-      unset($fieldmappingcopy[$valuetwo["name"]]);
+      if (isset($valuetwo["name"])) unset($fieldmappingcopy[$valuetwo["name"]]);
     }
 
+    var_dump($fieldmappingcopy);
     if (sizeof($fieldmappingcopy) != 0) {
       // Load next IDs and put them in the mapping.
       $name = $value["name"];
