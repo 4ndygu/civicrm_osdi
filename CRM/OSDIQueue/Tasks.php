@@ -228,6 +228,10 @@ class CRM_OSDIQueue_Tasks {
         'country_id' => isset($params["country_id"]) ? $params["country_id"] : "",
       ];
 
+      $phoneparams = [
+        'phone' => isset($params["phone"]) ? $params["phone"] : ""
+      ];
+
       // If contact exists, supply with id to update instead.
       $params["contact_type"] = "Individual";
       if ($contact_id == -1 or $contact_id == "") {
@@ -237,6 +241,7 @@ class CRM_OSDIQueue_Tasks {
         $result = civicrm_api3('Contact', 'create', $params);
 
         $addressparams["contact_id"] = $result["id"];
+        $phoneparams["contact_id"] = $result["id"];
 
         // create address
         if (isset($params["country_id"]) || isset($params["city"])
@@ -244,16 +249,23 @@ class CRM_OSDIQueue_Tasks {
           // change up the state
           if (isset($params["state_province_id"])) {
             $states = include 'config.php';
-            $params["state_province_id"] = $states[$params["state_province_id"]];
+            $addressparams["state_province_id"] = $states[$addressparams["state_province_id"]];
           }
 
           var_dump($addressparams);
 
           $result = civicrm_api3('Address', 'create', $addressparams);
         }
+
+        // create phone
+        if (isset($params["phone"])) {
+          // change up the state
+          var_dump($phoneparams);
+          $result = civicrm_api3('Phone', 'create', $phoneparams);
+        }
       }
       else {
-	      var_dump($params); var_dump($contact_id);
+        var_dump($params);
         $params["id"] = $contact_id;
 
         $result = civicrm_api3('Contact', 'create', $params);
@@ -264,10 +276,11 @@ class CRM_OSDIQueue_Tasks {
           'contact_id' => $params["id"],
         ]);
 
-
         $addressparams["contact_id"] = $params["id"];
+        $phoneparams["contact_id"] = $params["id"];
         if (sizeof($result["values"]) != 0) {
           $addressparams["id"] = $result["values"][0]["id"];
+          $phoneparams["id"] = $result["values"][0]["id"];
         }
 
         // create address or update
@@ -282,6 +295,14 @@ class CRM_OSDIQueue_Tasks {
           var_dump($addressparams);
           $result = civicrm_api3('Address', 'create', $addressparams);
         }
+
+        // create phone
+        if (isset($params["phone"])) {
+          // change up the state
+          var_dump($phoneparams);
+          $result = civicrm_api3('Phone', 'create', $phoneparams);
+        }
+
       }
 
       // Add to group as well.

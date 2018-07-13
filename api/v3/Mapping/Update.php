@@ -55,16 +55,16 @@ function civicrm_api3_mapping_Update($params) {
   ]);
 
   $fieldmapping = array();
-  $searchmapping = array();
   foreach ($result["values"] as $value) {
     $fieldmapping[$value["name"]] = $value["value"];
-    $searchmapping[$value["value"]] = $value["name"];
   }
+
   // make sure custom fields taht are NEW are pushed to this group before we update
   foreach ($custom_results["values"] as $custom_result) {
     // NOTE: this triggers if you delete a custom_field and add another
     // grab the name of this ID's custom field and check if match
-    if (!isset($searchmapping["custom_" . $custom_result["id"]])) {
+    if (!isset($fieldmapping["custom_" . $custom_result["id"]])) {
+
       // add it!!!\
       $result = civicrm_api3('MappingField', 'create', [
         'mapping_id' => $firstitem["id"],
@@ -81,7 +81,7 @@ function civicrm_api3_mapping_Update($params) {
         'column_number' => 1,
       ]);
 
-      $fieldmapping["custom_fields|" . $custom_result["name"]] = "custom_" . $custom_result["id"];
+      $fieldmapping["custom_" . $custom_result["id"]] = "custom_fields|" . $custom_result["name"];
     }
   }
 
@@ -92,7 +92,10 @@ function civicrm_api3_mapping_Update($params) {
   ]);
 
   foreach ($result["values"] as $value) {
-    var_dump($value);
+    if ($value["name"] == "osdi_contact") continue;
+    if ($value["name"] == "osdi_contact_remote") continue;
+    if (substr($value["name"], 0, 10) == "OSDIREMOTE") continue;
+
     // Grab the actual values.
     $values = civicrm_api3("MappingField", "get", array(
       "sequential" => 1,
@@ -104,14 +107,15 @@ function civicrm_api3_mapping_Update($params) {
     foreach ($values["values"] as $valuetwo) {
       if (isset($valuetwo["name"])) unset($fieldmappingcopy[$valuetwo["name"]]);
     }
+    $response[$value["name"]] = json_encode($fieldmappingcopy);
 
-    var_dump($fieldmappingcopy);
     if (sizeof($fieldmappingcopy) != 0) {
       // Load next IDs and put them in the mapping.
       $name = $value["name"];
-      $OSDIname = "OSDI_" . substr($name, 11);
+      $OSDIname = "OSDIREMOTE_" . substr($name, 5);
 
       $idresult = civicrm_api3('Mapping', 'get', array(
+        'sequential' => 1,
         'name' => $OSDIname,
       ));
 
@@ -125,12 +129,11 @@ function civicrm_api3_mapping_Update($params) {
         ));
 
         $addresult = civicrm_api3('MappingField', 'create', array(
-          'mapping_id' => $idresult["id"],
+          'mapping_id' => $idresult["values"][0]["id"],
           'name' => $leftovervalue,
           'value' => $leftoverkey,
           'column_number' => 1,
         ));
-
       }
     }
   }
