@@ -279,7 +279,7 @@ function convertContactOSDI($contact, $fieldmapping) {
     // Shunt the forward direction.
     $result = civicrm_api3('MappingField', 'create', [
       'mapping_id' => $firstitem["id"],
-      'name' => $key,
+      'name' => "custom_" . $fieldresult["id"],
       'value' => $OSDIvalue,
       'column_number' => 1,
     ]);
@@ -288,7 +288,7 @@ function convertContactOSDI($contact, $fieldmapping) {
     $result = civicrm_api3('MappingField', 'create', [
       'mapping_id' => $seconditem["id"],
       'name' => $OSDIvalue,
-      'value' => $key,
+      'value' => "custom_" . $fieldresult["id"],
       'column_number' => 1,
     ]);
 
