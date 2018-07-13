@@ -225,7 +225,8 @@ class CRM_OSDIQueue_Tasks {
         'street_address' => isset($params["street_address"]) ? $params["street_address"] : "",
         'city' => isset($params["city"]) ? $params["city"] : "",
         'state_province_id' => isset($params["state_province_id"]) ? $params["state_province_id"] : "",
-        'country_id' => isset($params["country_id"]) ? $params["country_id"] : "",
+	'country_id' => isset($params["country_id"]) ? $params["country_id"] : "",
+	'postal_code' => isset($params["postal_code"]) ? $params["postal_code"] : ""
       ];
 
       $phoneparams = [
@@ -245,14 +246,14 @@ class CRM_OSDIQueue_Tasks {
 
         // create address
         if (isset($params["country_id"]) || isset($params["city"])
-          || isset($params["street_address"]) || isset($params["state_province_id"])) {
-          // change up the state
-          if (isset($params["state_province_id"])) {
-            $states = include 'config.php';
-            $addressparams["state_province_id"] = $states[$addressparams["state_province_id"]];
+          || isset($params["street_address"]) || isset($params["state_province_id"])
+	  || isset($params["postal_code"])) {
+	  // change up the state
+	  if (isset($params["state_province_id"])) {
+            $states = include 'CRM/OSDIQueue/config.php';
+	    if ($addressparams["state_province_id"] != "" and $addressparams["state_province_id"] != NULL) 
+              $addressparams["state_province_id"] = $states[$addressparams["state_province_id"]];
           }
-
-          var_dump($addressparams);
 
           $result = civicrm_api3('Address', 'create', $addressparams);
         }
@@ -260,12 +261,10 @@ class CRM_OSDIQueue_Tasks {
         // create phone
         if (isset($params["phone"])) {
           // change up the state
-          var_dump($phoneparams);
           $result = civicrm_api3('Phone', 'create', $phoneparams);
         }
       }
       else {
-        var_dump($params);
         $params["id"] = $contact_id;
 
         $result = civicrm_api3('Contact', 'create', $params);
@@ -277,29 +276,38 @@ class CRM_OSDIQueue_Tasks {
         ]);
 
         $addressparams["contact_id"] = $params["id"];
-        $phoneparams["contact_id"] = $params["id"];
         if (sizeof($result["values"]) != 0) {
           $addressparams["id"] = $result["values"][0]["id"];
-          $phoneparams["id"] = $result["values"][0]["id"];
         }
 
-        // create address or update
+        // check if this contact has an address
+        $phoneparams["contact_id"] = $params["id"];
+        $result = civicrm_api3('Phone', 'get', [
+          'sequential' => 1,
+          'contact_id' => $params["id"],
+        ]);
+	
+	if (sizeof($result["values"]) != 0) {
+	  $phoneparams["id"] = $result["values"][0]["id"];
+        }
+
+	// create address or update
         if (isset($params["country_id"]) || isset($params["city"])
-          || isset($params["street_address"]) || isset($params["state_province_id"])) {
+          || isset($params["street_address"]) || isset($params["state_province_id"])
+	  || isset($params["postal_code"])) {
           // change up the state
           if (isset($params["state_province_id"])) {
-            $states = include 'config.php';
-            $params["state_province_id"] = $states[$params["state_province_id"]];
+            $states = include 'CRM/OSDIQueue/config.php';
+	    if ($addressparams["state_province_id"] != "" and $addressparams["state_province_id"] != NULL) 
+              $addressparams["state_province_id"] = $states[$addressparams["state_province_id"]];
           }
 
-          var_dump($addressparams);
           $result = civicrm_api3('Address', 'create', $addressparams);
         }
 
         // create phone
         if (isset($params["phone"])) {
           // change up the state
-          var_dump($phoneparams);
           $result = civicrm_api3('Phone', 'create', $phoneparams);
         }
 
@@ -424,6 +432,6 @@ function convertOSDIContact($fieldmapping, $contact) {
     }
   }
 
-  var_dump($newcontact);
+  //var_dump($newcontact);
   return $newcontact;
 }
