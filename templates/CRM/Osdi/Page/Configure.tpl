@@ -1,27 +1,21 @@
 <h3>OSDI Launchpad</h3>
 <h2>Import</h2>
 <form id="OSDIRequestForm" method="post">
-	<select name="endpoint">
-		<option value="" disabled="disabled" selected="selected">Please select a endpoint</option>
-		<option value="1">Actionnetwork</option>
-		<option value="2">CiviCRM</option>
-	</select>
-	<br>
 	<select name="resource">
 		<option value="" disabled="disabled" selected="selected">Please select a resource</option>
 		<option value="1">Contacts</option>
 	</select>
 	<br>
-	<p>CiviCRM endpoint</p> 
+	<p>OSDI endpoint (root)</p> 
 	<input type="text" name="civiendpoint" id="civiendpoint">
-        <br>
+	<br>
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
 	<br>
     <p>Rule ID:</p>
     <input type="text" name="rule" id="rule">
     <br>
-    <p>Group ID:</p>
+    <p>Group ID: (this is the ID of a valid group that you are importing INTO)</p>
     <input type="text" name="group" id="group">
     <br>
     <p>Specify Required Fields:</p>
@@ -116,24 +110,18 @@
 <br>
 <h2>Export</h2>
 <form id="OSDIExportForm" method="post">
-	<select name="endpoint">
-		<option value="" disabled="disabled" selected="selected">Please select a endpoint</option>
-		<option value="1">ActionNetwork</option>
-		<option value="2">CiviCRM</option>
-	</select>
-	<br>
 	<select name="resource">
 		<option value="" disabled="disabled" selected="selected">Please select a resource</option>
 		<option value="1">Contacts</option>
 	</select>
 	<br>
-	<p>CiviCRM endpoint</p> 
+	<p>OSDI endpoint</p> 
 	<input type="text" name="civiendpoint" id="civiendpoint">
         <br>
 	<p>API Key:</p> 
 	<input type="text" name="apikey" id="apikey">
     <br>
-    <p>Group ID:</p>
+    <p>Group ID: (this is the ID of the group that you're exporting FROM)</p>
     <input type="text" name="group" id="group">
     <br>
     <p>Specify Required Fields:</p>
@@ -334,19 +322,20 @@
 			data[x.name] = x.value;}
 		); 
 
-		if (data["endpoint"] == 1) {
-            var endpoint = "https://actionnetwork.org/api/v2/people/";
-            var endpointroot = "https://actionetwork.org/api/v2/";
-        } else if (data["endpoint"] == 2) {
-            var endpoint = data["civiendpoint"];
-            var endpointroot = data["civiendpoint"];
-            endpointroot = endpointroot.substring(0, endpointroot.indexOf("/civicrm"))
-                + "/civicrm";
+        var endpoint = data["civiendpoint"];
+		var endpointroot = data["civiendpoint"];
+        if (endpoint.indexOf("actionnetwork.org") !== -1) {
+		    endpointroot = endpointroot.substring(0, endpointroot.indexOf("/people"));
+        } else {
+		    endpointroot = endpointroot.substring(0, endpointroot.indexOf("/civicrm"))
+			    + "/civicrm";
         }
 
         if (data["resource"] == 1) {
-            console.log("calling api");
+            e.preventDefault();
+            console.log("calling exporter.bulk");
             console.log(data);
+
             CRM.api3('Exporter', 'bulk', {
                 "zone": data["zone"],
                 "allow_restart": 1,
@@ -370,8 +359,6 @@
                     }
 			});
 		}
-
-		e.preventDefault();
 	});
 
 	CRM.$("#OSDIRequestForm").submit(function(e) {
@@ -385,12 +372,7 @@
         var rule = -1;
         if (isInt(data["rule"])) { rule = data["rule"]; }
 
-        var endpoint = null;
-		if (data["endpoint"] == 1) {
-            var endpoint = "https://actionnetwork.org/api/v2";
-        } else if (data["endpoint"] == 2) {
-			var endpoint = data["civiendpoint"];
-        }
+        var endpoint = data["civiendpoint"];
 
         if (data["resource"] == 1) {
             console.log("calling api");
