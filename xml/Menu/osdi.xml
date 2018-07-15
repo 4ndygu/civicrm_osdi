@@ -31,4 +31,10 @@
     <title>Mapping</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/osdi/jobs</path>
+    <page_callback>CRM_Osdi_Page_OSDIJob</page_callback>
+    <title>OSDIJob</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
