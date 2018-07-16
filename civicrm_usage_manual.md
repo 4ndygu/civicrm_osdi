@@ -1,6 +1,11 @@
 ### Installation
 
-In order to install the app, simply put this code in the root of the extensions directory. Then, use `composer install` in order to install the dependencies on this application.
+In order to install the app, simply put this code in the root of the extensions directory. To do this, navigate to the directory where all your CiviCRM extensions sit and run the command:
+
+`git clone https://github.com/4ndygu/civicrm_osdi`
+
+Then, use `composer install` in order to install the dependencies on this application. If you don't have composer installed, you can do so [here](https://getcomposer.org/download/). In order to install all dependencies, after you run `git clone https://github.com/4ndygu/civicrm_osdi`
+, run `cd civicrm_osdi` and then run `composer install`. There should be a new directory called `vendor/` after you run this command.
 
 When the extension is installed, three things will be installed with it:
 
