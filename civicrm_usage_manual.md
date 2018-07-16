@@ -1,6 +1,6 @@
 ### Installation
 
-In order to install the app, simply put this code in the root of the extensions directory. To do this, navigate to the directory where all your CiviCRM extensions sit and run the command:
+In order to install the app, simply put this code in the root of the extensions directory. Doing this requires access to your server's command line console. If you do not have access, please ask your provider / partners for more information. If you do have command line access, navigate to the directory where all your CiviCRM extensions sit and run the command:
 
 `git clone https://github.com/4ndygu/civicrm_osdi`
 
