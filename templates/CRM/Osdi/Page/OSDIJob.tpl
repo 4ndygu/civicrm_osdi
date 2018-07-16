@@ -6,7 +6,7 @@
   <form>
     <fieldset>
       <label for="resource">Imported Resource</label>
-      <select name="resource">
+      <select name="resource" id="resource">
         <option value="" disabled="disabled" selected="selected">Imported Resource</option>
         <option value="1">Contacts</option>
       </select>
@@ -30,7 +30,7 @@
       <input type="text" name="reqfields" id="reqfields" class="text ui-widget-content ui-corner-all">
       <br>
       <label for="syncconfig">Sync Configuration</label>
-      <select name="syncconfig">
+      <select name="syncconfig" id="syncconfig">
         <option value="" disabled="disabled" selected="selected">Sync Configuration</option>
         <option value="1">Two-way sync</option>
         <option value="2">Import only</option>
@@ -38,7 +38,7 @@
       </select>
       <br>
       <label for="timezone">Time Zone</label>
-      <select name="timezone">
+      <select name="timezone" id="timezone">
         <option value="" disabled="disabled" selected="selected">Select a Time Zone</option>
         <option timeZoneId="1" gmtAdjustment="GMT-12:00" useDaylightTime="0" value="-12">(GMT-12:00) International Date Line West</option>
         <option timeZoneId="2" gmtAdjustment="GMT-11:00" useDaylightTime="0" value="-11">(GMT-11:00) Midway Island, Samoa</option>
@@ -186,10 +186,6 @@
 
     CRM.$("#accordion").accordion();
 
-    function addJob() {
-
-    }
-
     dialog = CRM.$( "#dialog-form" ).dialog({
         autoOpen: false,
         height: 400,
@@ -206,9 +202,37 @@
         }
     });
 
-  CRM.$('#addjob').click(function(e) {
-      dialog.dialog( "open" );
-  });
+    function addJob() {
+        resource = CRM.$("select#resource option:checked");
+        rootendpoint = CRM.$("#rootendpoint");
+        signupendpoint = CRM.$("#signupendpoint");
+        peopleendpoint = CRM.$("#peopleendpoint");
+        groupid = CRM.$("#groupid");
+        ruleid = CRM.$("#ruleid");
+        reqfields = CRM.$("#reqfields");
+        syncconfig = CRM.$("select#syncconfig option:checked");
+        timezone = CRM.$("select#timezone option:checked");
+
+        // validation logic
+        CRM.api3('OSDIJob', 'Add', {
+            "resource": resource.val(),
+            "rootendpoint": rootendpoint.val(),
+            "signupendpoint": signupendpoint.val(),
+            "peopleendpoint": peopleendpoint.val(),
+            "groupid": groupid.val(),
+            "ruleid": ruleid.val(),
+            "reqfields": reqfields.val(),
+            "syncconfig": syncconfig.val(),
+            "timezone": timezone.val(),
+        }).done(function(result) {
+            console.log(result);
+        });
+        dialog.dialog( "close" );
+    }
+
+    CRM.$('#addjob').click(function(e) {
+        dialog.dialog( "open" );
+    });
 
 </script>
 {/literal}

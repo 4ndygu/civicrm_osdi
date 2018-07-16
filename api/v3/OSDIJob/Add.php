@@ -31,6 +31,27 @@ function _civicrm_api3_o_s_d_i_job_Add_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_o_s_d_i_job_Add($params) {
-  $returnValues = array();
+    $returnValues = array();
+
+    /*if ($params["syncconfig"] == 1 or $params["syncconfig"] == 2) {
+      civicrm_api3('Job', 'create', [
+        'run_frequency' => "Daily",
+        'name' => "OSDISYNC_IMPORT",
+        'api_entity' => "Updater",
+        'api_action' => "Update",
+        'parameters' => ""
+      ]);
+    }
+
+    if ($params["syncconfig"] == 1 or $params["syncconfig"] == 3) {
+      civicrm_api3('Job', 'create', [
+        'run_frequency' => "Daily",
+        'name' => "OSDISYNC_EXPORT",
+        'api_entity' => "Exporter",
+        'api_action' => "Bulk",
+        'parameters' => ""
+      ]);
+    }*/
+
   return civicrm_api3_create_success($returnValues, $params, 'NewEntity', 'NewAction');
 }
