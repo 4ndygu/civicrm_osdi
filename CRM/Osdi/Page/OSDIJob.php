@@ -34,10 +34,12 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
       // load the export value
       $exportjobresults = civicrm_api3('Job', 'get', [
         'sequential' => 1,
-        'name' => "OSDISYNC_EXPORT_" . substr($metadata["name"], 16)
+        'name' => "OSDISYNC_EXPORT_" . $metadata["name"]
       ]);
 
-      $metadata["id_export"] = $exportjobresults["values"][0]["id"];
+      if (sizeof($exportjobresults["values"]) != 0) {
+        $metadata["id_export"] = $exportjobresults["values"][0]["id"];
+      }
 
       $metadata["id_export_log"] = "No runs yet!";
       $joblogresults = civicrm_api3("JobLog", "get", array(

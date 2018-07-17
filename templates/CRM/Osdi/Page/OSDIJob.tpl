@@ -1,5 +1,9 @@
 <h3>OSDI Job Setup</h3>
 
+<div id="dialog-confirm" title="Delete sync?">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>These syncs will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+
 <div id="dialog-form" title="Create new sync">
   <p class="validateTips">All form fields are required.</p>
 
@@ -146,6 +150,8 @@
       <p>Joblog: {$job.id_import_log}</p>
       <p>Export Job ID: {$job.id_export}</p>
       <p>Joblog: {$job.id_export_log}</p>
+      <button id="edit_{$job.name}">edit</button>
+      <button id="delete_{$job.name}">delete</button>
     </div>
   {/foreach}
 </div>
@@ -158,8 +164,8 @@
 
     dialog = CRM.$( "#dialog-form" ).dialog({
         autoOpen: false,
-        height: 400,
-        width: 350,
+        height: 450,
+        width: 500,
         modal: true,
         buttons: {
             "Create a sync": addJob,
@@ -169,6 +175,24 @@
         },
         close: function() {
             dialog.dialog( "close" );
+        }
+    });
+
+    dialogdelete = CRM.$( "#dialog-confirm" ).dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            "Delete": function() {
+                // call the osdijob delete function first
+                dialogdelete.dialog( "close" );
+            },
+            Cancel: function() {
+                dialogdelete.dialog( "close" );
+            }        },
+        close: function() {
+            dialogdelete.dialog( "close" );
         }
     });
 
@@ -209,6 +233,16 @@
 
     CRM.$('#addjob').click(function(e) {
         dialog.dialog( "open" );
+    });
+
+    CRM.$('[id^="edit_"]').click(function() {
+        // do something
+        dialog.dialog( "open" );
+    });
+
+    CRM.$('[id^="delete_"]').click(function() {
+        // do something
+        dialogdelete.dialog( "open" );
     });
 
 </script>
