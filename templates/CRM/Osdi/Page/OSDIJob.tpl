@@ -150,8 +150,8 @@
       <p>Joblog: {$job.id_import_log}</p>
       <p>Export Job ID: {$job.id_export}</p>
       <p>Joblog: {$job.id_export_log}</p>
-      <button id="edit_{$job.name}">edit</button>
-      <button id="delete_{$job.name}">delete</button>
+      <button id="edit_{$job.name}" name="{$job.id_import}_{$job.id_export}">edit</button>
+      <button id="delete_{$job.name}" name="{$job.id_import}_{$job.id_export}">delete</button>
     </div>
   {/foreach}
 </div>
@@ -159,6 +159,12 @@
 <button id="addjob">Add Job</button>
 {literal}
 <script type="text/javascript">
+
+    var edit = 0;
+
+    import_id = "";
+    export_id = "";
+    export_once_id = "";
 
     CRM.$("#accordion").accordion();
 
@@ -185,6 +191,20 @@
         modal: true,
         buttons: {
             "Delete": function() {
+
+                CRM.api3('OSDIJob', 'Clear', {
+                    "id_import": import_id,
+                    "id_export": export_id,
+                }).done(function(result) {
+                    console.log(result);
+                    if ("error_message" in result["values"]) {
+                        alert(result["values"]["error_message"]);
+                    }
+                });
+
+                // refresh
+                location.reload();
+
                 // call the osdijob delete function first
                 dialogdelete.dialog( "close" );
             },
@@ -222,27 +242,86 @@
             "key": key.val(),
             "syncconfig": syncconfig.val(),
             "timezone": timezone.val(),
+            "edit": edit
         }).done(function(result) {
             console.log(result);
-            if ("error_message" in result["values"]) {
-                alert(result["values"]["error_message"]);
+            if ("error_message" in result) {
+                alert(result["error_message"]);
+            }
+            if ("values" in result) {
+                if ("error_message" in result["values"]) alert(result["values"]["error_message"]);
             }
         });
         dialog.dialog( "close" );
     }
 
     CRM.$('#addjob').click(function(e) {
+        edit = 0;
         dialog.dialog( "open" );
     });
 
     CRM.$('[id^="edit_"]').click(function() {
-        // do something
+        jobname = CRM.$("#name");
+        resource = CRM.$("select#resource option:checked");
+        rootendpoint = CRM.$("#rootendpoint");
+        signupendpoint = CRM.$("#signupendpoint");
+        peopleendpoint = CRM.$("#peopleendpoint");
+        groupid = CRM.$("#groupid");
+        ruleid = CRM.$("#ruleid");
+        reqfields = CRM.$("#reqfields");
+        key = CRM.$("#key");
+        syncconfig = CRM.$("select#syncconfig option:checked");
+        timezone = CRM.$("select#timezone option:checked");
+
+        // open edit dialogue after noting that we're gonna edit
+        edit = 1;
+        ids = CRM.$(this).attr("name").split("_");
+        // set the IDs
+        import_id = ids[0];
+        export_id = ids[1];
+
+        jobcode = 0;
+        CRM.api3('Job', 'Get', {
+            "id": import_id,
+            "sequential": 1
+        }).done(function(result) {
+            parameters = result["values"]["parameters"].split("\n");
+            parameterarray = new Object();
+            for (param in parameters) {
+                paramparts = param.split("=")
+                parameterarray[paramparts[0]] = parameterarray[paramparts[1]];
+            }
+
+            if (result["values"].length != 0) {
+                jobcode = "2";
+            }
+        });
+        CRM.api3('Job', 'Get', {
+            "id": export_id,
+            "sequential": 1
+        }).done(function(result) {
+            if (result["values"].length != 0) {
+                if (jobcode == 0) jobcode = "3";
+                else jobcode = "1";
+            }
+        });
+
+        syncconfig.val(jobcode);
+
         dialog.dialog( "open" );
     });
 
     CRM.$('[id^="delete_"]').click(function() {
+        ids = CRM.$(this).attr("name").split("_");
+        // set the IDs
+        import_id = ids[0];
+        export_id = ids[1];
+        export_once_id = "";
+
         // do something
         dialogdelete.dialog( "open" );
+
+        // delete should refresh the page
     });
 
 </script>

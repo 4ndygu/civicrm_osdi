@@ -21,6 +21,7 @@ function _civicrm_api3_o_s_d_i_job_Add_spec(&$spec) {
   $spec['syncconfig']['api.required'] = 1;
   $spec['timezone']['api.required'] = 1;
   $spec['key']['api.required'] = 1;
+  $spec['edit']['api.required'] = 1;
 }
 
 /**
@@ -38,17 +39,25 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
     $params["name"] = htmlspecialchars($params["name"]);
 
     if ($params["syncconfig"] == 1 or $params["syncconfig"] == 2) {
+
+      $valid = FALSE;
+      $id = -1;
       // dedupe on name
       $results = civicrm_api3('Job', 'get', [
         'name' => "OSDISYNC_IMPORT_" . $params["name"],
       ]);
       if (sizeof($results["values"]) != 0) {
-        $returnValues["error_message"] = "this name is not unique.";
-        return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+        if ($params["edit"] == 0) {
+          $returnValues["error_message"] = "this name is not unique.";
+          return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+        } else {
+          $id = $results["values"][0]["id"];
+          if ($id != "") $valid = TRUE;
+        }
       }
 
       //first time import
-      $result = civicrm_api3('Importer', 'Import', [
+      civicrm_api3('Importer', 'Import', [
         "zone" => $params["timezone"],
         "group" => $params["groupid"],
         "key" => $params["key"],
@@ -66,14 +75,18 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         "zone=" . $params["timezone"]
       ));
 
-      //update import
-      civicrm_api3('Job', 'create', [
+      $jobcreateparams = [
         'run_frequency' => "Daily",
         'name' => "OSDISYNC_IMPORT_" . $params["name"],
         'api_entity' => "Updater",
         'api_action' => "Update",
         'parameters' => $importparams
-      ]);
+      ];
+
+      if ($params["edit"] == 1 and $valid) $jobcreateparams["id"] = $id;
+
+      //update import
+      civicrm_api3('Job', 'create', $jobcreateparams);
     }
 
     if ($params["syncconfig"] == 1 or $params["syncconfig"] == 3) {
@@ -81,9 +94,40 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
       $results = civicrm_api3('Job', 'get', [
         'name' => "OSDISYNC_EXPORT_" . $params["name"],
       ]);
+
+      $valid = FALSE;
+      $id = -1;
       if (sizeof($results["values"]) != 0) {
-        $returnValues["error_message"] = "this name is not unique.";
-        return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+        if ($params["edit"] == 0) {
+          $returnValues["error_message"] = "this name is not unique.";
+          return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+        } else {
+          // we have to DELETE the onetime job, so exportonceparams can live
+          $results = civicrm_api3('Job', 'get', [
+            'name' => "OSDISYNC_EXPORT_ONETIME_" . $params["name"],
+          ]);
+
+          if (sizeof($results["values"][0]) != 0) {
+            $results = civicrm_api3('Job', 'delete', [
+              'id' => $results["values"][0]["id"]
+            ]);
+
+            // clear the relevant session data
+            // Use a sha1 of the key with the endpoint to find our identifier.
+            // change the hash to the URL if Civi, key if actionnetwork
+            $hash = "CIVI_ID_actionnetwork";
+            if (strpos($params["rootendpoint"], "actionnetwork.org") === FALSE) {
+              $hash = "CIVI_ID_" . sha1($params["rootendpoint"]);
+            }
+            $second_key = $params["signupendpoint"] . $hash;
+
+            unset($_SESSION["exporters_offset"][$second_key]);
+          }
+
+          // and then continue the edit job as it were
+          $id = $results["values"][0]["id"];
+          if ($id != "") $valid = TRUE;
+        }
       }
 
       $exportonceparams = join("\n", array(
@@ -119,14 +163,18 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         "zone=" . $params["timezone"]
       ));
 
-      // exporter bulk update job
-      civicrm_api3('Job', 'create', [
+      $jobcreateparams = [
         'run_frequency' => "Daily",
         'name' => "OSDISYNC_EXPORT_" . $params["name"],
         'api_entity' => "Exporter",
         'api_action' => "Bulk",
-        'parameters' => $exportmanyparams
-      ]);
+        'parameters' => $exportmanyparams,
+      ];
+
+      if ($params["edit"] == 1 and $valid) $jobcreateparams["id"] = $id;
+
+      // exporter bulk update job
+      civicrm_api3('Job', 'create', $jobcreateparams);
 
     }
 
