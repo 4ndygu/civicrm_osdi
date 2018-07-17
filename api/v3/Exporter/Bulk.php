@@ -199,9 +199,11 @@ function civicrm_api3_exporter_Bulk($params) {
 
       $newer = TRUE;
       if (isset($params["updateendpoint"])) {
-        if ($params["updatejob"] == 1) {
-          $newer = contact_newer($contact, $params["updateendpoint"], $params["key"], $zone);
-        }
+        // this used to only be for update. I now want to check if this is the newest contact in all scenarios.
+//        if ($params["updatejob"] == 1) {
+//          $newer = contact_newer($contact, $params["updateendpoint"], $params["key"], $zone);
+//        }
+        $newer = contact_newer($contact, $params["updateendpoint"], $params["key"], $zone);
       }
 
       $url = "";

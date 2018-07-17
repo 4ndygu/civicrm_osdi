@@ -5,6 +5,9 @@
 
   <form>
     <fieldset>
+      <label for="name">Name</label>
+      <input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all">
+      <br>
       <label for="resource">Imported Resource</label>
       <select name="resource" id="resource">
         <option value="" disabled="disabled" selected="selected">Imported Resource</option>
@@ -19,6 +22,9 @@
       <br>
       <label for="peopleendpoint">Sync Endpoint (/People Endpoint)</label>
       <input type="text" name="peopleendpoint" id="peopleendpoint" class="text ui-widget-content ui-corner-all">
+      <br>
+      <label for="key">API Key</label>
+      <input type="text" name="key" id="key" class="text ui-widget-content ui-corner-all">
       <br>
       <label for="groupid">Group ID</label>
       <input type="text" name="groupid" id="groupid" class="text ui-widget-content ui-corner-all">
@@ -132,38 +138,16 @@
 </div>
 
 <div id="accordion">
-  <h3>osdi.megaphonetech.com <-> osdi2.megaphonetech.com</h3>
-  <div>
-    <p>Sync type: 2-way sync </p>
-    <p>Import Job ID: </p>
-    <p>Joblog: </p> 
-    <p>Export Job ID: </p>
-    <p>Joblog: </p>
-  </div>
-  <h3>osdi.megaphonetech.com <-> osdi3.megaphonetech.com</h3>
-  <div>
-    <p>Sync type: 2-way sync </p>
-    <p>Import Job ID: </p>
-    <p>Joblog: </p>
-    <p>Export Job ID: </p>
-    <p>Joblog: </p>
-  </div>
-  <h3>osdi.megaphonetech.com <-> osdi4.megaphonetech.com</h3>
-  <div>
-    <p>Sync type: 2-way sync </p>
-    <p>Import Job ID: </p>
-    <p>Joblog: </p>
-    <p>Export Job ID: </p>
-    <p>Joblog: </p>
-  </div>
-  <h3>osdi.megaphonetech.com <-> osdi5.megaphonetech.com</h3>
-  <div>
-    <p>Sync type: 2-way sync </p>
-    <p>Import Job ID: </p>
-    <p>Joblog: </p>
-    <p>Export Job ID: </p>
-    <p>Joblog: </p>
-  </div>
+  {foreach from=$jobs item=job}
+    <h3>{$job.name}</h3>
+    <div>
+      <p>Sync type: 2-way sync</p>
+      <p>Import Job ID: {$job.id_import}</p>
+      <p>Joblog: {$job.id_import_log}</p>
+      <p>Export Job ID: {$job.id_export}</p>
+      <p>Joblog: {$job.id_export_log}</p>
+    </div>
+  {/foreach}
 </div>
 
 <button id="addjob">Add Job</button>
@@ -189,6 +173,7 @@
     });
 
     function addJob() {
+        jobname = CRM.$("#name");
         resource = CRM.$("select#resource option:checked");
         rootendpoint = CRM.$("#rootendpoint");
         signupendpoint = CRM.$("#signupendpoint");
@@ -196,11 +181,13 @@
         groupid = CRM.$("#groupid");
         ruleid = CRM.$("#ruleid");
         reqfields = CRM.$("#reqfields");
+        key = CRM.$("#key");
         syncconfig = CRM.$("select#syncconfig option:checked");
         timezone = CRM.$("select#timezone option:checked");
 
         // validation logic
         CRM.api3('OSDIJob', 'Add', {
+            "name": jobname.val(),
             "resource": resource.val(),
             "rootendpoint": rootendpoint.val(),
             "signupendpoint": signupendpoint.val(),
@@ -208,10 +195,14 @@
             "groupid": groupid.val(),
             "ruleid": ruleid.val(),
             "reqfields": reqfields.val(),
+            "key": key.val(),
             "syncconfig": syncconfig.val(),
             "timezone": timezone.val(),
         }).done(function(result) {
             console.log(result);
+            if ("error_message" in result["values"]) {
+                alert(result["values"]["error_message"]);
+            }
         });
         dialog.dialog( "close" );
     }
