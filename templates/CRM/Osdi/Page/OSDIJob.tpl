@@ -14,7 +14,7 @@
       <br>
       <label for="resource">Imported Resource</label>
       <select name="resource" id="resource">
-        <option value="" disabled="disabled" selected="selected">Imported Resource</option>
+        <option value="0" disabled="disabled" selected="selected">Imported Resource</option>
         <option value="1">Contacts</option>
       </select>
       <br>
@@ -41,7 +41,7 @@
       <br>
       <label for="syncconfig">Sync Configuration</label>
       <select name="syncconfig" id="syncconfig">
-        <option value="" disabled="disabled" selected="selected">Sync Configuration</option>
+        <option value="0" disabled="disabled" selected="selected">Sync Configuration</option>
         <option value="1">Two-way sync</option>
         <option value="2">Import only</option>
         <option value="3">Export only</option>
@@ -275,38 +275,69 @@
 
         // open edit dialogue after noting that we're gonna edit
         edit = 1;
+
+        // jobcode represents if you're im/export or both
+        jobcode = 0;
+
         ids = CRM.$(this).attr("name").split("_");
         // set the IDs
         import_id = ids[0];
         export_id = ids[1];
 
-        jobcode = 0;
+        // load what you can from import
         CRM.api3('Job', 'Get', {
             "id": import_id,
             "sequential": 1
         }).done(function(result) {
-            parameters = result["values"]["parameters"].split("\n");
-            parameterarray = new Object();
-            for (param in parameters) {
-                paramparts = param.split("=")
-                parameterarray[paramparts[0]] = parameterarray[paramparts[1]];
-            }
-
             if (result["values"].length != 0) {
-                jobcode = "2";
+                jobcode = 2;
+
+                // then set the name
+                names = result["values"][0]["name"].split("_");
+                jobname.val(names[2]);
+
+                parameterarray = new Object();
+                parameters = result["values"][0]["parameters"].split("\n");
+                for (param in parameters) {
+                    paramparts = parameters[param].split("=");
+                    parameterarray[paramparts[0]] = paramparts[1];
+                }
+
+                if ("rule" in parameterarray) ruleid.val(parameterarray["rule"]);
+                if ("group" in parameterarray) groupid.val(parameterarray["group"]);
+                if ("zone" in parameterarray) CRM.$("#timezone")[0].selectedIndex
+                    = parseInt(parameterarray["zone"], 10) + 12;
+                if ("required" in parameterarray) reqfields.val(parameterarray["required"]);
+                rootendpoint.val(parameterarray["endpoint"]);
+                key.val(parameterarray["key"]);
             }
         });
+
+        // load what you can from export
         CRM.api3('Job', 'Get', {
             "id": export_id,
             "sequential": 1
         }).done(function(result) {
             if (result["values"].length != 0) {
-                if (jobcode == 0) jobcode = "3";
-                else jobcode = "1";
+                if (jobcode == 0) jobcode = 3;
+                else jobcode = 1;
+
+                parameterarray = new Object();
+                parameters = result["values"][0]["parameters"].split("\n");
+                for (param in parameters) {
+                    paramparts = parameters[param].split("=");
+                    parameterarray[paramparts[0]] = paramparts[1];
+                }
+
+                signupendpoint.val(parameterarray["endpoint"]);
+                console.log(parameterarray);
+                console.log(parameterarray["updateendpoint"]);
+                peopleendpoint.val(parameterarray["updateendpoint"]);
             }
         });
 
-        syncconfig.val(jobcode);
+        CRM.$("#syncconfig")[0].selectedIndex=jobcode;
+        CRM.$("#resource")[0].selectedIndex=1;
 
         dialog.dialog( "open" );
     });

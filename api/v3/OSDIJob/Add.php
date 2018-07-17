@@ -137,7 +137,7 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         "allow_restart=0",
         "group=" . $params["groupid"],
         "updatejob=0",
-        "updateendpoint=" . $params["updateendpoint"],
+        "updateendpoint=" . $params["peopleendpoint"],
         "required=" . $params["reqfields"],
         "zone=" . $params["timezone"]
       ));
@@ -158,7 +158,7 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         "allow_restart=1",
         "group=" . $params["groupid"],
         "updatejob=1",
-        "updateendpoint=" . $params["updateendpoint"],
+        "updateendpoint=" . $params["peopleendpoint"],
         "required=" . $params["reqfields"],
         "zone=" . $params["timezone"]
       ));
