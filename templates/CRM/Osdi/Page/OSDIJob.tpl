@@ -98,6 +98,7 @@
       <p>Export Job ID: {$job.id_export}</p>
       <p>Joblog: {$job.id_export_log}</p>
       <p>Group: {$job.group_id}, Name: {$job.group_name}</p>
+      <p>Rule: {$job.rule_id}, Fields: {$job.rule_fields}</p>
       <button id="edit_{$job.name}" name="{$job.id_import}_{$job.id_export}">edit</button>
       <button id="delete_{$job.name}" name="{$job.id_import}_{$job.id_export}">delete</button>
     </div>

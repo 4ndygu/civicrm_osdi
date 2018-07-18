@@ -31,13 +31,17 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
         $metadata["id_import_log"] = substr($joblogresults["values"][0]["data"], 0, 500);
       }
 
-      // extract groupID
-      $metadata["group_id"] = 0;
-      $metadata["group_name"] = "butt";
+      // extract groupID, ruleID
+      $metadata["group_id"] = "N/A";
+      $metadata["group_name"] = "";
+
+      // extract ruleID
+      $metadata["rule_id"] = "N/A";
+      $metadata["rule_fields"] = "";
+
       $parameters = explode("\n", $job["parameters"]);
       foreach($parameters as $parameter) {
         $params = explode("=", $parameter);
-        var_dump($params);
         if ($params[0] == "group") {
           if ($params[1] != "") {
             $results = civicrm_api3("Group", "get", [
@@ -47,6 +51,22 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
             if (sizeof($results["values"] != 0)) {
               $metadata["group_id"] = $results["values"][0]["id"];
               $metadata["group_name"] = $results["values"][0]["name"];
+            }
+          }
+        }
+        if ($params[0] == "rule") {
+          if ($params[1] != "") {
+            $rulegetresults = civicrm_api3("Rule", "get", [
+              "sequential" => 1,
+              "dedupe_rule_group_id" => $params[1]
+            ]);
+
+            if (sizeof($rulegetresults["values"]) != 0) {
+              $metadata["rule_id"] = $rulegetresults["values"][0]["id"];
+              foreach ($rulegetresults["values"] as $rulegetresult) {
+                $metadata["rule_fields"] = $metadata["rule_fields"] . $rulegetresult["rule_field"];
+                $metadata["rule_fields"] = $metadata["rule_fields"] . ", ";
+              }
             }
           }
         }
