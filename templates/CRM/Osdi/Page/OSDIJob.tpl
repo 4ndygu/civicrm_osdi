@@ -33,8 +33,8 @@
       <label for="groupid">Group ID (Optional)</label>
       <a class="helpicon" title="Group ID Help" onclick='CRM.help("groupID", "This is the existing ID for a group that you will be importing everyone from the third party group INTO. This is also the existing ID for a group that you will be exporting all specified CiviCRM users from."); return false;'></a>
       <input type="text" name="groupid" id="groupid" class="text ui-widget-content ui-corner-all">
-      <br>ddd
-      <label for="ruleid">Rule ID (Optional)</label>
+      <br>
+      <label for="ruleid">Rule ID (Optional, default blank represents first_name, last_name, email)</label>
       <a class="helpicon" title="Group ID Help" onclick='CRM.help("ruleID", "This is the existing ID for the dedupe rule that all users in this sync will use to find and update deduped users."); return false;'></a>
       <input type="text" name="ruleid" id="ruleid" class="text ui-widget-content ui-corner-all">
       <br>
@@ -199,6 +199,12 @@
                 if ("error_message" in result["values"]) alert(result["values"]["error_message"]);
             }
         });
+
+        if (edit) {
+            // redirect to mapping
+            alert("Now, you should set up the Mapping configuration for your remote endpoint.")
+        }
+
         dialog.dialog( "close" );
     }
 

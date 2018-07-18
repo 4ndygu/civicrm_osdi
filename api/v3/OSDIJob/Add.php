@@ -58,15 +58,17 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         }
       }
 
-      //first time import
-      civicrm_api3('Importer', 'Import', [
-        "zone" => $params["timezone"],
-        "group" => $params["groupid"],
-        "key" => $params["key"],
-        "rule" => $params["ruleid"],
-        "required" => $params["reqfields"],
-        "endpoint" => $params["rootendpoint"]
-      ]);
+      if ($params["edit"] == 0) {
+        //first time import
+        civicrm_api3('Importer', 'Import', [
+          "zone" => $params["timezone"],
+          "group" => $params["groupid"],
+          "key" => $params["key"],
+          "rule" => $params["ruleid"],
+          "required" => $params["reqfields"],
+          "endpoint" => $params["rootendpoint"]
+        ]);
+      }
 
       $importparams = join("\n", array(
         "key=" . $params["key"],
@@ -146,14 +148,16 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         "zone=" . $params["timezone"]
       ));
 
-      // exporter bulk one time job
-      civicrm_api3('Job', 'create', [
-        'run_frequency' => "Always",
-        'name' => "OSDISYNC_EXPORT_ONETIME_" . $params["name"],
-        'api_entity' => "Exporter",
-        'api_action' => "Bulk",
-        'parameters' => $exportonceparams
-      ]);
+      if ($params["edit"] == 0) {
+        // exporter bulk one time job
+        civicrm_api3('Job', 'create', [
+          'run_frequency' => "Always",
+          'name' => "OSDISYNC_EXPORT_ONETIME_" . $params["name"],
+          'api_entity' => "Exporter",
+          'api_action' => "Bulk",
+          'parameters' => $exportonceparams
+        ]);
+      }
 
       $exportmanyparams = join("\n", array(
         "key=" . $params["key"],
