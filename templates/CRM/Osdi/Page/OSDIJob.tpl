@@ -252,7 +252,7 @@
                 if ("rule" in parameterarray) ruleid.val(parameterarray["rule"]);
                 if ("group" in parameterarray) groupid.val(parameterarray["group"]);
                 if ("zone" in parameterarray) CRM.$("#timezone")[0].selectedIndex
-                    = parseInt(parameterarray["zone"], 10) + 11;
+                    = parseInt(parameterarray["zone"], 10) + 13;
                 if ("required" in parameterarray) reqfields.val(parameterarray["required"]);
                 rootendpoint.val(parameterarray["endpoint"]);
                 key.val(parameterarray["key"]);
