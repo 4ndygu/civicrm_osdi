@@ -30,13 +30,16 @@
       <label for="key">API Key</label>
       <input type="text" name="key" id="key" class="text ui-widget-content ui-corner-all">
       <br>
-      <label for="groupid">Group ID</label>
+      <label for="groupid">Group ID (Optional)</label>
+      <a class="helpicon" title="Group ID Help" onclick='CRM.help("groupID", "This is the existing ID for a group that you will be importing everyone from the third party group INTO. This is also the existing ID for a group that you will be exporting all specified CiviCRM users from."); return false;'></a>
       <input type="text" name="groupid" id="groupid" class="text ui-widget-content ui-corner-all">
-      <br>
-      <label for="ruleid">Rule ID</label>
+      <br>ddd
+      <label for="ruleid">Rule ID (Optional)</label>
+      <a class="helpicon" title="Group ID Help" onclick='CRM.help("ruleID", "This is the existing ID for the dedupe rule that all users in this sync will use to find and update deduped users."); return false;'></a>
       <input type="text" name="ruleid" id="ruleid" class="text ui-widget-content ui-corner-all">
       <br>
-      <label for="reqfields">Required fields</label>
+      <label for="reqfields">Required fields (Optional)</label>
+      <a class="helpicon" title="Group ID Help" onclick='CRM.help("required", "This is a comma separated (no spaces) string of all CiviCRM fields that the sync notes is necessary for import / export of contacts."); return false;'></a>
       <input type="text" name="reqfields" id="reqfields" class="text ui-widget-content ui-corner-all">
       <br>
       <label for="syncconfig">Sync Configuration</label>
@@ -247,6 +250,10 @@
                     paramparts = parameters[param].split("=");
                     parameterarray[paramparts[0]] = paramparts[1];
                 }
+
+                console.log("zone");
+                console.log(parameterarray["zone"]);
+                console.log(parseInt(parameterarray["zone"], 10) + 13);
 
                 CRM.$("#syncconfig")[0].selectedIndex=jobcode;
                 if ("rule" in parameterarray) ruleid.val(parameterarray["rule"]);
