@@ -184,6 +184,29 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
       // exporter bulk update job
       civicrm_api3('Job', 'create', $jobcreateparams);
 
+      if ($params["edit"] == 0) {
+        // set the mapping
+        $firstitemid = civicrm_api3('Mapping', 'get', array(
+          'name' => "osdi_contact",
+        ));
+
+        $firstitem = civicrm_api3('MappingField', 'get', array(
+          'mapping_id' => $firstitemid["id"],
+          'sequential' => 1,
+          'options' => ['limit' => 0],
+        ));
+
+        $data = array();
+        foreach ($firstitem["values"] as $key => $value) {
+          $data[$value["name"]] = $value["value"];
+        }
+
+        civicrm_api3('Mapping', 'set', [
+          "changes" => json_encode(array()),
+          "data" => json_encode($data),
+          "endpoint" => $params["rootendpoint"]
+        ]);
+      }
     }
 
   return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
