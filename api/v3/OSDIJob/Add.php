@@ -35,17 +35,19 @@ function _civicrm_api3_o_s_d_i_job_Add_spec(&$spec) {
  */
 function civicrm_api3_o_s_d_i_job_Add($params) {
     $returnValues = array();
-
     $params["name"] = htmlspecialchars($params["name"]);
 
     if ($params["syncconfig"] == 1 or $params["syncconfig"] == 2) {
 
       $valid = FALSE;
       $id = -1;
+
       // dedupe on name
       $results = civicrm_api3('Job', 'get', [
         'name' => "OSDISYNC_IMPORT_" . $params["name"],
+        'sequential' => 1
       ]);
+
       if (sizeof($results["values"]) != 0) {
         if ($params["edit"] == 0) {
           $returnValues["error_message"] = "this name is not unique.";
@@ -92,7 +94,8 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
     if ($params["syncconfig"] == 1 or $params["syncconfig"] == 3) {
       // dedupe on name
       $results = civicrm_api3('Job', 'get', [
-        'name' => "OSDISYNC_EXPORT_" . $params["name"],
+        'sequential' => 1,
+        'name' => "OSDISYNC_EXPORT_" . $params["name"]
       ]);
 
       $valid = FALSE;
@@ -103,13 +106,14 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
           return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
         } else {
           // we have to DELETE the onetime job, so exportonceparams can live
-          $results = civicrm_api3('Job', 'get', [
+          $results_onetime = civicrm_api3('Job', 'get', [
             'name' => "OSDISYNC_EXPORT_ONETIME_" . $params["name"],
+            'sequential' => 1
           ]);
 
-          if (sizeof($results["values"][0]) != 0) {
-            $results = civicrm_api3('Job', 'delete', [
-              'id' => $results["values"][0]["id"]
+          if (sizeof($results_onetime["values"][0]) != 0) {
+            civicrm_api3('Job', 'delete', [
+              'id' => $results_onetime["values"][0]["id"]
             ]);
 
             // clear the relevant session data
