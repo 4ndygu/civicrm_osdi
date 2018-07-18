@@ -14,20 +14,21 @@
       <br>
       <label for="resource">Imported Resource</label>
       <select name="resource" id="resource">
-        <option value="0" disabled="disabled" selected="selected">Imported Resource</option>
-        <option value="1">Contacts</option>
+        <option value="0" disabled="disabled">Imported Resource</option>
+        <option value="1" selected="selected">Contacts</option>
       </select>
       <br>
       <label for="rootendpoint">Sync Endpoint (root)</label>
-      <input type="text" name="rootendpoint" id="rootendpoint" class="text ui-widget-content ui-corner-all">
+      <input type="text" name="rootendpoint" id="rootendpoint" class="text ui-widget-content ui-corner-all" value="localhost/civicrm">
       <br>
       <label for="signupendpoint">Sync Endpoint (Person Signup Helper)</label>
-      <input type="text" name="signupendpoint" id="signupendpoint" class="text ui-widget-content ui-corner-all">
+      <input type="text" name="signupendpoint" id="signupendpoint" class="text ui-widget-content ui-corner-all" value="localhost/civicrm/osdi/webhook">
       <br>
       <label for="peopleendpoint">Sync Endpoint (/People Endpoint)</label>
-      <input type="text" name="peopleendpoint" id="peopleendpoint" class="text ui-widget-content ui-corner-all">
+      <input type="text" name="peopleendpoint" id="peopleendpoint" class="text ui-widget-content ui-corner-all" value=localhost/civicrm/osdi/webhook"">
       <br>
       <label for="key">API Key</label>
+      <a class="helpicon" title="Group ID Help" onclick='CRM.help("apikey", "apikey for the endpoint. For CiviCRM, generate this key on /civicrm/osdi/config"); return false;'></a>
       <input type="text" name="key" id="key" class="text ui-widget-content ui-corner-all">
       <br>
       <label for="groupid">Group ID (Optional)</label>
@@ -44,15 +45,15 @@
       <br>
       <label for="syncconfig">Sync Configuration</label>
       <select name="syncconfig" id="syncconfig">
-        <option value="0" disabled="disabled" selected="selected">Sync Configuration</option>
-        <option value="1">Two-way sync</option>
+        <option value="0" disabled="disabled">Sync Configuration</option>
+        <option value="1" selected="selected">Two-way sync</option>
         <option value="2">Import only</option>
         <option value="3">Export only</option>
       </select>
       <br>
       <label for="timezone">Time Zone</label>
       <select name="timezone" id="timezone">
-        <option value="" disabled="disabled" selected="selected">Select a Time Zone</option>
+        <option value="" disabled="disabled">Select a Time Zone</option>
         <option timeZoneId="1" gmtAdjustment="GMT-12:00" useDaylightTime="0" value="-12">(GMT-12:00) International Date Line West</option>
         <option timeZoneId="2" gmtAdjustment="GMT-11:00" useDaylightTime="0" value="-11">(GMT-11:00) Midway Island, Samoa</option>
         <option timeZoneId="3" gmtAdjustment="GMT-10:00" useDaylightTime="0" value="-10">(GMT-10:00) Hawaii</option>
@@ -65,7 +66,7 @@
         <option timeZoneId="23" gmtAdjustment="GMT-03:00" useDaylightTime="0" value="-3">(GMT-03:00) Buenos Aires, Georgetown</option>
         <option timeZoneId="26" gmtAdjustment="GMT-02:00" useDaylightTime="1" value="-2">(GMT-02:00) Mid-Atlantic</option>
         <option timeZoneId="27" gmtAdjustment="GMT-01:00" useDaylightTime="0" value="-1">(GMT-01:00) Cape Verde Is.</option>
-        <option timeZoneId="30" gmtAdjustment="GMT+00:00" useDaylightTime="1" value="0">(GMT+00:00) Greenwich Mean Time</option>
+        <option timeZoneId="30" gmtAdjustment="GMT+00:00" useDaylightTime="1" value="0" selected="selected">(GMT+00:00) Greenwich Mean Time</option>
         <option timeZoneId="31" gmtAdjustment="GMT+01:00" useDaylightTime="1" value="1">(GMT+01:00) Amsterdam, Berlin, Bern, Rome</option>
         <option timeZoneId="37" gmtAdjustment="GMT+02:00" useDaylightTime="1" value="2">(GMT+02:00) Athens, Bucharest, Istanbul</option>
         <option timeZoneId="46" gmtAdjustment="GMT+03:00" useDaylightTime="1" value="3">(GMT+03:00) Moscow, St. Petersburg, Volgograd</option>
