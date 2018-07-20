@@ -81,19 +81,28 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
 
   // check valid URL
   $client = new GuzzleHttp\Client();
-  $guzzleparams = [
+  $guzzleparams = array();
+  $guzzleparams["headers"] = [
     'OSDI-API-Token' => $params["key"],
   ];
 
   if (strpos($params["peopleendpoint"], 'actionnetwork.org') !== FALSE) {
-    $guzzleparams["Content-Type"] = "application/hal+json";
-    $guzzleparams['Object'] = ['Contact'];
+    $guzzleparams["headers"]['Content-Type'] = "application/json";
   }
   else {
-    $guzzleparams['Content-Type'] = "application/json";
+    $guzzleparams["headers"]["Content-Type"] = "application/hal+json";
+    $guzzleparams["headers"]['Object'] = 'Contact';
   }
 
-  $response = $client->request('GET', $params["peopleendpoint"], $guzzleparams);
+  try {
+    $response = $client->get($params["peopleendpoint"], $guzzleparams);
+  }
+  catch (Exception $exception) {
+    $responseBody = $exception->getResponse()->getBody(true);
+    $returnValues["error_message"] = "this URL / apikey combination is not valid";
+    $returnValues["body"] = $responseBody->getContents();
+    return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+  }
 
   if ($response->getStatusCode() != 200) {
     $returnValues["error_message"] = "this URL / apikey combination is not valid";
@@ -122,7 +131,7 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         }
       }
 
-      if ($params["edit"] == 0) {
+    if ($params["edit"] == 0) {
         //first time import
         civicrm_api3('Importer', 'Import', [
           "zone" => $params["timezone"],
@@ -132,23 +141,36 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
           "required" => $params["reqfields"],
           "endpoint" => $params["rootendpoint"]
         ]);
+    }
+
+    $importparams = array();
+      if ($params["key"] != "") {
+        $importparams[] = "key=" . $params["key"];
+      }
+      if ($params["reqfields"] != "") {
+        $importparams[] = "required=" . $params["reqfields"];
+      }
+      if ($params["ruleid"] != "") {
+        $importparams[] = "rule=" . $params["ruleid"];
+      }
+      if ($params["groupid"] != "") {
+        $importparams[] = "group=" . $params["groupid"];
+      }
+      if ($params["rootendpoint"] != "") {
+        $importparams[] = "endpoint=" . $params["rootendpoint"];
+      }
+      if ($params["timezone"] != "") {
+        $importparams[] = "zone=" . $params["timezone"];
       }
 
-      $importparams = join("\n", array(
-        "key=" . $params["key"],
-        "required=" . $params["reqfields"],
-        "rule=" . $params["ruleid"],
-        "group=" . $params["groupid"],
-        "endpoint=" . $params["rootendpoint"],
-        "zone=" . $params["timezone"]
-      ));
+      $importparamstring = join("\n", $importparams);
 
       $jobcreateparams = [
         'run_frequency' => "Daily",
         'name' => "OSDISYNC_IMPORT_" . $params["name"],
         'api_entity' => "Updater",
         'api_action' => "Update",
-        'parameters' => $importparams
+        'parameters' => $importparamstring
       ];
 
       if ($params["edit"] == 1 and $valid) $jobcreateparams["id"] = $id;
@@ -200,17 +222,32 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
         }
       }
 
-      $exportonceparams = join("\n", array(
-        "key=" . $params["key"],
-        "endpoint=" . $params["signupendpoint"],
-        "endpoint_root=" . $params["rootendpoint"],
-        "allow_restart=0",
-        "group=" . $params["groupid"],
-        "updatejob=0",
-        "updateendpoint=" . $params["peopleendpoint"],
-        "required=" . $params["reqfields"],
-        "zone=" . $params["timezone"]
-      ));
+      $exportonceparams = array();
+      if ($params["key"] != "") {
+        $exportonceparams[] = "key=" . $params["key"];
+      }
+      if ($params["signupendpoint"] != "") {
+        $exportonceparams[] = "endpoint=" . $params["signupendpoint"];
+      }
+      if ($params["rootendpoint"] != "") {
+        $exportonceparams[] = "endpoint_root=" . $params["rootendpoint"];
+      }
+      $exportonceparams[] = "allow_restart=0";
+      if ($params["groupid"] != "") {
+        $exportonceparams[] = "group=" . $params["groupid"];
+      }
+      $exportonceparams[] = "updatejob=0";
+      if ($params["peopleendpoint"] != "") {
+        $exportonceparams[] = "updateendpoint=" . $params["peopleendpoint"];
+      }
+      if ($params["reqfields"] != "") {
+        $exportonceparams[] = "required=" . $params["reqfields"];
+      }
+      if ($params["timezone"] != "") {
+        $exportonceparams[] = "zone=" . $params["timezone"];
+      }
+
+      $exportonceparamstring = join("\n", $exportonceparams);
 
       if ($params["edit"] == 0) {
         // exporter bulk one time job
@@ -219,28 +256,43 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
           'name' => "OSDISYNC_EXPORT_ONETIME_" . $params["name"],
           'api_entity' => "Exporter",
           'api_action' => "Bulk",
-          'parameters' => $exportonceparams
+          'parameters' => $exportonceparamstring
         ]);
       }
 
-      $exportmanyparams = join("\n", array(
-        "key=" . $params["key"],
-        "endpoint=" . $params["signupendpoint"],
-        "endpoint_root=" . $params["rootendpoint"],
-        "allow_restart=1",
-        "group=" . $params["groupid"],
-        "updatejob=1",
-        "updateendpoint=" . $params["peopleendpoint"],
-        "required=" . $params["reqfields"],
-        "zone=" . $params["timezone"]
-      ));
+      $exportmanyparams = array();
+      if ($params["key"] != "") {
+        $exportmanyparams[] = "key=" . $params["key"];
+      }
+      if ($params["signupendpoint"] != "") {
+        $exportmanyparams[] = "endpoint=" . $params["signupendpoint"];
+      }
+      if ($params["rootendpoint"] != "") {
+        $exportmanyparams[] = "endpoint_root=" . $params["rootendpoint"];
+      }
+      $exportmanyparams[] = "allow_restart=1";
+      if ($params["groupid"] != "") {
+        $exportmanyparams[] = "group=" . $params["groupid"];
+      }
+      $exportmanyparams[] = "updatejob=1";
+      if ($params["peopleendpoint"] != "") {
+        $exportmanyparams[] = "updateendpoint=" . $params["peopleendpoint"];
+      }
+      if ($params["reqfields"] != "") {
+        $exportmanyparams[] = "required=" . $params["reqfields"];
+      }
+      if ($params["timezone"] != "") {
+        $exportmanyparams[] = "zone=" . $params["timezone"];
+      }
+
+      $exportmanyparamstring = join("\n", $exportmanyparams);
 
       $jobcreateparams = [
         'run_frequency' => "Daily",
         'name' => "OSDISYNC_EXPORT_" . $params["name"],
         'api_entity' => "Exporter",
         'api_action' => "Bulk",
-        'parameters' => $exportmanyparams,
+        'parameters' => $exportmanyparamstring,
       ];
 
       if ($params["edit"] == 1 and $valid) $jobcreateparams["id"] = $id;
