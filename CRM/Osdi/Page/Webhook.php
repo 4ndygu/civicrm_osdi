@@ -53,12 +53,11 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
     $object = isset($headers["Object"]) ? $headers["Object"] : NULL;
     // Check CMS's permission for (presumably) anonymous users.
     if ($apikey != Civi::settings()->get("security_key")) {
-      throw new RuntimeException("Missing our incorrect apikey.", 500);
+      throw new RuntimeException("Missing or incorrect apikey.", 500);
     }
 
     if ($object == NULL) {
-      print "must set 'object' parameter in get or post";
-      CRM_Utils_System::civiExit();
+      throw new RuntimeException("Must set object parameter in get or post",  500);
       // parent::run();
       return;
     }

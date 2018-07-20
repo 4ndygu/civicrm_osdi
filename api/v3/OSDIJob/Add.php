@@ -37,23 +37,31 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
   $returnValues = array();
   $params["name"] = htmlspecialchars($params["name"]);
 
+  //validate group and rule
   if (isset($params["groupid"])) {
     $validgroup = False;
-    $groupresult = civicrm_api3("Group", "get", [
-      "sequential" => 1,
-      "id" => $params["groupid"]
-    ]);
-    if (sizeof($groupresult["values"]) != 0) $validgroup = True;
+
+    if ($params["groupid"] == "") $validgroup = True;
+    else {
+      $groupresult = civicrm_api3("Group", "get", [
+        "sequential" => 1,
+        "id" => $params["groupid"]
+      ]);
+      if (sizeof($groupresult["values"]) != 0) $validgroup = True;
+    }
   }
 
   if (isset($params["ruleid"])) {
     $validrule = False;
-    $ruleresult = civicrm_api3("Rule", "get", [
-      'sequential' => 1,
-      'dedupe_rule_group_id' => 3,
-    ]);
 
-    if (sizeof($ruleresult["values"]) != 0) $validrule = True;
+    if ($params["ruleid"] == "") $validrule = True;
+    else {
+      $ruleresult = civicrm_api3("Rule", "get", [
+        'sequential' => 1,
+        'dedupe_rule_group_id' => $params["ruleid"],
+      ]);
+      if (sizeof($ruleresult["values"]) != 0) $validrule = True;
+    }
   }
 
   if (!$validgroup) {
@@ -66,6 +74,31 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
     return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
   }
 
+  // check valid URL
+  $client = new GuzzleHttp\Client();
+  $guzzleparams = [
+    'OSDI-API-Token' => $params["key"],
+  ];
+
+  if (strpos($params["peopleendpoint"], 'actionnetwork.org') !== FALSE) {
+    $guzzleparams["Content-Type"] = "application/hal+json";
+    $guzzleparams['Object'] = ['Contact'];
+  }
+  else {
+    $guzzleparams['Content-Type'] = "application/json";
+  }
+
+  $response = $client->request('GET', $params["peopleendpoint"], $guzzleparams);
+  var_dump($response->getBody()->getContents());
+  var_dump($response->getStatusCode());
+
+  if ($response->getStatusCode() != 200) {
+    $returnValues["error_message"] = "this URL / apikey combination is not valid";
+    $returnValues["body"] = $response->getBody()->getContents();
+    return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+  }
+
+  return;
 
   if ($params["syncconfig"] == 1 or $params["syncconfig"] == 2) {
 
