@@ -34,10 +34,40 @@ function _civicrm_api3_o_s_d_i_job_Add_spec(&$spec) {
  * @throws API_Exception
  */
 function civicrm_api3_o_s_d_i_job_Add($params) {
-    $returnValues = array();
-    $params["name"] = htmlspecialchars($params["name"]);
+  $returnValues = array();
+  $params["name"] = htmlspecialchars($params["name"]);
 
-    if ($params["syncconfig"] == 1 or $params["syncconfig"] == 2) {
+  if (isset($params["groupid"])) {
+    $validgroup = False;
+    $groupresult = civicrm_api3("Group", "get", [
+      "sequential" => 1,
+      "id" => $params["groupid"]
+    ]);
+    if (sizeof($groupresult["values"]) != 0) $validgroup = True;
+  }
+
+  if (isset($params["ruleid"])) {
+    $validrule = False;
+    $ruleresult = civicrm_api3("Rule", "get", [
+      'sequential' => 1,
+      'dedupe_rule_group_id' => 3,
+    ]);
+
+    if (sizeof($ruleresult["values"]) != 0) $validrule = True;
+  }
+
+  if (!$validgroup) {
+    $returnValues["error_message"] = "this group is not valid.";
+    return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+  }
+
+  if (!$validrule) {
+    $returnValues["error_message"] = "this rule is not valid.";
+    return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+  }
+
+
+  if ($params["syncconfig"] == 1 or $params["syncconfig"] == 2) {
 
       $valid = FALSE;
       $id = -1;
