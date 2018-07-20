@@ -39,6 +39,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
     // Check CMS's permission for (presumably) anonymous users.
     if (CRM_Core_Config::singleton()->userPermissionClass->isModulePermissionSupported() && !CRM_Osdi_Permission::check('allow webhook posts')) {
+      header('Content-Type:application/hal+json', TRUE, 500);
       throw new RuntimeException("Missing allow webhook posts permission.", 500);
     }
 
@@ -53,10 +54,12 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
     $object = isset($headers["Object"]) ? $headers["Object"] : NULL;
     // Check CMS's permission for (presumably) anonymous users.
     if ($apikey != Civi::settings()->get("security_key")) {
+      header('Content-Type:application/hal+json', TRUE, 500);
       throw new RuntimeException("Missing or incorrect apikey.", 500);
     }
 
     if ($object == NULL) {
+      header('Content-Type:application/hal+json', TRUE, 500);
       throw new RuntimeException("Must set object parameter in get or post",  500);
       // parent::run();
       return;

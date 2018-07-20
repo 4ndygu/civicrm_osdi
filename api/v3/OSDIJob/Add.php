@@ -37,6 +37,11 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
   $returnValues = array();
   $params["name"] = htmlspecialchars($params["name"]);
 
+  if ($params["name"] == "") {
+    $returnValues["error_message"] = "Name cannot be empty.";
+    return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
+  }
+
   //validate group and rule
   if (isset($params["groupid"])) {
     $validgroup = False;
@@ -89,16 +94,12 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
   }
 
   $response = $client->request('GET', $params["peopleendpoint"], $guzzleparams);
-  var_dump($response->getBody()->getContents());
-  var_dump($response->getStatusCode());
 
   if ($response->getStatusCode() != 200) {
     $returnValues["error_message"] = "this URL / apikey combination is not valid";
     $returnValues["body"] = $response->getBody()->getContents();
     return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
   }
-
-  return;
 
   if ($params["syncconfig"] == 1 or $params["syncconfig"] == 2) {
 
