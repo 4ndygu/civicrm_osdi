@@ -24,7 +24,8 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
       $metadata["id_import_log"] = "No runs yet!";
       $joblogresults = civicrm_api3("JobLog", "get", array(
         "job_id" => $job["id"],
-        "options" => array("sort" => "run_time DESC")
+        "options" => array("sort" => "run_time DESC"),
+        "sequential" => 1
       ));
 
       if (sizeof($joblogresults["values"]) != 0) {
@@ -85,7 +86,8 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
       $metadata["id_export_log"] = "No runs yet!";
       $joblogresults = civicrm_api3("JobLog", "get", array(
         "job_id" => $metadata["id_export"],
-        "options" => array("sort" => "run_time DESC")
+        "options" => array("sort" => "run_time DESC"),
+        "sequential" => 1
       ));
 
       if (sizeof($joblogresults["values"]) != 0) {
