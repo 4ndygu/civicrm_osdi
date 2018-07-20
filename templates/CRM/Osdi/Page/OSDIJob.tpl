@@ -96,10 +96,10 @@
       <p>Sync type: 2-way sync</p>
       <p>Import Job ID: {$job.id_import}</p>
       <p>Joblog: {$job.id_import_log}</p>
-      <a href="civicrm/admin/joblog?jid={$job.id_import}">View full Job log here</a>
+      <a href="/civicrm/admin/joblog?jid={$job.id_import}&reset=1">View full Job log here</a>
       <p>Export Job ID: {$job.id_export}</p>
       <p>Joblog: {$job.id_export_log}</p>
-      <a href="civicrm/admin/joblog?jid={$job.id_export}">View full Job log here</a>
+      <a href="/civicrm/admin/joblog?jid={$job.id_export}&reset=1">View full Job log here</a>
       <p>Group: {$job.group_id}, Name: {$job.group_name}</p>
       <p>Rule: {$job.rule_id}, Fields: {$job.rule_fields}</p>
       <button id="edit_{$job.name}" name="{$job.id_import}_{$job.id_export}">edit</button>
