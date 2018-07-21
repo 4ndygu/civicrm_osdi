@@ -63,7 +63,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
     $data = json_decode($response_string, TRUE);
 
     $data = Resource::create($this->client, $data);
-    $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone, $this->apikey);
+    $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone, $this->apikey, "");
 
     // Shunt the root into the queue.
     if (!isset($_SESSION["extractors"])) {
