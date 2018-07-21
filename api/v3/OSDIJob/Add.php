@@ -288,7 +288,7 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
       $exportmanyparamstring = join("\n", $exportmanyparams);
 
       $jobcreateparams = [
-        'run_frequency' => "Daily",
+        'run_frequency' => "Always",
         'name' => "OSDISYNC_EXPORT_" . $params["name"],
         'api_entity' => "Exporter",
         'api_action' => "Bulk",

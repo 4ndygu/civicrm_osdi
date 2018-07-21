@@ -60,6 +60,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
 
     // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
     $response_string = $response->getBody()->getContents();
+
     $data = json_decode($response_string, TRUE);
 
     $data = Resource::create($this->client, $data);
