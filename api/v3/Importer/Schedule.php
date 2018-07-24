@@ -52,7 +52,7 @@ function civicrm_api3_importer_Schedule($params) {
 
   // Run this 20 times, quit if you hit NULL.
   $to_unserialize = array_pop($extractors);
-  Civi::settings()->set("extractors", $to_unserialize);
+  Civi::settings()->set("extractors", $extractors);
 
   $malformed = FALSE;
   if (is_string($to_unserialize)) {
