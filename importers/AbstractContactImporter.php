@@ -38,12 +38,15 @@ abstract class AbstractContactImporter {
     }
 
     // Shunt the root into the queue.
-    if (!isset($_SESSION["extractors"])) {
-      $_SESSION["extractors"] = array();
+    $extractors = Civi::settings()->get("extractors");
+    if ($extractors == NULL) {
+      $extractors = array();
     }
 
     $final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
-    $_SESSION["extractors"][] = serialize($final_data);
+    $extractors[] = serialize($final_data);
+
+    Civi::settings()->set("extractors", $extractors);
 
     return $counter;
   }

@@ -41,13 +41,19 @@ function _civicrm_api3_importer_Schedule_spec(&$spec) {
 function civicrm_api3_importer_Schedule($params) {
   $returnValues = array();
   // Get out if nobody started.
-  if (!isset($_SESSION["extractors"]) or empty($_SESSION["extractors"])) {
+  $extractors = Civi::settings()->get("extractors");
+  if ($extractors == NULL) {
+    $returnValues["status"] = "no variable set";
+    return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
+  } else if (empty($extractors)) {
     $returnValues["status"] = "no variable set";
     return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
   }
 
   // Run this 20 times, quit if you hit NULL.
-  $to_unserialize = array_pop($_SESSION["extractors"]);
+  $to_unserialize = array_pop($extractors);
+  Civi::settings()->set("extractors", $to_unserialize);
+
   $malformed = FALSE;
   if (is_string($to_unserialize)) {
     $rootdata = unserialize($to_unserialize);
@@ -125,7 +131,10 @@ function civicrm_api3_importer_Schedule($params) {
   CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
 
   $returned_data = new ResourceStruct($root, $rootdata->rule, $rootdata->filter, $rootdata->group, $zone, $apikey, $rootdata->endpoint);
-  $_SESSION["extractors"][] = serialize($returned_data);
+
+  $extractors = Civi::settings()->get("extractors");
+  $extractors[] = serialize($returned_data);
+  Civi::settings()->set("extractors", $extractors);
 
   $returnValues["status"] = "partially completed";
   $returnValues["counter"] = $counter;

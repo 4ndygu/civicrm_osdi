@@ -76,7 +76,7 @@ function civicrm_api3_importer_Import($params) {
 
   $returnValues["count"] = $count;
 
-  $returnValues["session"] = $_SESSION["extractors"];
+  $returnValues["session"] = Civi::settings()->get("extractors");
 
   return civicrm_api3_create_success($returnValues, $params, 'Importer', 'import');
 }
