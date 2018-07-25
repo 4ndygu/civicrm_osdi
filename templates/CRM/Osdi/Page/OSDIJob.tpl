@@ -103,7 +103,8 @@
       <p>Group: {$job.group_id}, Name: {$job.group_name}</p>
       <p>Rule: {$job.rule_id}, Fields: {$job.rule_fields}</p>
       <button id="edit_{$job.name}" name="{$job.id_import}_{$job.id_export}">edit</button>
-      <button id="delete_{$job.name}" name="{$job.id_import}_{$job.id_export}">delete</button>
+        <button id="delete_{$job.name}" name="{$job.id_import}_{$job.id_export}">delete</button>
+        <button id="mapping_{$job.endpointname}" name="mapping_{$job.endpointname}">edit mapping</button>
     </div>
   {/foreach}
 </div>
@@ -208,6 +209,8 @@
         if (!edit) {
             // redirect to mapping
             alert("A default mapping was configured for your remote endpoint.\n Visit /civicrm/osdi/mapping to change it.");
+            window.location.href = "/civicrm/osdi/mapping?endpoint=" + rootendpoint.val();
+
         }
 
         dialog.dialog( "close" );
@@ -317,6 +320,13 @@
         // do something
         dialogdelete.dialog( "open" );
 
+        // delete should refresh the page
+    });
+
+    CRM.$('[id^="mapping_"]').click(function() {
+        endpoints = CRM.$(this).attr("name").split("_");
+
+        window.location.href = "/civicrm/osdi/mapping?endpoint=" + endpoints[1];
         // delete should refresh the page
     });
 

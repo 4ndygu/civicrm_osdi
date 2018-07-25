@@ -33,6 +33,14 @@
 {literal}
 <script type="text/javascript">
 
+    // query string param parsing
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    };
+
     if(typeof(String.prototype.trim) === "undefined")
     {
         String.prototype.trim = function()
@@ -44,6 +52,7 @@
     var preexisting = new Object();
     preexisting["endpoint"] = "";
     preexisting["civiendpoint"] = "";
+
 
     CRM.$(document).ready(function() {
         var formResults = CRM.$("#MappingForm").serializeArray().map(function(x){
@@ -181,6 +190,18 @@
             }
         })
     })
+
+    endpointvar = getUrlParameter("endpoint");
+    CRM.$("#EndpointInputter").val(endpointvar);
+
+    if (endpointvar != "") {
+        if (endpointvar.indexOf("actionnetwork.org") !== -1) {
+            CRM.$("#EndpointSelector").val(1);
+        } else {
+            CRM.$("#EndpointSelector").val(2);
+        }
+    }
+
 </script>
 {/literal}
 

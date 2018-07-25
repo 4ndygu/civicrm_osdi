@@ -71,6 +71,9 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
             }
           }
         }
+        if ($params[0] == "endpoint") {
+          $metadata["endpointname"] = $params[1];
+        }
       }
 
       // load the export value
