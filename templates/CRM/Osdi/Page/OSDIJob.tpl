@@ -105,6 +105,7 @@
       <button id="edit_{$job.name}" name="{$job.id_import}_{$job.id_export}">edit</button>
         <button id="delete_{$job.name}" name="{$job.id_import}_{$job.id_export}">delete</button>
         <button id="mapping_{$job.endpointname}" name="mapping_{$job.endpointname}">edit mapping</button>
+        <a class="helpicon" title="Group ID Help" onclick='CRM.help("mapping", "This will allow you to edit the mappings for your sync from CiviCRM fields to OSDI fields."); return false;'></a>
     </div>
   {/foreach}
 </div>
