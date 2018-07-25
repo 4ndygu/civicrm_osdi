@@ -1,0 +1,18 @@
+site_name: CiviCRM OSDI Sync
+repo_url: https://github.com/4ndygu/civicrm_osdi
+theme: material
+
+pages:
+- Home: index.md
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - def_list
+  - codehilite
+  - toc(permalink=true)
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tilde
+  - pymdownx.betterem
+  - pymdownx.mark

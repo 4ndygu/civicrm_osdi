@@ -1,5 +1,6 @@
 <?php
 
+
 require_once 'osdi.civix.php';
 use CRM_Osdi_ExtensionUtil as E;
 
@@ -53,7 +54,7 @@ function install_groupid() {
           'max_multiple' => 0,
       ));
   } catch (CiviCRM_API3_Exception $e) {
-      if ($e->getErrorCode() == "already exists") {
+      if ($e->getErrorCode() === "already exists") {
           $result = civicrm_api3('CustomGroup', 'get', array(
               'title' => "osditags",
               'sequential' => 1
@@ -62,6 +63,19 @@ function install_groupid() {
 
       $id = $result["id"];
       Civi::settings()->set('OSDIGROUPID', 'osditags');
+  }
+
+  // add the existing ID to this group
+  $key = "CIVI_ID_" . sha1(CRM_Utils_System::url("civicrm", NULL, TRUE, NULL, FALSE, TRUE));
+  try {
+    $fieldresult = civicrm_api3('CustomField', 'create', array(
+      'custom_group_id' => $id,
+      'label' => $key,
+      'data_type' => 'String',
+      'html_type' => "Text",
+    ));
+  } catch (CiviCRM_API3_Exception $e) {
+    if ($e->getErrorCode() !== "already exists") throw $e;
   }
 
   $id = $result["id"];
@@ -135,20 +149,28 @@ function install_matching() {
       }
 
       // shunt the forward direction
-      $result = civicrm_api3('MappingField', 'create', [
+      try {
+        $result = civicrm_api3('MappingField', 'create', [
           'mapping_id' => $id,
           'name' => $first,
           'value' => $second,
           'column_number'=> 1
-      ]);
+        ]);
+      } catch (CiviCRM_API3_Exception $e) {
+        if ($e->getErrorCode() !== "already exists") throw $e;
+      }
 
       // shunt the backward direction
-      $result = civicrm_api3('MappingField', 'create', [
-          'mapping_id' => $id2,
-          'name' => $second,
-          'value' => $first,
-          'column_number'=> 1
-      ]);
+      try {
+        $result = civicrm_api3('MappingField', 'create', [
+            'mapping_id' => $id2,
+            'name' => $second,
+            'value' => $first,
+            'column_number'=> 1
+        ]);
+      } catch (CiviCRM_API3_Exception $e) {
+        if ($e->getErrorCode() !== "already exists") throw $e;
+      }
   }
 }
 
@@ -271,6 +293,14 @@ function osdi_civicrm_navigationMenu(&$menu) {
     'label' => E::ts('Import via OSDI'),
     'name' => 'Import via OSDI',
     'url' => 'civicrm/osdi/config',
+    'permission' => 'access CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ));
+  _osdi_civix_insert_navigation_menu($menu, 'Contacts', array(
+    'label' => E::ts('OSDI Job Sync'),
+    'name' => 'OSDI Job Sync',
+    'url' => 'civicrm/osdi/jobs',
     'permission' => 'access CiviCRM',
     'operator' => 'OR',
     'separator' => 0,

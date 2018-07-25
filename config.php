@@ -10,7 +10,7 @@ return array(
     "email" => "email_addresses|0|address",
     "street_address" => "postal_addresses|0|address_lines|0",
     "city" => "postal_addresses|0|locality",
-    "state_province_name" => "postal_addresses|0|region",
+    "state_province_id" => "postal_addresses|0|region",
     "country" => "postal_addresses|0|country",
     "postal_code" => "postal_addresses|0|postal_code",
     "postal_code_suffix" => "postal_addresses|0|postal_code+",
