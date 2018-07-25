@@ -54,6 +54,29 @@ In order to implement 2-way sync, we have implemented a handy online interface a
 
 ### setting up a sync via the interface
 
+You can access the sync job management page via the navigation bar, at `Contacts -> OSDI Job Sync`. The page should look like this, presuming that you've already set up a job. If there is no job set up, then this is blank. A sample page would look like this:
+
+![job add page](https://raw.githubusercontent.com/4ndygu/civicrm_osdi/pipeline_new/images/OSDIJob_home.png)
+
+Press the `Add job` button to add a job. A dialog should pop up that looks like this.
+
+![job page](https://github.com/4ndygu/civicrm_osdi/blob/pipeline_new/images/OSDIJob_add.png?raw=true)
+
+As you can see, there are a few fillins that you can place for your job.
+
+- Name: the name of your job. Do not place underscore characters in the name.
+- Imported Resource: the resource to be imported. Only contacts are allowed for now.
+- Sync endpoint (root): the root of your api endpoint. This would be the /civicrm link if you're using a Civi to Civi sync, and the root of any other OSDI-compliant API endpoint. We currently only support ActionNetwork and CiviCRM Syncs.
+- Sync endpoint (Person Signup Helper) This is the endpoint that we would send POST requests to to upload a user. For a Civi to Civi sync, this would be the civicrm/osdi/webhook URL.
+- Sync endpoint (People Endpoint) This would be the endpoint that we would make GET requests to to retrieve users. For a Civi to Civi sync, this would be the civicrm/osdi/webhook URL.
+- API Key: The API Key for the endpoint.
+- GroupID: This is the existing ID for a group that you will be importing everyone from the third party group INTO. This is also the existing ID for a group that you will be exporting all specified CiviCRM users from. 
+- RuleID: This is the existing ID for the dedupe rule that all users in this sync will use to find and update deduped users.
+- Required Fields: This is a comma separated (no spaces) string of all CiviCRM fields that the sync notes is necessary for import / export of contacts.
+- Sync configuration: We offer three configuration options: two way (both import and export), only export, or only import
+- Time Zone: The time zone set on the REMOTE endpoint. Ask your system administrator for more information.
+
+After you press submit, you will be directed to `civicrm/osdi/mapping`. Read the above guide for instructions on how to configure a new mapping for your endpoint. You don't have to do anything here if you've already configured the mapping for an existing endpoint. If you go back to `civicrm/osdi/jobs`, where your job will be displayed. This instruction will ALSO kick off a full time import and export job, as well as set up cron jobs to take all newly modified users each day and sync them across both instances. Please wait a few hours for all users to be imported and exported.
 
 ### setting up a sync manually
 
