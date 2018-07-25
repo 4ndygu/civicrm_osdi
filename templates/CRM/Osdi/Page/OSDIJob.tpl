@@ -208,8 +208,7 @@
 
         if (!edit) {
             // redirect to mapping
-            alert("A default mapping was configured for your remote endpoint.\n Visit /civicrm/osdi/mapping to change it.");
-            window.location.href = "/civicrm/osdi/mapping?endpoint=" + rootendpoint.val();
+            window.location.href = "/civicrm/osdi/mapping?change=1&endpoint=" + rootendpoint.val();
 
         }
 
@@ -326,7 +325,7 @@
     CRM.$('[id^="mapping_"]').click(function() {
         endpoints = CRM.$(this).attr("name").split("_");
 
-        window.location.href = "/civicrm/osdi/mapping?endpoint=" + endpoints[1];
+        window.location.href = "/civicrm/osdi/mapping?change=1&endpoint=" + endpoints[1];
         // delete should refresh the page
     });
 

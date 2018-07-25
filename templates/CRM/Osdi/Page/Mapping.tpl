@@ -170,6 +170,10 @@
             }
         });
 
+        if (getUrlParameter("change") == 1) {
+            window.location.href = "/civicrm/osdi/jobs";
+        }
+
         var formResults = CRM.$("#MappingForm").serializeArray().map(function(x){
             preexisting[x.name] = x.value;
         });
