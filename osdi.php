@@ -297,6 +297,14 @@ function osdi_civicrm_navigationMenu(&$menu) {
     'operator' => 'OR',
     'separator' => 0,
   ));
+  _osdi_civix_insert_navigation_menu($menu, 'Contacts', array(
+    'label' => E::ts('OSDI Job Sync'),
+    'name' => 'OSDI Job Sync',
+    'url' => 'civicrm/osdi/jobs',
+    'permission' => 'access CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ));
   _osdi_civix_navigationMenu($menu);
 } 
 
