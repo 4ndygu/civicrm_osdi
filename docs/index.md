@@ -163,3 +163,14 @@ You can find it at `/civicrm/osdi/response?object=contact`. This is currently
 still in alpha, but it allows users to page through all users with emails, 
 first, and last names. I suppose everything here is in alpha, but this endpoint 
 is currently in even more alpha than the above task.
+
+## Extending CiviCRM OSDI
+
+To support further extractors, there are a few important steps.
+
+- Ensure your new extractor is OSDI compliant
+- Add a new Importer in the `importers/` directory
+- Edit the export functionality in the `Exporter.Bulk` API
+- Edit the import functionality in the `Importer.Import` API
+- Edit the import functionality in the `CRM/OSDIQueue/Tasks` if your endpoint is managing different groups with the same URL, like actionnetwork
+
