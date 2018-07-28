@@ -174,3 +174,17 @@ To support further extractors, there are a few important steps.
 - Edit the import functionality in the `Importer.Import` API
 - Edit the import functionality in the `CRM/OSDIQueue/Tasks` if your endpoint is managing different groups with the same URL, like actionnetwork
 
+### Ensure your new extractor is OSDI compliant
+
+The motivation for this is obvious -- this is an extension for syncing contacts based on OSDI compliance. This endpoint must support the return of OSDI objects. You can check this [here](https://haltalk.herokuapp.com/explorer/browser.html#/) with the HAL browser. It must accept some form of key in the OSDI-API-Token header.
+
+### Add a new Importer in the `importers/` directory
+
+Most of the import logic is handled via the importer class. Importer classes must inherit from the AbstractImporer class, also in the `importers/` directory. 
+
+### Edit the export functionality in the `Exporter.Bulk` API
+
+### Edit the import functionality in the `Importer.Import` API
+
+### Edit the import functionality in the `CRM/OSDIQueue/Tasks` if your endpoint is managing different groups with the same URL, like actionnetwork
+
