@@ -194,49 +194,49 @@ Most of the import logic is handled via the importer class. Importer classes mus
 
 This API seeds an importer based on the endpoint provided. You must change this snippet of code to allow your importer to be used as well. The code is below:
 
-`
-  if (strpos($params["endpoint"], "actionnetwork.org") !== FALSE) {
-    $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
-  }
-  else {
-    $importer = new CiviCRMContactImporter($params["endpoint"], "x", $params["key"]);
-  }
-`
+```
+    if (strpos($params["endpoint"], "actionnetwork.org") !== FALSE) {
+      $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
+    }
+    else {
+      $importer = new CiviCRMContactImporter($params["endpoint"], "x", $params["key"]);
+    }
+```
 
 ### Edit the export functionality in the `Exporter.Bulk` API
 
 This does not need to change as long as the extractor endpoint is OSDI-compliant. However, if your service is managing different groups with the same URL, like actionnetwork, you must include that as well. This will allow CIVI_ID_ tags that are used to uniquely identify your service to all be labeled with your service name rather than the hash of the service's URL. This is also important to have one consistent mapping for your service. A code snippet is attached:
 
-`
-  $hash = "CIVI_ID_actionnetwork";
-  if (strpos($params["endpoint_root"], "actionnetwork.org") === FALSE) {
-    $hash = "CIVI_ID_" . sha1($params["endpoint_root"]);
-  }
-  $second_key = $params["endpoint"] . $hash;
-`
+```
+    $hash = "CIVI_ID_actionnetwork";
+    if (strpos($params["endpoint_root"], "actionnetwork.org") === FALSE) {
+      $hash = "CIVI_ID_" . sha1($params["endpoint_root"]);
+    }
+    $second_key = $params["endpoint"] . $hash;
+```
 
 ### Edit the import functionality in the `CRM/OSDIQueue/Tasks` 
 
 This is also done, like above, if your endpoint is managing different groups with the same URL, like ActionNetwork. A code snippet is attached:
 
-`
+```
     $url = $contactresource->endpoint;
     if (substr($apikey, 0, 4) != "OSDI") {
       $url = "actionnetwork";
     }
-`
+```
 
-`
-      $hash = "CIVI_ID_actionnetwork"; 
-      if (stripos($url, "actionnetwork.org") === FALSE) {
-        $hash = "CIVI_ID_" . sha1($url); 
-      }
-`
+```
+    $hash = "CIVI_ID_actionnetwork"; 
+    if (stripos($url, "actionnetwork.org") === FALSE) {
+     $hash = "CIVI_ID_" . sha1($url); 
+    }
+```
 
-`
+```
     $key = "CIVI_ID_actionnetwork";
     if (strpos($url, "actionnetwork.org") === FALSE) $key = "CIVI_ID_" . sha1($url);
-`
+```
 
 These three code blocks would change in an extension of the service.
 
