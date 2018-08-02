@@ -49,10 +49,13 @@ function install_groupid() {
   try {
       $result = civicrm_api3('CustomGroup', 'create', array(
           'title' => "osditags",
+          "sequential" => 1,
           'extends' => "Contact",
           'is_multiple' => 1,
           'max_multiple' => 0,
       ));
+
+      $id = $result["values"][0]["id"];
   } catch (CiviCRM_API3_Exception $e) {
       if ($e->getErrorCode() === "already exists") {
           $result = civicrm_api3('CustomGroup', 'get', array(
