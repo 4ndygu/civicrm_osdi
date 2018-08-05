@@ -200,9 +200,9 @@
 
     if (endpointvar != "") {
         if (endpointvar.indexOf("actionnetwork.org") !== -1) {
-            CRM.$("#EndpointSelector").val(1);
+            CRM.$("#EndpointSelector").val(1).change();
         } else {
-            CRM.$("#EndpointSelector").val(2);
+            CRM.$("#EndpointSelector").val(2).change();
         }
     }
 
