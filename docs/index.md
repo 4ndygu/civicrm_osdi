@@ -240,4 +240,10 @@ This is also done, like above, if your endpoint is managing different groups wit
 
 These three code blocks would change in an extension of the service.
 
+### FAQ
+
+Q: When I press import, nothing happens!
+A: This often might happen because permissions are not set correctly. Go to Settings -> Permissions and enable the OSDI Sample Application: Allow Webhook Posts permissions.
+
+
 
