@@ -1,5 +1,9 @@
 # com.example.osdi
 
+This is an extension for importing from and exporting to OSDI endpoints from CiviCRM. We suport syncs for Contact resources between CiviCRM to CiviCRM instances, as well as ActionNetwork to CiviCRM instances. Syncs are updated every day automatically through jobs that take groups of contacts on a remote instance of CiviCRM / ActionNetwork and ensure that these contacts are store and up to date on the host CiviCRM instance. All actions are negotiated through the OSDI implementation, and this extension provides an OSDI API endpoint to access contact instances through an OSDI format. 
+
+For more information, please check the `docs` folder.
+
 [![Coverage Status](https://coveralls.io/repos/github/4ndygu/civicrm_osdi/badge.svg?branch=master)](https://coveralls.io/github/4ndygu/civicrm_osdi?branch=master)
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
