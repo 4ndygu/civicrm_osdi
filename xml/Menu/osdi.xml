@@ -12,4 +12,29 @@
     <title>OSDIRunner</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/osdi/config</path>
+    <page_callback>CRM_Osdi_Page_Configure</page_callback>
+    <title>Configure</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/osdi/webhook</path>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+    <page_callback>CRM_Osdi_Page_Webhook</page_callback>
+    <title>Webhook</title>
+  </item>
+  <item>
+    <path>civicrm/osdi/mapping</path>
+    <page_callback>CRM_Osdi_Page_Mapping</page_callback>
+    <title>Mapping</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/osdi/jobs</path>
+    <page_callback>CRM_Osdi_Page_OSDIJob</page_callback>
+    <title>OSDIJob</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
