@@ -10,6 +10,8 @@ For more information on how to use or extend this application, please check the 
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
+This extension to CiviCRM was built by Andy Gu for Google Summer of Code 2018.
+
 ## Requirements
 
 * PHP v5.4+
