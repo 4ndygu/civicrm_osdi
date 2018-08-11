@@ -6,11 +6,11 @@ For a demo video, look [here](https://drive.google.com/file/d/1Xlcxlr52bE4hvSUPR
 
 For more information on how to use or extend this application, please check the `docs` folder.
 
+This extension to CiviCRM was built by Andy Gu for Google Summer of Code 2018. This repository's single purpose is to contain Andy Gu's submission to GSoC 2018. 
+
 [![Coverage Status](https://coveralls.io/repos/github/4ndygu/civicrm_osdi/badge.svg?branch=master)](https://coveralls.io/github/4ndygu/civicrm_osdi?branch=master)
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
-
-This extension to CiviCRM was built by Andy Gu for Google Summer of Code 2018.
 
 ## Requirements
 
