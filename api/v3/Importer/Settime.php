@@ -15,7 +15,7 @@
  *
  * @see http://wiki.civicrm.org/confluence/display/CRMDOC/API+Architecture+Standards
  */
-function _civicrm_api3_importer_SetTime_spec(&$spec) {
+function _civicrm_api3_importer_Settime_spec(&$spec) {
   $spec['zone']['api.required'] = 1;
 }
 
@@ -31,7 +31,7 @@ function _civicrm_api3_importer_SetTime_spec(&$spec) {
  *
  * @throws API_Exception
  */
-function civicrm_api3_importer_SetTime($params) {
+function civicrm_api3_importer_Settime($params) {
   Civi::settings()->set('server_time_zone', $params["zone"]);
 
   $returnValues["result_zone"] = Civi::settings()->get("server_time_zone");
