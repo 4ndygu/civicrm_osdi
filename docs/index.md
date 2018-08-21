@@ -34,7 +34,7 @@ In order to access the webhook (required for Civi to Civi sync), you must enable
 
 #### 3. Configure a Mapping
 
-This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. The endpoint for editing the mapping endpoint is at `/civicrm/osdi/mapping`. You will be presented with a page that contains the default contact to OSDI endpoint, which looks like this: 
+This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. The endpoint for editing the mapping endpoint is at `/civicrm/osdi/mapping`. You will be presented with a page that contains the default contact to OSDI endpoint, which looks like this, though the label should say "Server's local time zone": 
 
 ![osdi mapping image](https://raw.githubusercontent.com/4ndygu/civicrm_osdi/master/civicrm_mapping.png)
 
