@@ -215,7 +215,7 @@
 </form>
 
 <form id="TimeForm" method="post">
-    <p>Time zone of remote server:</p>
+    <p>Server's local time zone:</p>
     <select name="zone">
 		<option timeZoneId="1" gmtAdjustment="GMT-12:00" useDaylightTime="0" value="-12">(GMT-12:00) International Date Line West</option>
 		<option timeZoneId="2" gmtAdjustment="GMT-11:00" useDaylightTime="0" value="-11">(GMT-11:00) Midway Island, Samoa</option>
