@@ -38,7 +38,7 @@ function osdi_civicrm_install() {
  */
 function osdi_civicrm_postInstall() {
   install_groupid();
-  //install_matching();
+  install_matching();
 
   _osdi_civix_civicrm_postInstall();
 }
@@ -87,6 +87,22 @@ function install_groupid() {
 
   $id = $result["id"];
   Civi::settings()->set('OSDIGROUPID', 'osditags');
+}
+
+/**
+ * deletes the customgroup of OSDI Tags
+ */
+function uninstall_groupid() {
+  $id_result = civicrm_api3('CustomGroup', 'get', array(
+      'sequential' => 1,
+      'name' => "osditags"
+  ));
+
+  if (sizeof($id_result["values"]) != 0) {
+      $result = civcrm_api3('CustomGroup', 'delete', array(
+          "id" => $id_result["values"][0]["id"]
+      ));
+  }
 }
 
 /**
@@ -186,11 +202,32 @@ function install_matching() {
 }
 
 /**
+ * Uninstalls the custom mappings generated on install.
+ */
+function uninstall_matching() {
+  // grab all the rules
+  $id_result = civicrm_api3('Mapping', 'get', array(
+    'sequential' => 1,
+     'name' => ['LIKE' => "OSDI%"],
+  ));
+
+  if (sizeof($id_result["values"]) > 0) {
+    foreach ($id_result["values"] as $value) {
+      $result = civicrm_api3('Mapping', 'delete', array(
+        'id' => $value["id"]
+      ));
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_uninstall().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
 function osdi_civicrm_uninstall() {
+  uninstall_groupid();
+  uninstall_matching();
   _osdi_civix_civicrm_uninstall();
 }
 
@@ -200,9 +237,6 @@ function osdi_civicrm_uninstall() {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
 function osdi_civicrm_enable() {
-  install_groupid();
-  install_matching();
-
   _osdi_civix_civicrm_enable();
 }
 
