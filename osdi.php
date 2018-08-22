@@ -43,6 +43,10 @@ function osdi_civicrm_postInstall() {
   _osdi_civix_civicrm_postInstall();
 }
 
+/**
+ * Installs the customgroup of OSDI Tags. These tags are used to identify the ID of 
+ * each corresponding contact, per source.
+ */
 function install_groupid() {
   $id = -1;
 
@@ -85,6 +89,10 @@ function install_groupid() {
   Civi::settings()->set('OSDIGROUPID', 'osditags');
 }
 
+/**
+ * Installs the initial mapping from civi to OSDI fields.
+ * Also installs mappings for custom fields
+ */
 function install_matching() {
   // set ID for later
   $id = -1;
