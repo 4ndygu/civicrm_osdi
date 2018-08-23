@@ -99,7 +99,7 @@ function uninstall_groupid() {
   ));
 
   if (sizeof($id_result["values"]) != 0) {
-      $result = civcrm_api3('CustomGroup', 'delete', array(
+      $result = civicrm_api3('CustomGroup', 'delete', array(
           "id" => $id_result["values"][0]["id"]
       ));
   }
