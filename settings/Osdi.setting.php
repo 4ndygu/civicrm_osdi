@@ -4,6 +4,7 @@ return array(
     'group_name' => 'OSDI',
     'group' => 'osdi',
     'name' => 'server_time_zone',
+    'title' => 'OSDI Server Time Zone',
     'type' => 'String', //Wish there was something to capture non-integer numbers
     'default' => 0,
     'add' => '5.4',
