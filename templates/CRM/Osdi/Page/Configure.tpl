@@ -24,13 +24,13 @@
     <td><input type="text" name="apikey" id="apikey"><br /></td>
   </tr>
   <tr class="crm-osdi-configure-import-rule">
-    <td class="label"><label for="rule">Rule ID</label></td>
+    <td class="label"><label for="rule">Dedupe Rule</label></td>
     <td><input type="text" name="rule" id="rule"><br /></td>
   </tr>
   <tr class="crm-osdi-configure-import-group">
-    <td class="label"><label for="group">Group ID</label></td>
+    <td class="label"><label for="group">Group</label></td>
     <td><input type="text" name="group" id="group"><br />
-    <span class="description">This is the ID of a valid group that you are importing INTO.</span>
+    <span class="description">This is the group you are importing INTO.</span>
     </td>
   </tr>
   <tr class="crm-osdi-configure-import-required">
@@ -156,9 +156,9 @@
 	  <td><input type="text" name="apikey" id="apikey"><br /><td>
   </tr>
   <tr class="crm-osdi-configure-export-group">
-    <td class="label"><label for="group">Group ID</label></td>
+    <td class="label"><label for="group">Group</label></td>
     <td><input type="text" name="group" id="group"><br />
-      <span class="description">This is the ID of the group that you're exporting FROM.</span>
+      <span class="description">This is the group you are exporting FROM.</span>
     </td>
   </tr>
   <tr class="crm-osdi-configure-export-required">
@@ -483,6 +483,24 @@
                 alert(result["values"]["message"]);
             }
         });
+    });
+
+    // Use Select2 where appropriate.
+    CRM.$('#rule').crmEntityRef({
+      entity: 'RuleGroup',
+      extra: 'contact_type',
+      api: {params: {is_active: 1}},
+      select: {allowClear:true, minimumInputLength: 0},
+    });
+    CRM.$('.crm-osdi-configure-export-group #group').crmEntityRef({
+      entity: 'Group',
+      api: {params: {is_active: 1}},
+      select: {allowClear:true, minimumInputLength: 0},
+    });
+    CRM.$('.crm-osdi-configure-import-group #group').crmEntityRef({
+      entity: 'Group',
+      api: {params: {is_active: 1}},
+      select: {allowClear:true, minimumInputLength: 0},
     });
 </script>
 {/literal}
