@@ -72,7 +72,7 @@
                     "name": querystring
                 }).done(function(result) {
                     if (result["values"].length == 0) {
-                        alert("This group doesn't exist yet. Create it first!");
+                        CRM.alert("This group doesn't exist yet. Create it first!");
                     } else {
                         CRM.api3('MappingField', 'get', {
                             "mapping_id": result["id"],
@@ -105,7 +105,7 @@
             }).done(function(result) {
                 console.log(result);
                 if (result["values"].length == 0) {
-                    alert("This group doesn't exist yet. Create it first!");
+                    CRM.alert("This group doesn't exist yet. Create it first!");
                 } else {
                     CRM.api3('MappingField', 'get', {
                         "mapping_id": result["id"],
@@ -164,9 +164,9 @@
             "endpoint" : endpoint
         }).done(function(result) {
             if (result["values"]["message"] = "new item initialized") {
-                alert("Updated.");
+                CRM.alert("Updated.");
             } else if (result["values"]["message"] = "updated") {
-                alert("Updated.");
+                CRM.alert("Updated.");
             }
         });
 
@@ -188,9 +188,9 @@
         }).done(function(result) {
             console.log(result);
             if (result["is_error"] == 1) {
-                alert("Error: " + result["error_message"]);
+                CRM.alert("Error: " + result["error_message"]);
             } else {
-                alert("Mapping Updated.");
+                CRM.alert("Mapping Updated.");
             }
         })
     })
