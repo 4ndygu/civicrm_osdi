@@ -152,7 +152,7 @@
                 }).done(function(result) {
                     console.log(result);
                     if ("error_message" in result["values"]) {
-                        alert(result["values"]["error_message"]);
+                        CRM.alert(result["values"]["error_message"]);
                     }
                 });
 
@@ -200,10 +200,10 @@
         }).done(function(result) {
             console.log(result);
             if ("error_message" in result) {
-                alert(result["error_message"]);
+                CRM.alert(result["error_message"]);
             }
             if ("values" in result) {
-                if ("error_message" in result["values"]) alert(result["values"]["error_message"]);
+                if ("error_message" in result["values"]) CRM.alert(result["values"]["error_message"]);
             }
         });
 

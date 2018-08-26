@@ -401,17 +401,17 @@
                 "key": data["apikey"],
                 "endpoint": endpoint}).done(function(result) {
                     if ("error_message" in result) {
-                        alert(result["error_message"]);
+                        CRM.alert(result["error_message"]);
                         return;
                     } 
                     console.log(result["values"]["session"]);
 					var returnedCount = '' + result["values"]["count"];
                     if (returnedCount == -1) {
-                        alert("no users added. job completed.");
+                        CRM.alert("no users added. job completed.");
                     } else if (returnedCount == -100) {
-                        alert("job added to session. Please add the exporter.bulk job to the list of scheduled jobs.");
+                        CRM.alert("job added to session. Please add the exporter.bulk job to the list of scheduled jobs.");
                     } else {
-                        alert(returnedCount + " Users successfully added to group. Please add the exporter.bulk job to the list of scheduled jobs.");
+                        CRM.alert(returnedCount + " Users successfully added to group. Please add the exporter.bulk job to the list of scheduled jobs.");
                     }
 			});
 		}
@@ -443,9 +443,9 @@
                     console.log(result["values"]);
                     var returnedCount = result["values"]["count"];
                     if (returnedCount == 0) {
-                        alert("Jobs added to queue successfully.");
+                        CRM.alert("Jobs added to queue successfully.");
                     } else {
-                        alert("ERROR: Jobs not added successfully.");
+                        CRM.alert("ERROR: Jobs not added successfully.");
                     }
                 });
         }
@@ -465,7 +465,7 @@
         CRM.api3('Importer', 'SetTime', {
             "zone": data["zone"]}).done(function(result) {
                 console.log(result);
-                alert(''.concat("Zone: ", result["values"]["result_zone"], " set successfully."));
+                CRM.alert(''.concat("Zone: ", result["values"]["result_zone"], " set successfully."));
             });
 
         e.preventDefault();
@@ -478,9 +478,9 @@
         }).done(function(result) {
             console.log(result);
             if (result["is_error"] == 1) {
-                alert("Error: " + result["error_message"]);
+                CRM.alert("Error: " + result["error_message"]);
             } else {
-                alert(result["values"]["message"]);
+                CRM.alert(result["values"]["message"]);
             }
         });
     });
