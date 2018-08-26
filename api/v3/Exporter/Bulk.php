@@ -104,7 +104,7 @@ function civicrm_api3_exporter_Bulk($params) {
 
   // Use a sha1 of the key with the endpoint to generate our identifier.
   // change the hash to the URL if Civi, key if actionnetwork
-  $hash = "CIVI_ID_actionnetwork";
+  $hash = "CIVI_ID_actionnetwork_" . sha1($params["key"]);
   if (strpos($params["endpoint_root"], "actionnetwork.org") === FALSE) {
     $hash = "CIVI_ID_" . sha1($params["endpoint_root"]);
   }
