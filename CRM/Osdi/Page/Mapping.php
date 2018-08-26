@@ -36,7 +36,9 @@ class CRM_Osdi_Page_Mapping extends CRM_Core_Page {
           'id' => (int) substr($value["name"], 7),
         ));
 
-        $addOn = "/" . $result["values"][0]["name"];
+        if (isset($result["values"][0])) {
+          $addOn = "/" . $result["values"][0]["name"];
+        }
       }
       $item = array();
       $item["first"] = $value["name"];

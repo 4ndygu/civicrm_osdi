@@ -34,7 +34,7 @@ In order to access the webhook (required for Civi to Civi sync), you must enable
 
 #### 3. Configure a Mapping
 
-This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. The endpoint for editing the mapping endpoint is at `/civicrm/osdi/mapping`. You will be presented with a page that contains the default contact to OSDI endpoint, which looks like this: 
+This is technically also optional, but it may be useful if you want a different way for certain Civi fields to map to different OSDI objects for different endpoints. The endpoint for editing the mapping endpoint is at `/civicrm/osdi/mapping`. You will be presented with a page that contains the default contact to OSDI endpoint, which looks like this, though the label should say "Server's local time zone": 
 
 ![osdi mapping image](https://raw.githubusercontent.com/4ndygu/civicrm_osdi/master/civicrm_mapping.png)
 
@@ -170,7 +170,80 @@ To support further extractors, there are a few important steps.
 
 - Ensure your new extractor is OSDI compliant
 - Add a new Importer in the `importers/` directory
-- Edit the export functionality in the `Exporter.Bulk` API
 - Edit the import functionality in the `Importer.Import` API
+- Edit the export functionality in the `Exporter.Bulk` API
 - Edit the import functionality in the `CRM/OSDIQueue/Tasks` if your endpoint is managing different groups with the same URL, like actionnetwork
+
+### Ensure your new extractor is OSDI compliant
+
+The motivation for this is obvious -- this is an extension for syncing contacts based on OSDI compliance. This endpoint must support the return of OSDI objects. You can check this [here](https://haltalk.herokuapp.com/explorer/browser.html#/) with the HAL browser. It must accept some form of key in the OSDI-API-Token header.
+
+There also must be *some* way to filter OSDI objects by email or modified date. Both ActionNetwork and this CiviCRM implementation use Odata queries. For more information, look at ActionNetwork's documentation [here](https://actionnetwork.org/docs/v2/#odata).
+
+### Add a new Importer in the `importers/` directory
+
+Most of the import logic is handled via the importer class. Importer classes must inherit from the AbstractImporer class, also in the `importers/` directory. You have to implement the following functions 
+
+ - pull_endpoint_data -- this takes the first page of data (with a pointer to the next page) and loads it into a queue implemented in settings as "extractors"
+ - update_endpoint_data -- this does the same as above, except the first page of data is a filter for all objects whose modified date are since the previous day.
+ - validate_endpoint_data -- not necessary per se, but returns True / False given a query string `required` that returns True if and only if first_name, last_name, email, and all fields in `required` are contained in the object.
+ - is_newest_endpoint_data -- returns True / False by checking if the data provided is NEWER than the data that is stored on the system. 
+ - add_task_with_page -- adds the existing OSDI object to the OSDIQueue that will later run and add these OSDI objects into the database.  
+
+### Edit the import functionality in the `Importer.Import` API
+
+This API seeds an importer based on the endpoint provided. You must change this snippet of code to allow your importer to be used as well. The code is below:
+
+```
+    if (strpos($params["endpoint"], "actionnetwork.org") !== FALSE) {
+      $importer = new ActionNetworkContactImporter("https://actionnetwork.org/api/v2", "x", $params["key"]);
+    }
+    else {
+      $importer = new CiviCRMContactImporter($params["endpoint"], "x", $params["key"]);
+    }
+```
+
+### Edit the export functionality in the `Exporter.Bulk` API
+
+This does not need to change as long as the extractor endpoint is OSDI-compliant. However, if your service is managing different groups with the same URL, like actionnetwork, you must include that as well. This will allow CIVI_ID_ tags that are used to uniquely identify your service to all be labeled with your service name rather than the hash of the service's URL. This is also important to have one consistent mapping for your service. A code snippet is attached:
+
+```
+    $hash = "CIVI_ID_actionnetwork";
+    if (strpos($params["endpoint_root"], "actionnetwork.org") === FALSE) {
+      $hash = "CIVI_ID_" . sha1($params["endpoint_root"]);
+    }
+    $second_key = $params["endpoint"] . $hash;
+```
+
+### Edit the import functionality in the `CRM/OSDIQueue/Tasks` 
+
+This is also done, like above, if your endpoint is managing different groups with the same URL, like ActionNetwork. A code snippet is attached:
+
+```
+    $url = $contactresource->endpoint;
+    if (substr($apikey, 0, 4) != "OSDI") {
+      $url = "actionnetwork";
+    }
+```
+
+```
+    $hash = "CIVI_ID_actionnetwork"; 
+    if (stripos($url, "actionnetwork.org") === FALSE) {
+     $hash = "CIVI_ID_" . sha1($url); 
+    }
+```
+
+```
+    $key = "CIVI_ID_actionnetwork";
+    if (strpos($url, "actionnetwork.org") === FALSE) $key = "CIVI_ID_" . sha1($url);
+```
+
+These three code blocks would change in an extension of the service.
+
+### FAQ
+
+Q: When I press import, nothing happens!
+A: This often might happen because permissions are not set correctly. Go to Settings -> Permissions and enable the OSDI Sample Application: Allow Webhook Posts permissions.
+
+
 

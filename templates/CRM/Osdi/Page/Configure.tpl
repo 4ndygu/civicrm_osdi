@@ -1,27 +1,46 @@
+<div class="crm-block crm-form-block crm-osdi-configure-block">
 <h3>OSDI Launchpad</h3>
-<h2>Import</h2>
+<div class="crm-accordion-wrapper crm-osdi-configure_basic-accordion ">
+<div class="crm-accordion-header active">Import</div>
+<div class="crm-accordion-body">
 <form id="OSDIRequestForm" method="post">
-	<select name="resource">
-		<option value="" disabled="disabled" selected="selected">Please select a resource</option>
-		<option value="1">Contacts</option>
-	</select>
-	<br>
-	<p>OSDI endpoint (root)</p> 
-	<input type="text" name="civiendpoint" id="civiendpoint">
-	<br>
-	<p>API Key:</p> 
-	<input type="text" name="apikey" id="apikey">
-	<br>
-    <p>Rule ID:</p>
-    <input type="text" name="rule" id="rule">
-    <br>
-    <p>Group ID: (this is the ID of a valid group that you are importing INTO)</p>
-    <input type="text" name="group" id="group">
-    <br>
-    <p>Specify Required Fields:</p>
-    <input type="text" name="required" id="required">
-    <p>Time zone:</p>
-    <select name="zone">
+<table class="form-layout">
+  <tr class="crm-osdi-configure-import-resource">
+    <td class="label"><label for="resource">OSDI Import Resource</label></td>
+    <td>
+	    <select class="crm-select2" name="resource">
+		    <option value="" disabled="disabled" selected="selected">Please select a resource</option>
+		    <option value="1">Contacts</option>
+	    </select>
+	    <br />
+    </td>
+  </tr>
+  <tr class="crm-osdi-configure-import-endpoint">
+    <td class="label"><label for="civiendpoint">OSDI endpoint (root)</label></td> 
+	  <td><input type="text" name="civiendpoint" id="civiendpoint"><br /></td>
+  </tr>
+  <tr class="crm-osdi-configure-import-apikey">
+    <td class="label"><label for="apikey">API Key</label></td>
+    <td><input type="text" name="apikey" id="apikey"><br /></td>
+  </tr>
+  <tr class="crm-osdi-configure-import-rule">
+    <td class="label"><label for="rule">Dedupe Rule</label></td>
+    <td><input type="text" name="rule" id="rule"><br /></td>
+  </tr>
+  <tr class="crm-osdi-configure-import-group">
+    <td class="label"><label for="group">Group</label></td>
+    <td><input type="text" name="group" id="group"><br />
+    <span class="description">This is the group you are importing INTO.</span>
+    </td>
+  </tr>
+  <tr class="crm-osdi-configure-import-required">
+    <td class="label"><label for="required">Specify Required Fields</label></td>
+    <td><input type="text" name="required" id="required"></br></td>
+  </tr>
+  <tr class="crm-osdi-configure-import-zone">
+    <td class="label"><label for="zone">Time Zone</label></td>
+    <td>
+    <select class="crm-select2" name="zone">
 		<option timeZoneId="1" gmtAdjustment="GMT-12:00" useDaylightTime="0" value="-12">(GMT-12:00) International Date Line West</option>
 		<option timeZoneId="2" gmtAdjustment="GMT-11:00" useDaylightTime="0" value="-11">(GMT-11:00) Midway Island, Samoa</option>
 		<option timeZoneId="3" gmtAdjustment="GMT-10:00" useDaylightTime="0" value="-10">(GMT-10:00) Hawaii</option>
@@ -105,29 +124,50 @@
 		<option timeZoneId="81" gmtAdjustment="GMT+12:00" useDaylightTime="0" value="12">(GMT+12:00) Fiji, Kamchatka, Marshall Is.</option>
 		<option timeZoneId="82" gmtAdjustment="GMT+13:00" useDaylightTime="0" value="13">(GMT+13:00) Nuku'alofa</option>
     </select>											
-	<button>Import data</button>
+    <br /></td>
+  </tr>
+  <tr><td>
+  <button>Import data</button>
+  </td></tr>
 </form>
-<br>
-<h2>Export</h2>
+</table>
+</div>
+</div>
+<div class="crm-accordion-wrapper crm-osdi-configure_basic-accordion ">
+<div class="crm-accordion-header active">Export</div>
+<div class="crm-accordion-body">
 <form id="OSDIExportForm" method="post">
-	<select name="resource">
-		<option value="" disabled="disabled" selected="selected">Please select a resource</option>
-		<option value="1">Contacts</option>
-	</select>
-	<br>
-	<p>OSDI endpoint</p> 
-	<input type="text" name="civiendpoint" id="civiendpoint">
-        <br>
-	<p>API Key:</p> 
-	<input type="text" name="apikey" id="apikey">
-    <br>
-    <p>Group ID: (this is the ID of the group that you're exporting FROM)</p>
-    <input type="text" name="group" id="group">
-    <br>
-    <p>Specify Required Fields:</p>
-    <input type="text" name="required" id="required">
-    <p>Time zone:</p>
-    <select name="zone">
+<table class="form-layout">
+  <tr class="crm-osdi-configure-export-resource">
+    <td class="label"><label for="resource">OSDI Export Resource</label></td>
+	  <td>
+      <select class="crm-select2" name="resource">
+	 	    <option value="" disabled="disabled" selected="selected">Please select a resource</option>
+		    <option value="1">Contacts</option>
+	    </select><br />
+    <td>
+  </tr>
+  <tr class="crm-osdi-configure-export-civiendpoint">
+    <td class="label"><label for="civiendpoint">OSDI Endpoint</label></td>
+	  <td><input type="text" name="civiendpoint" id="civiendpoint"><br /></td>
+  </tr>
+  <tr class="crm-osdi-configure-export-apikey">
+    <td class="label"><label for="apikey">API Key</label></td>
+	  <td><input type="text" name="apikey" id="apikey"><br /><td>
+  </tr>
+  <tr class="crm-osdi-configure-export-group">
+    <td class="label"><label for="group">Group</label></td>
+    <td><input type="text" name="group" id="group"><br />
+      <span class="description">This is the group you are exporting FROM.</span>
+    </td>
+  </tr>
+  <tr class="crm-osdi-configure-export-required">
+    <td class="label"><label for="required">Specify Required Fields</label></td>
+    <td><input type="text" name="required" id="required"><br /></td>
+  <tr class="crm-osdi-configure-export-zone">
+    <td class="label"><label for="zone">Time Zone</label></td>
+    <td>
+    <select class="crm-select2" name="zone">
 		<option timeZoneId="1" gmtAdjustment="GMT-12:00" useDaylightTime="0" value="-12">(GMT-12:00) International Date Line West</option>
 		<option timeZoneId="2" gmtAdjustment="GMT-11:00" useDaylightTime="0" value="-11">(GMT-11:00) Midway Island, Samoa</option>
 		<option timeZoneId="3" gmtAdjustment="GMT-10:00" useDaylightTime="0" value="-10">(GMT-10:00) Hawaii</option>
@@ -210,13 +250,25 @@
 		<option timeZoneId="80" gmtAdjustment="GMT+12:00" useDaylightTime="1" value="12">(GMT+12:00) Auckland, Wellington</option>
 		<option timeZoneId="81" gmtAdjustment="GMT+12:00" useDaylightTime="0" value="12">(GMT+12:00) Fiji, Kamchatka, Marshall Is.</option>
 		<option timeZoneId="82" gmtAdjustment="GMT+13:00" useDaylightTime="0" value="13">(GMT+13:00) Nuku'alofa</option>
-    </select>											
+    </select><br />
+    </td>
+  </tr>
+  <tr><td>
 	<button>Export data</button>
+  </td><tr/>
 </form>
-
+</table>
+</div>
+</div>
+<div class="crm-accordion-wrapper crm-osdi-configure_basic-accordion ">
+<div class="crm-accordion-header active">General Configuration</div>
+<div class="crm-accordion-body">
+<table class="form-layout">
 <form id="TimeForm" method="post">
-    <p>Time zone of remote server:</p>
-    <select name="zone">
+  <tr class="crm-osdi-configure-server-zone">
+    <td class="label"><label for="zone">Server Local Time Zone</label></td>
+    <td>
+    <select class="crm-select2" name="zone">
 		<option timeZoneId="1" gmtAdjustment="GMT-12:00" useDaylightTime="0" value="-12">(GMT-12:00) International Date Line West</option>
 		<option timeZoneId="2" gmtAdjustment="GMT-11:00" useDaylightTime="0" value="-11">(GMT-11:00) Midway Island, Samoa</option>
 		<option timeZoneId="3" gmtAdjustment="GMT-10:00" useDaylightTime="0" value="-10">(GMT-10:00) Hawaii</option>
@@ -300,11 +352,15 @@
 		<option timeZoneId="81" gmtAdjustment="GMT+12:00" useDaylightTime="0" value="12">(GMT+12:00) Fiji, Kamchatka, Marshall Is.</option>
 		<option timeZoneId="82" gmtAdjustment="GMT+13:00" useDaylightTime="0" value="13">(GMT+13:00) Nuku'alofa</option>
     </select>											
-	<button>Set Remote Time zone</button>
+    <br /></td>
+    <tr><td><button>Set Time Zone</button></td></tr>
 </form>
 
-<button id="SetKey">Update API Key</button>
-
+<tr><td><button id="SetKey">Update API Key</button></td></tr>
+</table>
+</div>
+</div>
+</div>
 {literal}
 <script type="text/javascript">
 
@@ -400,14 +456,14 @@
     CRM.$("#TimeForm").submit(function(e) {
         var data = new Object();
 
-        var formResults = CRM.$("#OSDIRequestForm").serializeArray().map(function(x){
+        var formResults = CRM.$("#TimeForm").serializeArray().map(function(x){
             data[x.name] = x.value;}
         ); 
 
         console.log("calling api");
         console.log(JSON.stringify(data));
         CRM.api3('Importer', 'SetTime', {
-            "server_time_zone": data["zone"]}).done(function(result) {
+            "zone": data["zone"]}).done(function(result) {
                 console.log(result);
                 alert(''.concat("Zone: ", result["values"]["result_zone"], " set successfully."));
             });
@@ -427,6 +483,24 @@
                 alert(result["values"]["message"]);
             }
         });
+    });
+
+    // Use Select2 where appropriate.
+    CRM.$('#rule').crmEntityRef({
+      entity: 'RuleGroup',
+      extra: 'contact_type',
+      api: {params: {is_active: 1}},
+      select: {allowClear:true, minimumInputLength: 0},
+    });
+    CRM.$('.crm-osdi-configure-export-group #group').crmEntityRef({
+      entity: 'Group',
+      api: {params: {is_active: 1}},
+      select: {allowClear:true, minimumInputLength: 0},
+    });
+    CRM.$('.crm-osdi-configure-import-group #group').crmEntityRef({
+      entity: 'Group',
+      api: {params: {is_active: 1}},
+      select: {allowClear:true, minimumInputLength: 0},
     });
 </script>
 {/literal}
