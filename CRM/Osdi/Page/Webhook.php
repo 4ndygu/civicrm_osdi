@@ -36,7 +36,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
    *
    */
   public function run() {
-
+    header('Content-Type:application/hal+json', TRUE);
     // Check CMS's permission for (presumably) anonymous users.
     if (CRM_Core_Config::singleton()->userPermissionClass->isModulePermissionSupported() && !CRM_Osdi_Permission::check('allow webhook posts')) {
       header('Content-Type:application/hal+json', TRUE, 500);
@@ -65,7 +65,7 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
     if ($object == NULL) {
       header('Content-Type:application/hal+json', TRUE, 500);
-      print "Missing allow webhook posts permission.";
+      print "Missing allow webhook posts permission, no Object header set";
       CRM_Utils_System::civiExit();
 
       // parent::run();
@@ -88,6 +88,8 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
 
       header('Content-Type:application/hal+json', TRUE, 200);
       print json_encode($result["values"]);
+      CRM_Utils_System::civiExit();
+      return;
     }
     elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $contact = json_decode(file_get_contents('php://input'), TRUE);
@@ -211,6 +213,8 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
         }
         header('Content-Type:application/hal+json', TRUE, 200);
         print json_encode(convertContactOSDI($result["values"][0], array()), JSON_PRETTY_PRINT);
+        CRM_Utils_System::civiExit();
+        return;
       }
     }
 
