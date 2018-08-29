@@ -212,8 +212,9 @@ class CRM_Osdi_Page_Webhook extends CRM_Core_Page {
           }
         }
         header('Content-Type:application/hal+json', TRUE, 200);
-	print json_encode(convertContactOSDI($result["values"][0], array()), JSON_PRETTY_PRINT);
-	return;
+        print json_encode(convertContactOSDI($result["values"][0], array()), JSON_PRETTY_PRINT);
+        CRM_Utils_System::civiExit();
+        return;
       }
     }
 
