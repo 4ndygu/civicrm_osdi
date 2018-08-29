@@ -207,7 +207,7 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
             // clear the relevant session data
             // Use a sha1 of the key with the endpoint to find our identifier.
             // change the hash to the URL if Civi, key if actionnetwork
-            $hash = "CIVI_ID_actionnetwork";
+            $hash = "CIVI_ID_actionnetwork_" . sha1($params["key"]);
             if (strpos($params["rootendpoint"], "actionnetwork.org") === FALSE) {
               $hash = "CIVI_ID_" . sha1($params["rootendpoint"]);
             }
