@@ -205,13 +205,11 @@
             if ("values" in result) {
                 if ("error_message" in result["values"]) CRM.alert(result["values"]["error_message"]);
             }
+            if (!edit) {
+                // redirect to mapping
+                window.location.href = "/civicrm/osdi/mapping?change=1&endpoint=" + rootendpoint.val();
+            }
         });
-
-        if (!edit) {
-            // redirect to mapping
-            window.location.href = "/civicrm/osdi/mapping?change=1&endpoint=" + rootendpoint.val();
-
-        }
 
         dialog.dialog( "close" );
     }

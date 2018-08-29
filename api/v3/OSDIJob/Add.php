@@ -193,7 +193,7 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
           $returnValues["error_message"] = "this name is not unique.";
           return civicrm_api3_create_success($returnValues, $params, 'OSDIJob', 'Add');
         } else {
-          // we have to DELETE the onetime job, so exportonceparams can live
+          // we have to DELETE the onetime job, so exportonceparams can live (if one exists)
           $results_onetime = civicrm_api3('Job', 'get', [
             'name' => "OSDISYNC_EXPORT_ONETIME_" . $params["name"],
             'sequential' => 1
