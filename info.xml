@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="com.example.osdi" type="module">
   <file>osdi</file>
-  <name>OSDI sample application</name>
-  <description>FIXME</description>
+  <name>OSDI Contact Sync</name>
+  <description>An application for syncing CiviCRM contacts through the OSDI format.</description>
   <license>AGPL-3.0</license>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -12,9 +12,9 @@
     <email>andygu@usc.edu</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Main Extension Page">https://github.com/4ndygu/civicrm_osdi</url>
+    <url desc="Documentation">https://github.com/4ndygu/civicrm_osdi/blob/master/docs/index.md</url>
+    <url desc="Support">https://github.com/4ndygu/civicrm_osdi/blob/master/docs/index.md</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2018-04-27</releaseDate>
