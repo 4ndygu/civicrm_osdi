@@ -16,7 +16,7 @@
     </td>
   </tr>
   <tr class="crm-osdi-configure-import-endpoint">
-    <td class="label"><label for="civiendpoint">OSDI endpoint (/people endpoint)</label></td> 
+    <td class="label"><label for="civiendpoint">OSDI endpoint (/people or /webhook endpoint)</label></td> 
 	  <td><input type="text" name="civiendpoint" id="civiendpoint"><br /></td>
   </tr>
   <tr class="crm-osdi-configure-import-apikey">
@@ -440,7 +440,8 @@
                 "rule": rule, 
                 "required": data["required"],
                 "endpoint": endpoint}).done(function(result) {
-                    console.log(result["values"]);
+                    console.log(result);
+
                     var returnedCount = result["values"]["count"];
                     if (returnedCount == 0) {
                         CRM.alert("Jobs added to queue successfully.");
