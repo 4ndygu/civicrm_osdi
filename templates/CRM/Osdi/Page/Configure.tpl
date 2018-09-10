@@ -16,7 +16,7 @@
     </td>
   </tr>
   <tr class="crm-osdi-configure-import-endpoint">
-    <td class="label"><label for="civiendpoint">OSDI endpoint (root)</label></td> 
+    <td class="label"><label for="civiendpoint">OSDI endpoint (/people or /webhook endpoint)</label></td> 
 	  <td><input type="text" name="civiendpoint" id="civiendpoint"><br /></td>
   </tr>
   <tr class="crm-osdi-configure-import-apikey">
@@ -379,13 +379,6 @@
 		); 
 
         var endpoint = data["civiendpoint"];
-		var endpointroot = data["civiendpoint"];
-        if (endpoint.indexOf("actionnetwork.org") !== -1) {
-		    endpointroot = endpointroot.substring(0, endpointroot.indexOf("/people"));
-        } else {
-		    endpointroot = endpointroot.substring(0, endpointroot.indexOf("/civicrm"))
-			    + "/civicrm";
-        }
 
         if (data["resource"] == 1) {
             e.preventDefault();
@@ -395,7 +388,6 @@
             CRM.api3('Exporter', 'bulk', {
                 "zone": data["zone"],
                 "allow_restart": 1,
-                "endpoint_root": endpointroot,
                 "group": data["group"],
                 "required": data["required"],
                 "key": data["apikey"],
@@ -440,7 +432,8 @@
                 "rule": rule, 
                 "required": data["required"],
                 "endpoint": endpoint}).done(function(result) {
-                    console.log(result["values"]);
+                    console.log(result);
+
                     var returnedCount = result["values"]["count"];
                     if (returnedCount == 0) {
                         CRM.alert("Jobs added to queue successfully.");

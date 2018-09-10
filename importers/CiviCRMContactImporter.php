@@ -35,7 +35,7 @@ class CiviCRMContactImporter extends AbstractContactImporter {
       'Content-Type' => "application/hal+json",
     ));
 
-    $this->entrypoint = new EntryPoint('/osdi/webhook', $this->client);
+    $this->entrypoint = new EntryPoint('', $this->client);
 
     // Seed a client in Guzzle to craft raw queries.
     $this->raw_client = new Client();
@@ -48,8 +48,14 @@ class CiviCRMContactImporter extends AbstractContactImporter {
    *
    */
   public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
+    // figure out separator based on the CMS engine
+    $separator = "?";
+    if (strpos($this->endpoint, '?') !== false) {
+      $separator = "&";    
+    }
+    
     // TODO: sanitize this input later.
-    $query_string = "/osdi/webhook?filter=modified_date gt '" . $date . "'";
+    $query_string = $separator . "filter=modified_date gt '" . $date . "'";
     $full_uri = $this->endpoint . $query_string;
 
     $response = $this->raw_client->request('GET', $full_uri, [
