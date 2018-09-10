@@ -16,7 +16,7 @@
     </td>
   </tr>
   <tr class="crm-osdi-configure-import-endpoint">
-    <td class="label"><label for="civiendpoint">OSDI endpoint (root)</label></td> 
+    <td class="label"><label for="civiendpoint">OSDI endpoint (/people endpoint)</label></td> 
 	  <td><input type="text" name="civiendpoint" id="civiendpoint"><br /></td>
   </tr>
   <tr class="crm-osdi-configure-import-apikey">
