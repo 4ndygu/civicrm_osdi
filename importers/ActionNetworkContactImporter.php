@@ -49,7 +49,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
   public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
     // figure out separator based on the CMS engine
     $separator = "?";
-    if (strpos($this->endpoint, '?') !== false {
+    if (strpos($this->endpoint, '?') !== false) {
       $separator = "&";    
     }
 
