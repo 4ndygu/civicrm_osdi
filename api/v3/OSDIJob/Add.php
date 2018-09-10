@@ -231,9 +231,6 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
       if ($params["signupendpoint"] != "") {
         $exportonceparams[] = "endpoint=" . $params["signupendpoint"];
       }
-      if ($params["rootendpoint"] != "") {
-        $exportonceparams[] = "endpoint_root=" . $params["rootendpoint"];
-      }
       $exportonceparams[] = "allow_restart=0";
       if ($params["groupid"] != "") {
         $exportonceparams[] = "group=" . $params["groupid"];
@@ -268,9 +265,6 @@ function civicrm_api3_o_s_d_i_job_Add($params) {
       }
       if ($params["signupendpoint"] != "") {
         $exportmanyparams[] = "endpoint=" . $params["signupendpoint"];
-      }
-      if ($params["rootendpoint"] != "") {
-        $exportmanyparams[] = "endpoint_root=" . $params["rootendpoint"];
       }
       $exportmanyparams[] = "allow_restart=1";
       if ($params["groupid"] != "") {

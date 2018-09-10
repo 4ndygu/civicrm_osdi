@@ -17,10 +17,6 @@
         <option value="0" disabled="disabled">Imported Resource</option>
         <option value="1" selected="selected">Contacts</option>
       </select>
-      <br>
-      <label for="rootendpoint">Sync Endpoint (root)</label>
-      <input type="text" name="rootendpoint" id="rootendpoint" class="text ui-widget-content ui-corner-all" value="localhost/civicrm">
-      <br>
       <label for="signupendpoint">Sync Endpoint (Person Signup Helper)</label>
       <input type="text" name="signupendpoint" id="signupendpoint" class="text ui-widget-content ui-corner-all" value="localhost/civicrm/osdi/webhook">
       <br>
@@ -173,7 +169,6 @@
     function addJob() {
         jobname = CRM.$("#name");
         resource = CRM.$("select#resource option:checked");
-        rootendpoint = CRM.$("#rootendpoint");
         signupendpoint = CRM.$("#signupendpoint");
         peopleendpoint = CRM.$("#peopleendpoint");
         groupid = CRM.$("#groupid");
@@ -187,7 +182,7 @@
         CRM.api3('OSDIJob', 'Add', {
             "name": jobname.val(),
             "resource": resource.val(),
-            "rootendpoint": rootendpoint.val(),
+            "rootendpoint": peopleendpoint.val(),
             "signupendpoint": signupendpoint.val(),
             "peopleendpoint": peopleendpoint.val(),
             "groupid": groupid.val(),
@@ -207,7 +202,7 @@
             }
             if (!edit) {
                 // redirect to mapping
-                window.location.href = "/civicrm/osdi/mapping?change=1&endpoint=" + rootendpoint.val();
+                window.location.href = "/civicrm/osdi/mapping?change=1&endpoint=" + peopleendpoint.val();
             }
         });
 
@@ -222,7 +217,7 @@
     CRM.$('[id^="edit_"]').click(function() {
         jobname = CRM.$("#name");
         resource = CRM.$("select#resource option:checked");
-        rootendpoint = CRM.$("#rootendpoint");
+        rootendpoint = CRM.$("#peopleendpoint");
         signupendpoint = CRM.$("#signupendpoint");
         peopleendpoint = CRM.$("#peopleendpoint");
         groupid = CRM.$("#groupid");
@@ -273,7 +268,6 @@
                 if ("zone" in parameterarray) CRM.$("#timezone")[0].selectedIndex
                     = parseInt(parameterarray["zone"], 10) + 13;
                 if ("required" in parameterarray) reqfields.val(parameterarray["required"]);
-                rootendpoint.val(parameterarray["endpoint"]);
                 key.val(parameterarray["key"]);
             }
         });

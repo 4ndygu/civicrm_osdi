@@ -379,13 +379,6 @@
 		); 
 
         var endpoint = data["civiendpoint"];
-		var endpointroot = data["civiendpoint"];
-        if (endpoint.indexOf("actionnetwork.org") !== -1) {
-		    endpointroot = endpointroot.substring(0, endpointroot.indexOf("/people"));
-        } else {
-		    endpointroot = endpointroot.substring(0, endpointroot.indexOf("/civicrm"))
-			    + "/civicrm";
-        }
 
         if (data["resource"] == 1) {
             e.preventDefault();
@@ -395,7 +388,6 @@
             CRM.api3('Exporter', 'bulk', {
                 "zone": data["zone"],
                 "allow_restart": 1,
-                "endpoint_root": endpointroot,
                 "group": data["group"],
                 "required": data["required"],
                 "key": data["apikey"],

@@ -22,7 +22,6 @@ include "Export.php";
 function _civicrm_api3_exporter_Bulk_spec(&$spec) {
   $spec['key']['api.required'] = 1;
   $spec['endpoint']['api.required'] = 1;
-  $spec['endpoint_root']['api.required'] = 1;
   $spec['allow_restart']['api.required'] = 0;
   $spec['group']['api.required'] = 0;
   $spec['updatejob']['api.required'] = 0;
@@ -105,8 +104,8 @@ function civicrm_api3_exporter_Bulk($params) {
   // Use a sha1 of the key with the endpoint to generate our identifier.
   // change the hash to the URL if Civi, key if actionnetwork
   $hash = "CIVI_ID_actionnetwork_" . sha1($params["key"]);
-  if (strpos($params["endpoint_root"], "actionnetwork.org") === FALSE) {
-    $hash = "CIVI_ID_" . sha1($params["endpoint_root"]);
+  if (strpos($params["updateendpoint"], "actionnetwork.org") === FALSE) {
+    $hash = "CIVI_ID_" . sha1($params["updateendpoint"]);
   }
   $second_key = $params["endpoint"] . $hash;
 
