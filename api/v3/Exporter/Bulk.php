@@ -216,7 +216,7 @@ function civicrm_api3_exporter_Bulk($params) {
         $url = "actionnetwork";
       }
       else {
-        $url = $params["endpoint_root"];
+        $url = $params["endpoint"];
       }
 
       if (validate_array_data($contact, $params["required"]) and $newer) {
