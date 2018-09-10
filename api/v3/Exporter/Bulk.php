@@ -279,7 +279,12 @@ function civicrm_api3_exporter_Bulk($params) {
 function contact_newer($contact, $updateendpoint, $key, $zone) {
   $cividate = $contact["modified_date"];
 
-  $query_string = $updateendpoint . "?filter=email_address eq '" . $contact["email"] . "'";
+  $separator = "?";
+  if (strpos($updateendpoint, '?') !== false) {
+    $separator = "&";
+  }
+
+  $query_string = $updateendpoint . $separator . "filter=email_address eq '" . $contact["email"] . "'";
 
   $raw_client = new Client();
   $response = $raw_client->request('GET', $query_string, [
