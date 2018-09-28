@@ -108,6 +108,12 @@ function civicrm_api3_importer_Schedule($params) {
 
   // for storing the next object
   $entryobject = array();
+  if (array_key_exists("next", $root->getLinks())) {
+    if (array_key_exists("href", $root->getLinks()["next"])) {
+      $entryobject["endpoint"] = $root->getLinks()["next"]["href"];
+      $entryobject["headers"] = $rootdata->resource["headers"];
+    }
+  }
 
   for ($i = 0; $i <= 10; $i++) {
     $people = $root->get('osdi:people');
@@ -147,10 +153,7 @@ function civicrm_api3_importer_Schedule($params) {
       // ActionNetworkContactImporter::merge_task_with_page($rootdata->rule);.
       CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
       return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
-    } else {
-      $entryobject["endpoint"] = $root->getLinks()["next"]["href"];
-      $entryobject["headers"] = $rootdata->resource["headers"];
-    }
+    } 
   }
 
   // In this case, we still got stuff to do! so im gonna put it back into the array.
