@@ -17,6 +17,7 @@ abstract class AbstractContactImporter {
   protected $apikey;
   protected $client;
   protected $entrypoint;
+  protected $endpath;
 
   /**
    * For raw http requests.
@@ -43,7 +44,13 @@ abstract class AbstractContactImporter {
       $extractors = array();
     }
 
-    $final_data = new ResourceStruct($resource_root, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
+    $entryobject = array();
+
+    $entryobject["endpoint"] = $this->endpoint . $this->endpath;
+    $entryobject["headers"] = $this->headers;
+
+    $final_data = new ResourceStruct($entryobject, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
+
     $extractors[] = serialize($final_data);
 
     Civi::settings()->set("extractors", $extractors);

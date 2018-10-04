@@ -27,13 +27,15 @@ class CiviCRMContactImporter extends AbstractContactImporter {
     $this->endpoint = $endpoint;
     $this->schema = $schema;
     $this->apikey = $apikey;
-
-    // Create a HttpClient to perform http request.
-    $this->client = new FileGetContentsHttpClient($this->endpoint, array(
+    $this->endpath = "/osdi/webhook";
+    $this->headers = [
       'OSDI-API-Token' => $this->apikey,
       'Object' => 'Contact',
       'Content-Type' => "application/hal+json",
-    ));
+    ];
+
+    // Create a HttpClient to perform http request.
+    $this->client = new FileGetContentsHttpClient($this->endpoint, $this->headers);
 
     $this->entrypoint = new EntryPoint('/osdi/webhook', $this->client);
 
@@ -45,27 +47,43 @@ class CiviCRMContactImporter extends AbstractContactImporter {
   }
 
   /**
+   * given a URL, request the relevant object
+   */
+  public function request_object($full_uri) {
+    $response = $this->raw_client->request('GET', $full_uri, [
+     'headers' => $this->headers
+    ]);
+    
+    // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
+    $response_string = $response->getBody()->getContents();
+    $data = json_decode($response_string, TRUE);
+    $data = Resource::create($this->client, $data);
+
+    return $data;
+  }
+
+  /**
    *
    */
   public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
     // TODO: sanitize this input later.
+    // The actual heavy lifting is done by the request_object function, but we 
+    // want any errors to throw first. 
     $query_string = "/osdi/webhook?filter=modified_date gt '" . $date . "'";
     $full_uri = $this->endpoint . $query_string;
-
     $response = $this->raw_client->request('GET', $full_uri, [
-      'headers' => [
-        'OSDI-API-Token' => $this->apikey,
-        'Object' => 'Contact',
-        'Content-Type' => "application/hal+json",
-      ],
+      'headers' => $this->headers
     ]);
-
     // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
     $response_string = $response->getBody()->getContents();
     $data = json_decode($response_string, TRUE);
-
     $data = Resource::create($this->client, $data);
-    $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
+
+    $entryobject = array();
+    $entryobject["endpoint"] = $full_uri;
+    $entryobject["headers"] = $this->headers;
+
+    $final_data = new ResourceStruct($entryobject, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
 
     // Shunt the root into the queue.
     $extractors = Civi::settings()->get("extractors");

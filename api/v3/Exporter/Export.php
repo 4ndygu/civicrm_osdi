@@ -159,7 +159,9 @@ function civicrm_api3_exporter_Export($params) {
     // nextPage.
     $config = CRM_Core_Config::singleton();
     $paramscopy = $params;
-    $response["_links"]["self"] = CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE);
+    $response["_links"]["self"] = array(
+      "href" => CRM_Utils_System::url("civicrm/osdi/webhook", URLformat($paramscopy), TRUE, NULL, FALSE, TRUE)
+    );
     if (!$singleuser) {
       $paramscopy["page"]++;
       $nextarray = array();

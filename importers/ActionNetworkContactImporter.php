@@ -27,6 +27,11 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
     $this->endpoint = $endpoint;
     $this->schema = $schema;
     $this->apikey = $apikey;
+    $this->endpath = "/people";
+    $this->headers =  [
+      'OSDI-API-Token' => $this->apikey,
+      'Content-Type' => "application/json"
+    ];
 
     // Create a HttpClient to perform http request.
     $this->client = new FileGetContentsHttpClient($this->endpoint, array(
@@ -44,6 +49,22 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
   }
 
   /**
+   * given a URL, request the relevant object
+   */
+  public function request_object($full_uri) {
+    $response = $this->raw_client->request('GET', $full_uri, [
+     'headers' => $this->headers
+    ]);
+    
+    // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
+    $response_string = $response->getBody()->getContents();
+    $data = json_decode($response_string, TRUE);
+    $data = Resource::create($this->client, $data);
+
+    return $data;
+  }
+
+  /**
    *
    */
   public function update_endpoint_data($date, $filter = NULL, $rule = NULL, $group = -1, $zone = 0) {
@@ -52,10 +73,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
     $full_uri = $this->endpoint . $query_string;
 
     $response = $this->raw_client->request('GET', $full_uri, [
-      'headers' => [
-        'OSDI-API-Token' => $this->apikey,
-        'Content-Type' => "application/json",
-      ],
+      'headers' => $this->headers
     ]);
 
     // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
@@ -64,7 +82,12 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
     $data = json_decode($response_string, TRUE);
 
     $data = Resource::create($this->client, $data);
-    $final_data = new ResourceStruct($data, $rule, $filter, $group, $zone, $this->apikey, "");
+
+    $entryobject = array();
+    $entryobject["endpoint"] = $full_uri;
+    $entryobject["headers"] = $this->headers;
+
+    $final_data = new ResourceStruct($entryobject, $rule, $filter, $group, $zone, $this->apikey, "");
 
     // Shunt the root into the queue.
     $extractors = Civi::settings()->get("extractors");
