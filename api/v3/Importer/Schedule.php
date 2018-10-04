@@ -76,6 +76,7 @@ function civicrm_api3_importer_Schedule($params) {
   $malformed = FALSE;
   if (is_string($to_unserialize)) {
     $rootdata = unserialize($to_unserialize);
+    // actually convert $rootdata into a data point
   }
   else {
     $malformed = TRUE;

@@ -89,7 +89,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
     $headerobject = var_dump($data)["client"]["defaultHeaders"];
     $entryobject["headers"] = $headerobject;
 
-    $final_data = new ResourceStruct($headerobject, $rule, $filter, $group, $zone, $this->apikey, "");
+    $final_data = new ResourceStruct($entryobject, $rule, $filter, $group, $zone, $this->apikey, "");
 
     // Shunt the root into the queue.
     $extractors = Civi::settings()->get("extractors");
