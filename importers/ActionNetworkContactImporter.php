@@ -27,6 +27,11 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
     $this->endpoint = $endpoint;
     $this->schema = $schema;
     $this->apikey = $apikey;
+    $this->endpath = "/people";
+    $this->headers =  [
+      'OSDI-API-Token' => $this->apikey,
+      'Content-Type' => "application/json"
+    ];
 
     // Create a HttpClient to perform http request.
     $this->client = new FileGetContentsHttpClient($this->endpoint, array(
@@ -48,10 +53,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
    */
   public function request_object($full_uri) {
     $response = $this->raw_client->request('GET', $full_uri, [
-     'headers' => [
-        'OSDI-API-Token' => $this->apikey,
-        'Content-Type' => "application/json",
-      ],
+     'headers' => $this->headers
     ]);
     
     // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
@@ -71,10 +73,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
     $full_uri = $this->endpoint . $query_string;
 
     $response = $this->raw_client->request('GET', $full_uri, [
-      'headers' => [
-        'OSDI-API-Token' => $this->apikey,
-        'Content-Type' => "application/json",
-      ],
+      'headers' => $this->headers
     ]);
 
     // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
@@ -86,8 +85,7 @@ class ActionNetworkContactImporter extends AbstractContactImporter {
 
     $entryobject = array();
     $entryobject["endpoint"] = $full_uri;
-    $headerobject = var_dump($data)["client"]["defaultHeaders"];
-    $entryobject["headers"] = $headerobject;
+    $entryobject["headers"] = $this->headers;
 
     $final_data = new ResourceStruct($entryobject, $rule, $filter, $group, $zone, $this->apikey, "");
 

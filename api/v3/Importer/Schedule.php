@@ -7,6 +7,7 @@
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
+use Ekino\HalClient\HttpClient\FileGetContentsHttpClient;
 use Ekino\HalClient\Resource;
 use GuzzleHttp\Client;
 
@@ -32,6 +33,7 @@ function _civicrm_api3_importer_Schedule_spec(&$spec) {
 */
 function buildRequest($entryobject) {
   $raw_client = new Client();
+  $full_client = new FileGetContentsHttpClient($entryobject["endpoint"], $entryobject["headers"]);
 
   $response = $raw_client->request('GET', $entryobject["endpoint"], [
     'headers' => $entryobject["headers"]
@@ -40,7 +42,7 @@ function buildRequest($entryobject) {
   // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
   $response_string = $response->getBody()->getContents();
   $data = json_decode($response_string, TRUE);
-  $data = Resource::create($this->client, $data);
+  $data = Resource::create($full_client, $data);
 
   return $data;
 }
@@ -105,6 +107,9 @@ function civicrm_api3_importer_Schedule($params) {
   // Add the relevant contacts that can be added to the queue.
   $returnValues["person"] = array();
 
+  // for storing the next object
+  $entryobject = array();
+
   for ($i = 0; $i <= 10; $i++) {
     $people = $root->get('osdi:people');
     if ($people == NULL) {
@@ -143,20 +148,20 @@ function civicrm_api3_importer_Schedule($params) {
       // ActionNetworkContactImporter::merge_task_with_page($rootdata->rule);.
       CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
       return civicrm_api3_create_success($returnValues, $params, 'Importer', 'schedule');
-    }
+    } 
   }
 
+  if (array_key_exists("next", $root->getLinks())) {
+    if (array_key_exists("href", $root->getLinks()["next"])) {
+      $entryobject["endpoint"] = $root->getLinks()["next"]["href"];
+      $entryobject["headers"] = $rootdata->resource["headers"];
+    }
+  }
   // In this case, we still got stuff to do! so im gonna put it back into the array.
   // i throw it into tthe back to prevent starvation in event of multiple extractors.
   CRM_Core_Session::setStatus('adding contacts to pipeline', 'Queue task', 'success');
 
-  $rootarray = var_dump($root);
-  $entryobject = array();
-  $entryobject["endpoint"] = $rootarray["self"]["href"];
-  $headerobject = $rootarray["client"]["defaultHeaders"];
-  $entryobject["headers"] = $headerobject;
-
-  $returned_data = new ResourceStruct($entrypoint, $rootdata->rule, $rootdata->filter, $rootdata->group, $zone, $apikey, $rootdata->endpoint);
+  $returned_data = new ResourceStruct($entryobject, $rootdata->rule, $rootdata->filter, $rootdata->group, $zone, $apikey, $rootdata->endpoint);
 
   $extractors = Civi::settings()->get("extractors");
   $extractors[] = serialize($returned_data);

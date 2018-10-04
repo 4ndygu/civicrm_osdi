@@ -17,6 +17,7 @@ abstract class AbstractContactImporter {
   protected $apikey;
   protected $client;
   protected $entrypoint;
+  protected $endpath;
 
   /**
    * For raw http requests.
@@ -43,13 +44,10 @@ abstract class AbstractContactImporter {
       $extractors = array();
     }
 
-    $request_metadata = array();
-    $request_metadata["baseurl"] = $this->entrypoint;
-
     $entryobject = array();
-    $entryobject["endpoint"] = $this->endpoint;
-    $headerobject = var_dump($resource_root)["client"]["defaultHeaders"];
-    $entryobject["headers"] = $headerobject;
+
+    $entryobject["endpoint"] = $this->endpoint . $this->endpath;
+    $entryobject["headers"] = $this->headers;
 
     $final_data = new ResourceStruct($entryobject, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
 

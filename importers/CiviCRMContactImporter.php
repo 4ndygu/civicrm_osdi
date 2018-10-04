@@ -27,13 +27,15 @@ class CiviCRMContactImporter extends AbstractContactImporter {
     $this->endpoint = $endpoint;
     $this->schema = $schema;
     $this->apikey = $apikey;
-
-    // Create a HttpClient to perform http request.
-    $this->client = new FileGetContentsHttpClient($this->endpoint, array(
+    $this->endpath = "/osdi/webhook";
+    $this->headers = [
       'OSDI-API-Token' => $this->apikey,
       'Object' => 'Contact',
       'Content-Type' => "application/hal+json",
-    ));
+    ];
+
+    // Create a HttpClient to perform http request.
+    $this->client = new FileGetContentsHttpClient($this->endpoint, $this->headers);
 
     $this->entrypoint = new EntryPoint('/osdi/webhook', $this->client);
 
@@ -49,11 +51,7 @@ class CiviCRMContactImporter extends AbstractContactImporter {
    */
   public function request_object($full_uri) {
     $response = $this->raw_client->request('GET', $full_uri, [
-     'headers' => [
-       'OSDI-API-Token' => $this->apikey,
-       'Object' => 'Contact',
-       'Content-Type' => "application/hal+json"
-      ],
+     'headers' => $this->headers
     ]);
     
     // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
@@ -74,11 +72,7 @@ class CiviCRMContactImporter extends AbstractContactImporter {
     $query_string = "/osdi/webhook?filter=modified_date gt '" . $date . "'";
     $full_uri = $this->endpoint . $query_string;
     $response = $this->raw_client->request('GET', $full_uri, [
-      'headers' => [
-        'OSDI-API-Token' => $this->apikey,
-        'Object' => 'Contact',
-        'Content-Type' => "application/hal+json",
-      ],
+      'headers' => $this->headers
     ]);
     // Wrap everything into a hal-client resource so nobody knows I used Guzzle.
     $response_string = $response->getBody()->getContents();
@@ -87,8 +81,7 @@ class CiviCRMContactImporter extends AbstractContactImporter {
 
     $entryobject = array();
     $entryobject["endpoint"] = $full_uri;
-    $headerobject = var_dump($data)["client"]["defaultHeaders"];
-    $entryobject["headers"] = $headerobject;
+    $entryobject["headers"] = $this->headers;
 
     $final_data = new ResourceStruct($entryobject, $rule, $filter, $group, $zone, $this->apikey, $this->endpoint);
 
