@@ -45,6 +45,7 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
         $params = explode("=", $parameter);
         if ($params[0] == "group") {
           if ($params[1] != "") {
+            $params[1] = is_int($params[1]) ?: (int) $params[1];
             $results = civicrm_api3("Group", "get", [
               "sequential" => 1,
               "id" => $params[1]
@@ -57,6 +58,7 @@ class CRM_Osdi_Page_OSDIJob extends CRM_Core_Page {
         }
         if ($params[0] == "rule") {
           if ($params[1] != "") {
+            $params[1] = is_int($params[1]) ?: (int) $params[1];            
             $rulegetresults = civicrm_api3("Rule", "get", [
               "sequential" => 1,
               "dedupe_rule_group_id" => $params[1]
