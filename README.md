@@ -28,7 +28,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
 cd <extension-dir>
-cv dl com.example.osdi@https://github.com/FIXME/com.example.osdi/archive/master.zip
+cv dl com.example.osdi@https://github.com/4ndygu/civicrm_osdi/archive/master.zip
 ```
 
 ## Installation (CLI, Git)
