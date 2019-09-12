@@ -16,8 +16,8 @@
     </td>
   </tr>
   <tr class="crm-osdi-configure-import-endpoint">
-    <td class="label"><label for="civiendpoint">OSDI endpoint (root)</label></td> 
-	  <td><input type="text" name="civiendpoint" id="civiendpoint"><br /></td>
+    <td class="label"><label for="civiendpointimport">OSDI endpoint (root)</label></td> 
+	  <td><input type="text" name="civiendpointimport" id="civiendpointimport"><br /></td>
   </tr>
   <tr class="crm-osdi-configure-import-apikey">
     <td class="label"><label for="apikey">API Key</label></td>
@@ -428,7 +428,7 @@
         var rule = -1;
         if (isInt(data["rule"])) { rule = data["rule"]; }
 
-        var endpoint = data["civiendpoint"];
+        var endpoint = data["civiendpointimport"];
 
         if (data["resource"] == 1) {
             console.log("calling api");
