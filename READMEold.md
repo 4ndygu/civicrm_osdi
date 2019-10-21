@@ -1,3 +1,17 @@
+Hello,
+
+We have moved the project space for [this extension] to CiviCRM's Gitlab.
+This includes both the issue tracking and support, and merge requests.
+
+The new URL is: https://lab.civicrm.org/extensions/civicrm_osdi
+
+All issues have been migrated to: https://lab.civicrm.org/extensions/civicrm_osdi/issues
+
+If you do not already have an account on CiviCRM's Gitlab, you can create an account
+by registering on https://civicrm.org/user
+
+Thank you!
+
 # com.example.osdi
 
 This is an extension for importing from and exporting to OSDI endpoints from CiviCRM. We suport syncs for Contact resources between CiviCRM to CiviCRM instances, as well as ActionNetwork to CiviCRM instances. Syncs are updated every day automatically through jobs that take groups of contacts on a remote instance of CiviCRM / ActionNetwork and ensure that these contacts are store and up to date on the host CiviCRM instance. All actions are negotiated through the OSDI implementation, and this extension provides an OSDI API endpoint to access contact instances through an OSDI format. 
