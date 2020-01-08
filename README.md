@@ -1,17 +1,3 @@
-Hello,
-
-We have moved the project space for [this extension] to CiviCRM's Gitlab.
-This includes both the issue tracking and support, and merge requests.
-
-The new URL is: https://lab.civicrm.org/extensions/civicrm_osdi
-
-All issues have been migrated to: https://lab.civicrm.org/extensions/civicrm_osdi/issues
-
-If you do not already have an account on CiviCRM's Gitlab, you can create an account
-by registering on https://civicrm.org/user
-
-Thank you!
-
 # com.example.osdi
 
 This is an extension for importing from and exporting to OSDI endpoints from CiviCRM. We suport syncs for Contact resources between CiviCRM to CiviCRM instances, as well as ActionNetwork to CiviCRM instances. Syncs are updated every day automatically through jobs that take groups of contacts on a remote instance of CiviCRM / ActionNetwork and ensure that these contacts are store and up to date on the host CiviCRM instance. All actions are negotiated through the OSDI implementation, and this extension provides an OSDI API endpoint to access contact instances through an OSDI format. 
@@ -45,6 +31,9 @@ cd <extension-dir>
 cv dl com.example.osdi@https://github.com/4ndygu/civicrm_osdi/archive/master.zip
 ```
 
+Make sure to install the dependencies as well, by invoking `composer install`.
+
+
 ## Installation (CLI, Git)
 
 Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
@@ -54,6 +43,8 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 git clone https://github.com/FIXME/com.example.osdi.git
 cv en osdi
 ```
+
+Make sure to install the dependencies as well, by invoking `composer install`.
 
 ## Usage
 
@@ -147,6 +138,7 @@ You can set update as a scheduled job that runs daily.
 ### A generic OSDI-compliant endpoint.
 
 You can find it at `/civicrm/osdi/response?object=contact`. This is currently still in alpha, but it allows users to page through all users with emails, first, and last names. I suppose everything here is in alpha, but this endpoint is currently in even more alpha than the above task.
+
 ## Known Issues
 
 (* FIXME *)
