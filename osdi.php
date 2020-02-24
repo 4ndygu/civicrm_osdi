@@ -350,6 +350,14 @@ function osdi_civicrm_navigationMenu(&$menu) {
     'operator' => 'OR',
     'separator' => 0,
   ));
+  _osdi_civix_insert_navigation_menu($menu, 'Contacts', array(
+    'label' => E::ts('OSDI Mapping'),
+    'name' => 'OSDI Mapping',
+    'url' => 'civicrm/osdi/mapping',
+    'permission' => 'access CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ));
   _osdi_civix_navigationMenu($menu);
 } 
 
